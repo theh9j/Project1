@@ -1,0 +1,34 @@
+Game Description
+Game name: Magic Sort
+
+Foundation:
+
+Currency:
+User has 5 lives and they can re-generate one by 30 minutes, alternatively, they can regain each heart by paying coins or watching an ad. Once their hearts each 5 count, no more can be gained.
+User has currency which increases by level completion (harder levels should give more coins)
+
+Game experience:
+User can pour liquid of similar color to each other, liquid cannot be poured in a bottle if color of liquid is not the same or bottle has already counted to 4 (max liquid)
+User has 3 types of supports -> Undo, Shuffle (shuffle selected bottle colors), Add empty bottle (from bottom right)
+Each support types are free for the first 3 uses, after that it will cost coins
+
+
+Levels:
+IMPORTANT - Levels are not hard scripted, their layout are similar, but the same. If the user retry that level, the bottles will have different colors
+Bottle default generation amount is capped at 11 (Subject to change)
+Total amount of color is 4, once a bottle has been filled with the same color entirely, they will no longer be interactable
+Once all of the colors are sorted, level is completed
+
+
+Level 1-10
+Simple bottle pouring from one to another
+Each level increases difficulty by increasing bottle count and increase by 2 liquid types
+At level 5 users will gain a significant amount of coins
+
+Level 11-20
+Added mysterious colors, the color below will only reveal if the color on the top of said mystery color in the bottle is removed from the bottle.
+Mystery colors cannot be on the top of the bottle.
+If all of the color within a bottle (regardless of amount) are the same even if mystery, they'll all be revealed
+
+Level 21-40
+Added covers/blinds, these have conditions, only if a bottle of red has finished with a cover/blind of the same condition then that cover/blind will be automatically removed.
