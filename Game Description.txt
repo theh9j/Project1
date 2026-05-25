@@ -8,7 +8,7 @@ User has 5 lives and they can re-generate one by 30 minutes, alternatively, they
 User has currency which increases by level completion (harder levels should give more coins)
 
 Game experience:
-User can pour liquid of similar color to each other, liquid cannot be poured in a bottle if color of liquid is not the same or bottle has already counted to 4 (max liquid)
+User can pour liquid of similar color to each other, liquid cannot be poured in a bottle if color of liquid on the top is not the same or bottle has already counted to 4 (max liquid)
 User has 3 types of supports -> Undo, Shuffle (shuffle selected bottle colors), Add empty bottle (from bottom right)
 Each support types are free for the first 3 uses, after that it will cost coins
 
@@ -32,3 +32,4 @@ If all of the color within a bottle (regardless of amount) are the same even if 
 
 Level 21-40
 Added covers/blinds, these have conditions, only if a bottle of red has finished with a cover/blind of the same condition then that cover/blind will be automatically removed.
+Multiple bottles can share a condition and multiple bottles can have different conditions as well
