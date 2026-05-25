@@ -9,8 +9,6 @@ public class GameManager : MonoBehaviour
     private List<Bottle> bottles = new List<Bottle>();
     private Bottle from;
 
-    [Header("Probably Important")]
-    public AnimationHandler anim;
 
     void Start() {
         bottles = bottle.GenAmount(Random.Range(3, 16));
@@ -51,18 +49,23 @@ public class GameManager : MonoBehaviour
 
     public void TryPour(Bottle to) {
         if (from == null) {
-            if (to.IsEmpty) return;
+            if (to.IsEmpty) {
+                to.anim.PlayShake();
+                return;
+            }
             Debug.Log("Selected bottle");
             from = to;
-            anim.SelectedHover(true);
+            from.anim.SelectedHover(true);
             return;
         } else if (from == to) {
+            from.anim.SelectedHover(false);
+            from = null;
             return;
         }
         bool res = from.Pour(to);
         if (res) {
+            from.anim.SelectedHover(false);
             from = null;
-            anim.SelectedHover(false);
             Debug.Log("Pouring successful");
         }
     }

@@ -30,7 +30,10 @@ public class InputHandler : MonoBehaviour
         Bottle bottle = hit.collider.GetComponent<Bottle>();
         Debug.Log(Mouse.current.position.ReadValue().ToString());
 
-        if (!gameManager.BottleAvailable(bottle)) return;
+        if (!gameManager.BottleAvailable(bottle)) {
+            bottle.anim.PlayShake();
+            return;
+        }
         gameManager.TryPour(bottle);
     }
 }

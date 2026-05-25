@@ -2,11 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Bottle : MonoBehaviour {
+
+    public AnimationHandler anim;
     public bool isLocked = false;
     public bool isCompleted = false;
 
     public int maxCapacity = 4;
     public List<LiquidUnit> liquidUnits = new List<LiquidUnit>();
+
 
     public bool IsEmpty => liquidUnits.Count == 0;
     public bool IsFull => liquidUnits.Count >= maxCapacity;

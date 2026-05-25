@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3079518178923040815}
   - component: {fileID: 8166212613817562024}
   - component: {fileID: 5657617648688901086}
+  - component: {fileID: 6567199702672268554}
   m_Layer: 0
   m_Name: bottle
   m_TagString: Untagged
@@ -105,6 +106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 730e0aa65c233cd45ae613525a998b8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bottle
+  anim: {fileID: 6567199702672268554}
   isLocked: 0
   isCompleted: 0
   maxCapacity: 4
@@ -155,3 +157,15 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.89, y: 5.14}
   m_EdgeRadius: 0
+--- !u!114 &6567199702672268554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6738866251805647063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e838e3a83f92cd4fbf750f1feec8617, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimationHandler
