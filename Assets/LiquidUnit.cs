@@ -3,16 +3,21 @@ using UnityEngine;
 
 public class LiquidUnit
 {
-    public int colorId;
+    public LiquidColor colorId;
     public bool isMystery;
 
-    public LiquidUnit(int colorId, bool isMystery = false)
+    public LiquidUnit(LiquidUnit liquidUnit) {
+        colorId = liquidUnit.colorId;
+        isMystery = liquidUnit.isMystery;
+    }
+
+    public LiquidUnit(LiquidColor colorId, bool isMystery = false)
     {
         this.colorId = colorId;
         this.isMystery = isMystery;
     }
 
-    public void deMysterize()
+    public void DeMysterize()
     {
         isMystery = false;
     }

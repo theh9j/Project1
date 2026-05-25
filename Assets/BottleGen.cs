@@ -5,6 +5,7 @@ public class BottleGen : MonoBehaviour
 {
     [Header("GenObject")]
     public GameObject bottle;
+    List<Bottle> bottles = new List<Bottle>();
 
     [Header("Settings")]
     public int minBottleCount = 2;
@@ -18,12 +19,8 @@ public class BottleGen : MonoBehaviour
 
     public int genAmount = 5;
 
-    public void Start()
-    {
-        GenAmount(genAmount);
-    }
 
-    public void GenerateBottles(int amount)
+    public List<Bottle> GenerateBottles(int amount)
     {
         int maxSlot = rowCount * colCount;
         amount = Mathf.Min(amount, maxSlot);
@@ -46,12 +43,14 @@ public class BottleGen : MonoBehaviour
                 Vector2 spawnPoint = new Vector2(startX + i * xSpacing, Vector2.zero.y - rowIndex * ySpacing);
                 GameObject currentBot = Instantiate(bottle, spawnPoint, Quaternion.identity, transform);
                 currentBot.name = $"Bottle_{genCount + 1}";
+                Bottle bot = currentBot.GetComponent<Bottle>();
+                bottles.Add(bot);
                 genCount++;
             }
             rowIndex++;
 
         }
-        
+        return bottles;
     }
 
     public void ClearBottles()
@@ -62,14 +61,15 @@ public class BottleGen : MonoBehaviour
         }
     }
 
-    public void GenAmount(int amount)
+    public List<Bottle> GenAmount(int amount)
     {
         if (amount < minBottleCount || amount > maxBottleCount)
         {
             Debug.LogError($"Invalid bottle count!");
-            return;
+            return null;
         }
-        GenerateBottles(amount);
+        bottles = GenerateBottles(amount);
+        return bottles;
     }
 
     private int GetColumnsForBottleCount(int count)
