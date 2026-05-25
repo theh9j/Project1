@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,7 +30,19 @@ public class BottleTest : MonoBehaviour {
             Debug.Log("Bottle B unit " + i + ": " + bottleB.liquidUnits[i].colorId);
         }
 
-        bottleA.Pour(bottleB);
+
+        StartCoroutine(Test(bottleA, bottleB));
+    }
+
+    IEnumerator Test(Bottle bottleA, Bottle bottleB) {
+        yield return new WaitForSeconds(6);
+
+
+        PourLog(bottleA, bottleB);
+    }
+
+    private void PourLog(Bottle bottleA, Bottle bottleB) {
+        
 
         Debug.Log("After pour:");
         Debug.Log("Bottle A count: " + bottleA.CurrentCapacity());

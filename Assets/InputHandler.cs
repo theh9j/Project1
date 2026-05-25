@@ -5,11 +5,8 @@ public class InputHandler : MonoBehaviour
 {
     [Header("Settings")]
     public BottleGen bottleGen;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public Camera mainCamera;
+    public GameManager gameManager;
 
     // Update is called once per frame
     void Update()
@@ -19,6 +16,21 @@ public class InputHandler : MonoBehaviour
             bottleGen.ClearBottles();
         }
 
+        if (Mouse.current.leftButton.wasPressedThisFrame) {
+            onMouseDown();
+        }
 
+    }
+
+    private void onMouseDown() {
+        Vector2 worldPos = mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
+        if (hit.collider == null) Debug.Log("No hit");
+
+        Bottle bottle = hit.collider.GetComponent<Bottle>();
+        Debug.Log(Mouse.current.position.ReadValue().ToString());
+
+        if (!gameManager.BottleAvailable(bottle)) return;
+        gameManager.TryPour(bottle);
     }
 }

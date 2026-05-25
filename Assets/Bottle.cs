@@ -44,8 +44,8 @@ public class Bottle : MonoBehaviour {
         return myTop.colorId == targetTop.colorId;
     }
 
-    public void Pour(Bottle nextBottle) {
-        if (!CanPourTo(nextBottle)) return;
+    public bool Pour(Bottle nextBottle) {
+        if (!CanPourTo(nextBottle)) return false;
 
         LiquidColor pourColor = GetTopLiquid().colorId;
 
@@ -68,6 +68,7 @@ public class Bottle : MonoBehaviour {
             }
         }
         BottleSatisfy(nextBottle);
+        return true;
     }
 
     private void BottleSatisfy(Bottle nextbottle) {

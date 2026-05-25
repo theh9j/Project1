@@ -7,11 +7,15 @@ public class GameManager : MonoBehaviour
 {
     public BottleGen bottle;
     private List<Bottle> bottles = new List<Bottle>();
+    private Bottle from;
+
+    [Header("Probably Important")]
+    public AnimationHandler anim;
 
     void Start() {
-        bottles = bottle.GenAmount(10);
+        bottles = bottle.GenAmount(Random.Range(3, 16));
 
-        StartCoroutine(testCompletion());
+        //StartCoroutine(testCompletion());
         
     }
 
@@ -34,9 +38,32 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public bool BottleAvailable(Bottle currentBottle) {
+        if (currentBottle.isLocked || currentBottle.isCompleted) return false;
+        return true;
+    }
+
     public bool InGame() {
         int bottles = bottle.genAmount;
         if (bottles == 0) return false;
         return true;
+    }
+
+    public void TryPour(Bottle to) {
+        if (from == null) {
+            if (to.IsEmpty) return;
+            Debug.Log("Selected bottle");
+            from = to;
+            anim.SelectedHover(true);
+            return;
+        } else if (from == to) {
+            return;
+        }
+        bool res = from.Pour(to);
+        if (res) {
+            from = null;
+            anim.SelectedHover(false);
+            Debug.Log("Pouring successful");
+        }
     }
 }
