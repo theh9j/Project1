@@ -7,9 +7,13 @@ public class AnimationHandler : MonoBehaviour
     private Vector3 targetPos;
     private Quaternion originalRotation;
     private Quaternion targetRot;
+
+    private Vector3 newPos;
+    private Quaternion newRot;
+
     [SerializeField] private Transform visual;
 
-    public float pourCornerOffset = 3f;
+    public float pourCornerOffset = 3.1f;
     public float pourHeiOffset = 4f;
     public float pourDuration = 2f;
     public float pourAngle = 95f;
@@ -73,20 +77,38 @@ public class AnimationHandler : MonoBehaviour
         isBusy = false;
     }
 
+    private void LeftPour() {
+        newPos.x = newPos.x - pourCornerOffset;
+        newRot = Quaternion.Euler(0, 0, -pourAngle);
+    }
+
+    private void RightPour() {
+        newPos.x = newPos.x + pourCornerOffset;
+        newRot = Quaternion.Euler(0, 0, pourAngle);
+    }
+
     private IEnumerator PourRoutine(Transform nextBottle) {
         isBusy = true;
-        Vector3 newPos = nextBottle.position;
-        Quaternion newRot = nextBottle.rotation;
+        newPos = nextBottle.position;
+        newRot = nextBottle.rotation;
 
         newPos.y = newPos.y + pourHeiOffset;
         if (originalPos.x > newPos.x) {
-            newPos.x = newPos.x + pourCornerOffset;
-            newRot = Quaternion.Euler(0, 0, pourAngle);
+            Debug.Log("Right");
+            RightPour();
         } else if (originalPos.x < newPos.x) {
-            newPos.x = newPos.x - pourCornerOffset;
-            newRot = Quaternion.Euler(0, 0, -pourAngle);
+            Debug.Log("Left");
+            LeftPour();
         } else {
-            Debug.Log("Math went wrong");
+            if (originalPos.x >= 0) {
+                Debug.Log("Middle-Left");
+                targetPos = originalPos + Vector3.left * 2f;
+                LeftPour();
+            } else {
+                Debug.Log("Middle-Right");
+                targetPos = originalPos + Vector3.right * 2f;
+                RightPour();
+            }
         }
 
         targetRot = newRot;
@@ -94,7 +116,11 @@ public class AnimationHandler : MonoBehaviour
         
 
         yield return new WaitForSeconds(pourDuration);
+        newRot = Quaternion.identity;
+        newPos = Vector3.zero;
+
         targetRot = originalRotation;
         SelectedHover(false);
+        isBusy = false;
     }
 }
