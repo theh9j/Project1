@@ -6,7 +6,7 @@ public class BottleTest : MonoBehaviour {
     [SerializeField] private Bottle bottleA;
     [SerializeField] private Bottle bottleB;
 
-    private void Start() {
+    private void Awake() {
         bottleA.BottleInit(new List<LiquidUnit>
         {
             new LiquidUnit(LiquidColor.Red),

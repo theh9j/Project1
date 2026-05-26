@@ -44,6 +44,7 @@ public class BottleGen : MonoBehaviour
                 GameObject currentBot = Instantiate(bottle, spawnPoint, Quaternion.identity, transform);
                 currentBot.name = $"Bottle_{genCount + 1}";
                 Bottle bot = currentBot.GetComponent<Bottle>();
+                if (bot == null) Debug.Log("Errored");
                 bottles.Add(bot);
                 genCount++;
             }

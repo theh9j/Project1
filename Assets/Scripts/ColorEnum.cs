@@ -2,6 +2,7 @@ using UnityEngine;
 
 public enum LiquidColor
 {
+    Unknown,
     Red,
     Green,
     Blue,

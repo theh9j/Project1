@@ -4,6 +4,7 @@ using UnityEngine;
 public class Bottle : MonoBehaviour {
 
     public AnimationHandler anim;
+    private BottleView bottleView;
     public bool isLocked = false;
     public bool isCompleted = false;
 
@@ -71,6 +72,8 @@ public class Bottle : MonoBehaviour {
             }
         }
         BottleSatisfy(nextBottle);
+        RefreshView();
+        nextBottle.RefreshView();
         return true;
     }
 
@@ -85,6 +88,18 @@ public class Bottle : MonoBehaviour {
         if (i == 4) {
             nextbottle.isCompleted = true;
         }
+    }
+
+    private void Awake() {
+        bottleView = GetComponent<BottleView>();
+    }
+
+    private void Start() { 
+        RefreshView();
+    }
+
+    public void RefreshView() {
+        bottleView.Refresh(liquidUnits);
     }
 
 }

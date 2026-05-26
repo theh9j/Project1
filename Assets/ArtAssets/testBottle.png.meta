@@ -129,12 +129,12 @@ TextureImporter:
       name: testBottle_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1024
-        height: 1531
+        x: 365
+        y: 253
+        width: 293
+        height: 1000
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 9245597bb177a554e8a670e2df34809e
     internalID: 0
     vertices: []
     indices: 
