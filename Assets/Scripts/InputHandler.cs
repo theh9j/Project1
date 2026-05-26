@@ -26,7 +26,7 @@ public class InputHandler : MonoBehaviour
     private void onMouseDown() {
         Vector2 worldPos = mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
-        if (hit.collider == null) Debug.Log("No hit");
+        if (hit.collider == null) return;
 
         if (hit.collider.GetComponent<Bottle>() == null) return;
 
@@ -34,9 +34,10 @@ public class InputHandler : MonoBehaviour
         Debug.Log(Mouse.current.position.ReadValue().ToString());
 
         if (!gameManager.BottleAvailable(bottle)) {
-            bottle.anim.PlayShake();
+            bottle.anim.Play(1);
             return;
         }
+        
         gameManager.TryPour(bottle);
     }
 }

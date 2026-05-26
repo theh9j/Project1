@@ -8,7 +8,11 @@ public class LiquidSlotView : MonoBehaviour
     public void SetLiquid(Color color, bool isMystery, int i) {
         liquid.gameObject.SetActive(true);
 
-        liquid.color = color;
+        if (isMystery) {
+            liquid.color = Color.black;
+        } else {
+            liquid.color = color;
+        }
         if (i != 3) mystery.gameObject.SetActive(isMystery);
     }
 

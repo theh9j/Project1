@@ -7,8 +7,6 @@ public class BottleView : MonoBehaviour
     [SerializeField]
     private LiquidSlotView[] liquidSlots;
 
-    private LiquidColor color;
-
     private readonly ColorTranslator colorTranslator = new ColorTranslator();
 
     public void Refresh(List<LiquidUnit> liquidUnits) {
@@ -19,6 +17,16 @@ public class BottleView : MonoBehaviour
             }
 
             LiquidUnit liquid = liquidUnits[i];
+
+            bool isTopLiquid = i == liquidUnits.Count - 1;
+            bool hasLiquidAbove = i < liquidUnits.Count - 1;
+
+            if (liquid.isMystery &&
+               (isTopLiquid ||
+               (hasLiquidAbove && liquid.colorId == liquidUnits[i + 1].colorId))) {
+                liquid.DeMysterize();
+            }
+
             Color liquidColor = colorTranslator.GetColor(liquid.colorId);
             liquidSlots[i].SetLiquid(
                 liquidColor,

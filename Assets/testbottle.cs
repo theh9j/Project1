@@ -5,6 +5,8 @@ using UnityEngine;
 public class BottleTest : MonoBehaviour {
     [SerializeField] private Bottle bottleA;
     [SerializeField] private Bottle bottleB;
+    [SerializeField] private Bottle bottleC;
+    [SerializeField] private Bottle bottleD;
 
     private void Awake() {
         bottleA.BottleInit(new List<LiquidUnit>
@@ -20,6 +22,15 @@ public class BottleTest : MonoBehaviour {
             new LiquidUnit(LiquidColor.Blue)
         });
 
+        bottleC.BottleInit(new List<LiquidUnit>
+        {
+            new LiquidUnit(LiquidColor.Purple, true),
+            new LiquidUnit(LiquidColor.Red, true),
+            new LiquidUnit(LiquidColor.Red),
+            new LiquidUnit(LiquidColor.Red, true)       
+        });
+        bottleD.BottleInit(new List<LiquidUnit>());
+
         Debug.Log("Before pour:");
         Debug.Log("Bottle A count: " + bottleA.CurrentCapacity());
         Debug.Log("Bottle B count: " + bottleB.CurrentCapacity());
@@ -31,7 +42,7 @@ public class BottleTest : MonoBehaviour {
         }
 
 
-        StartCoroutine(Test(bottleA, bottleB));
+        //StartCoroutine(Test(bottleA, bottleB));
     }
 
     IEnumerator Test(Bottle bottleA, Bottle bottleB) {

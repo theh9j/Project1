@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
     public void TryPour(Bottle to) {
         if (from == null) {
             if (to.IsEmpty) {
-                to.anim.PlayShake();
+                to.anim.Play(1);
                 return;
             }
             Debug.Log("Selected bottle");
@@ -64,9 +64,11 @@ public class GameManager : MonoBehaviour
         }
         bool res = from.Pour(to);
         if (res) {
-            from.anim.SelectedHover(false);
+            from.anim.Play(2, to.transform);
             from = null;
             Debug.Log("Pouring successful");
+        } else {
+            to.anim.Play(1);
         }
     }
 }
