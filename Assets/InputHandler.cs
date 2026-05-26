@@ -8,6 +8,7 @@ public class InputHandler : MonoBehaviour
     public Camera mainCamera;
     public GameManager gameManager;
 
+
     // Update is called once per frame
     void Update()
     {
@@ -26,6 +27,8 @@ public class InputHandler : MonoBehaviour
         Vector2 worldPos = mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
         if (hit.collider == null) Debug.Log("No hit");
+
+        if (hit.collider.GetComponent<Bottle>() == null) return;
 
         Bottle bottle = hit.collider.GetComponent<Bottle>();
         Debug.Log(Mouse.current.position.ReadValue().ToString());
