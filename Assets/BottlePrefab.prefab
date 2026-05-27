@@ -171,6 +171,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AnimationHandler
   visual: {fileID: 3373396530423720878}
+  currentBottle: {fileID: 6712314156034263368}
+  pourCornerOffset: 3.1
+  pourHeiOffset: 4
+  pourDuration: 0.45
+  pourAngle: 95
 --- !u!114 &7960786220834411949
 MonoBehaviour:
   m_ObjectHideFlags: 0

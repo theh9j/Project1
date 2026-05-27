@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     public BottleGen bottle;
     private List<Bottle> bottles = new List<Bottle>();
     private Bottle from;
+    private bool res;
 
 
     void Start() {
@@ -48,27 +49,36 @@ public class GameManager : MonoBehaviour
     }
 
     public void TryPour(Bottle to) {
+        if (to.IsOccupied) return;
+        to.IsOccupied = true;
+
         if (from == null) {
             if (to.IsEmpty) {
                 to.anim.Play(1);
+                to.IsOccupied = false;
                 return;
             }
             Debug.Log("Selected bottle");
             from = to;
             from.anim.SelectedHover(true);
+            to.IsOccupied = false;
             return;
         } else if (from == to) {
             from.anim.SelectedHover(false);
             from = null;
+            to.IsOccupied = false;
             return;
         }
-        bool res = from.Pour(to);
+        res = from.Pour(to);
         if (res) {
-            from.anim.Play(2, to.transform);
+            from.anim.Play(2, to);
             from = null;
             Debug.Log("Pouring successful");
         } else {
             to.anim.Play(1);
         }
+        to.IsOccupied = false;
     }
+
+    
 }

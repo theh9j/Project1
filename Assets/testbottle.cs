@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BottleTest : MonoBehaviour {
-    [SerializeField] private Bottle bottleA;
-    [SerializeField] private Bottle bottleB;
-    [SerializeField] private Bottle bottleC;
-    [SerializeField] private Bottle bottleD;
+    [SerializeField] private Bottle[] bottles;
 
     private void Awake() {
-        bottleA.BottleInit(new List<LiquidUnit>
+        bottles[0].BottleInit(new List<LiquidUnit>
         {
             new LiquidUnit(LiquidColor.Red),
             new LiquidUnit(LiquidColor.Blue),
@@ -17,29 +14,37 @@ public class BottleTest : MonoBehaviour {
             new LiquidUnit(LiquidColor.Blue)
         });
 
-        bottleB.BottleInit(new List<LiquidUnit>
+        bottles[1].BottleInit(new List<LiquidUnit>
         {
             new LiquidUnit(LiquidColor.Blue)
         });
 
-        bottleC.BottleInit(new List<LiquidUnit>
+        bottles[2].BottleInit(new List<LiquidUnit>
         {
             new LiquidUnit(LiquidColor.Purple, true),
             new LiquidUnit(LiquidColor.Red, true),
             new LiquidUnit(LiquidColor.Red),
             new LiquidUnit(LiquidColor.Red, true)       
         });
-        bottleD.BottleInit(new List<LiquidUnit>());
 
-        Debug.Log("Before pour:");
-        Debug.Log("Bottle A count: " + bottleA.CurrentCapacity());
-        Debug.Log("Bottle B count: " + bottleB.CurrentCapacity());
-        for (int i = 0; i < bottleA.CurrentCapacity(); i++) {
-            Debug.Log("Bottle A unit " + i + ": " + bottleA.liquidUnits[i].colorId);
-        }
-        for (int i = 0; i < bottleB.CurrentCapacity(); i++) {
-            Debug.Log("Bottle B unit " + i + ": " + bottleB.liquidUnits[i].colorId);
-        }
+        bottles[3].BottleInit(new List<LiquidUnit>());
+
+        bottles[4].BottleInit(new List<LiquidUnit>
+        {
+            new LiquidUnit(LiquidColor.Purple),
+            new LiquidUnit(LiquidColor.Purple, true),
+            new LiquidUnit(LiquidColor.Purple, true),
+            new LiquidUnit(LiquidColor.Green)
+        });
+
+        bottles[5].BottleInit(new List<LiquidUnit>
+        {
+            new LiquidUnit(LiquidColor.Pink),
+            new LiquidUnit(LiquidColor.Green, true),
+            new LiquidUnit(LiquidColor.Green, true),
+            new LiquidUnit(LiquidColor.Green, true)
+        });
+
 
 
         //StartCoroutine(Test(bottleA, bottleB));

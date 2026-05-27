@@ -13,7 +13,9 @@ public class Bottle : MonoBehaviour {
 
 
     public bool IsEmpty => liquidUnits.Count == 0;
-    public bool IsFull => liquidUnits.Count >= maxCapacity;
+    private bool IsFull => liquidUnits.Count >= maxCapacity;
+    private bool isOccupied = false;
+    private int changes = 1;
 
     public void BottleInit(List<LiquidUnit> initialLiquids) {
         liquidUnits = new List<LiquidUnit>();
@@ -49,8 +51,9 @@ public class Bottle : MonoBehaviour {
     }
 
     public bool Pour(Bottle nextBottle) {
+        
         if (!CanPourTo(nextBottle)) return false;
-
+        changes = 1;
         LiquidColor pourColor = GetTopLiquid().colorId;
 
         while (true) {
@@ -64,6 +67,7 @@ public class Bottle : MonoBehaviour {
 
             liquidUnits.RemoveAt(liquidUnits.Count - 1);
             nextBottle.liquidUnits.Add(new LiquidUnit(topLiquid));
+            changes++;
 
             if (!IsEmpty) {
                 if (GetTopLiquid().isMystery) {
@@ -72,8 +76,6 @@ public class Bottle : MonoBehaviour {
             }
         }
         BottleSatisfy(nextBottle);
-        RefreshView();
-        nextBottle.RefreshView();
         return true;
     }
 
@@ -100,6 +102,16 @@ public class Bottle : MonoBehaviour {
 
     public void RefreshView() {
         bottleView.Refresh(liquidUnits);
+    }
+
+    public bool IsOccupied {
+        get { return isOccupied; }
+        set { isOccupied = value; }
+    }
+
+    public int lastChanges {
+        get { return changes; }
+        private set { changes = value;}
     }
 
 }

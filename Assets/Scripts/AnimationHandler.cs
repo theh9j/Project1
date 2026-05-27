@@ -12,10 +12,11 @@ public class AnimationHandler : MonoBehaviour
     private Quaternion newRot;
 
     [SerializeField] private Transform visual;
+    [SerializeField] private Bottle currentBottle;
 
     public float pourCornerOffset = 3.1f;
     public float pourHeiOffset = 4f;
-    public float pourDuration = 2f;
+    public float pourDuration = 0.35f;
     public float pourAngle = 95f;
 
     private float shakeDuration = 0.02f;
@@ -45,7 +46,7 @@ public class AnimationHandler : MonoBehaviour
         }
     }
 
-    public void Play(int action, Transform nextBottle = null) {
+    public void Play(int action, Bottle nextBottle = null) {
         if (isBusy) return;
 
         switch (action) {
@@ -87,10 +88,13 @@ public class AnimationHandler : MonoBehaviour
         newRot = Quaternion.Euler(0, 0, pourAngle);
     }
 
-    private IEnumerator PourRoutine(Transform nextBottle) {
+    private IEnumerator PourRoutine(Bottle nextBottle) {
         isBusy = true;
-        newPos = nextBottle.position;
-        newRot = nextBottle.rotation;
+
+        
+        Transform bottleIndex = nextBottle.transform;
+        newPos = bottleIndex.position;
+        newRot = bottleIndex.rotation;
 
         newPos.y = newPos.y + pourHeiOffset;
         if (originalPos.x > newPos.x) {
@@ -103,7 +107,7 @@ public class AnimationHandler : MonoBehaviour
             if (originalPos.x >= 0) {
                 Debug.Log("Middle-Left");
                 targetPos = originalPos + Vector3.left * 2f;
-                LeftPour();
+                LeftPour(); 
             } else {
                 Debug.Log("Middle-Right");
                 targetPos = originalPos + Vector3.right * 2f;
@@ -115,7 +119,10 @@ public class AnimationHandler : MonoBehaviour
         targetPos = newPos;
         
 
-        yield return new WaitForSeconds(pourDuration);
+        yield return new WaitForSeconds(pourDuration * currentBottle.lastChanges);
+        currentBottle.RefreshView();
+        nextBottle.RefreshView();
+        yield return new WaitForSeconds(0.2f);
         newRot = Quaternion.identity;
         newPos = Vector3.zero;
 
