@@ -23,7 +23,7 @@ public class BottleView : MonoBehaviour
 
             if (liquid.isMystery &&
                (isTopLiquid ||
-               (hasLiquidAbove && liquid.colorId == liquidUnits[i + 1].colorId))) {
+               (hasLiquidAbove && liquid.colorId == liquidUnits[liquidSlots.Length-1].colorId && !liquidUnits[i+1].isMystery))) {
                 liquid.DeMysterize();
             }
 

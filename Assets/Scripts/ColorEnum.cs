@@ -2,13 +2,13 @@ using UnityEngine;
 
 public enum LiquidColor
 {
-    Unknown,
-    Red,
-    Green,
-    Blue,
-    Yellow,
-    Pink,
-    Purple,
-    Grey,
-    Brown
+    unknown,
+    red,
+    green,
+    blue,
+    yellow,
+    pink,
+    purple,
+    grey,
+    brown
 }

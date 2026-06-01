@@ -32,7 +32,6 @@ public class InputHandler : MonoBehaviour
         if (hit.collider.GetComponent<Bottle>() == null) return;
 
         Bottle bottle = hit.collider.GetComponent<Bottle>();
-        Debug.Log(Mouse.current.position.ReadValue().ToString());
 
         if (ui.admin) {
             if (!ui.Selection && (prev == null || prev == bottle)) {

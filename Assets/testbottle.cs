@@ -8,41 +8,41 @@ public class BottleTest : MonoBehaviour {
     private void Awake() {
         bottles[0].BottleInit(new List<LiquidUnit>
         {
-            new LiquidUnit(LiquidColor.Red),
-            new LiquidUnit(LiquidColor.Blue),
-            new LiquidUnit(LiquidColor.Blue),
-            new LiquidUnit(LiquidColor.Blue)
+            new LiquidUnit(LiquidColor.red),
+            new LiquidUnit(LiquidColor.blue),
+            new LiquidUnit(LiquidColor.blue),
+            new LiquidUnit(LiquidColor.blue)
         });
 
         bottles[1].BottleInit(new List<LiquidUnit>
         {
-            new LiquidUnit(LiquidColor.Blue)
+            new LiquidUnit(LiquidColor.blue)
         });
 
         bottles[2].BottleInit(new List<LiquidUnit>
         {
-            new LiquidUnit(LiquidColor.Purple, true),
-            new LiquidUnit(LiquidColor.Red, true),
-            new LiquidUnit(LiquidColor.Red),
-            new LiquidUnit(LiquidColor.Red, true)       
+            new LiquidUnit(LiquidColor.purple, true),
+            new LiquidUnit(LiquidColor.red, true),
+            new LiquidUnit(LiquidColor.red),
+            new LiquidUnit(LiquidColor.red, true)       
         });
 
         bottles[3].BottleInit(new List<LiquidUnit>());
 
         bottles[4].BottleInit(new List<LiquidUnit>
         {
-            new LiquidUnit(LiquidColor.Purple),
-            new LiquidUnit(LiquidColor.Purple, true),
-            new LiquidUnit(LiquidColor.Purple, true),
-            new LiquidUnit(LiquidColor.Green)
+            new LiquidUnit(LiquidColor.purple),
+            new LiquidUnit(LiquidColor.purple, true),
+            new LiquidUnit(LiquidColor.purple, true),
+            new LiquidUnit(LiquidColor.green)
         });
 
         bottles[5].BottleInit(new List<LiquidUnit>
         {
-            new LiquidUnit(LiquidColor.Pink),
-            new LiquidUnit(LiquidColor.Green, true),
-            new LiquidUnit(LiquidColor.Green, true),
-            new LiquidUnit(LiquidColor.Green, true)
+            new LiquidUnit(LiquidColor.pink),
+            new LiquidUnit(LiquidColor.green, true),
+            new LiquidUnit(LiquidColor.green, true),
+            new LiquidUnit(LiquidColor.green, true)
         });
 
 

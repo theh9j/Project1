@@ -64,11 +64,22 @@ public class UIHandler : MonoBehaviour
         }
     }
 
+    public void RemoveLiquid(int i) {
+        levelDesigner.RemoveColor(bottle, i, out List<LiquidUnit> liquidUnits);
+
+        for (int j = 0; j < liquidUnits.Count; j++) {
+            SetColor(liquidUnits[j], colors[j], mys[j]);
+        }
+
+        for (int u = liquidUnits.Count; (u >= liquidUnits.Count) && (u < colors.Length); u++) {
+            colors[u].text = $"Color{u}";
+        }
+    }
+
     public void NewDataForBottle() {
         if (!admin) return;
         if (Selection) {
             levelDesigner.SetColors(bottle, colors, mys);
-            Debug.Log(colors.ToString());
 
         }
     }
@@ -81,47 +92,7 @@ public class UIHandler : MonoBehaviour
             List<LiquidUnit> liquids = bottle.liquidUnits;
 
             for (int i = 0; i < liquids.Count; i++) {
-                LiquidUnit liquid = liquids[i];
-
-                switch (liquid.colorId) {
-                    case LiquidColor.Red:
-                        colors[i].text = "Red";
-                        break;
-                    case LiquidColor.Green:
-                        colors[i].text = "Green";
-                        break;
-                    case LiquidColor.Blue:
-                        colors[i].text = "Blue";
-                        break;
-                    case LiquidColor.Yellow:
-                        colors[i].text = "Yellow";
-                        break;
-                    case LiquidColor.Pink:
-                        colors[i].text = "Pink";
-                        break;
-                    case LiquidColor.Purple:
-                        colors[i].text = "Purple";
-                        break;
-                    case LiquidColor.Grey:
-                        colors[i].text = "Grey";
-                        break;
-                    case LiquidColor.Brown:
-                        colors[i].text = "Brown";
-                        break;
-                    case LiquidColor.Unknown:
-                        colors[i].text = "Unknown";
-                        break;
-                    default:
-                        colors[i].text = "Invalid/Empty";
-                        break;
-                }
-
-                if (liquid.isMystery) {
-                    mys[i].text = "True";
-
-                } else {
-                    mys[i].text = "False";
-                }
+                SetColor(liquids[i], colors[i], mys[i]);
             }
         } else {
             bottle = null;
@@ -145,5 +116,48 @@ public class UIHandler : MonoBehaviour
     public bool Selection {
         get { return selected; }
         private set { selected = value; }
+    }
+
+    private void SetColor(LiquidUnit liquid, TMP_InputField color, TMP_Text mys) {
+
+        switch (liquid.colorId) {
+            case LiquidColor.red:
+                color.text = "Red";
+                break;
+            case LiquidColor.green:
+                color.text = "Green";
+                break;
+            case LiquidColor.blue:
+                color.text = "Blue";
+                break;
+            case LiquidColor.yellow:
+                color.text = "Yellow";
+                break;
+            case LiquidColor.pink:
+                color.text = "Pink";
+                break;
+            case LiquidColor.purple:
+                color.text = "Purple";
+                break;
+            case LiquidColor.grey:
+                color.text = "Grey";
+                break;
+            case LiquidColor.brown:
+                color.text = "Brown";
+                break;
+            case LiquidColor.unknown:
+                color.text = "Unknown";
+                break;
+            default:
+                color.text = "Invalid/Empty";
+                break;
+        }
+
+        if (liquid.isMystery) {
+            mys.text = "True";
+
+        } else {
+            mys.text = "False";
+        }
     }
 }
