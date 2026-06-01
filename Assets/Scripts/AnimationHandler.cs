@@ -56,7 +56,7 @@ public class AnimationHandler : MonoBehaviour
         }
     }
 
-    public void Play(int action, Bottle nextBottle = null) {
+    public void Play(int action, Bottle nextBottle = null, Vector3 newPos = new Vector3()) {
         if (isBusy) return;
 
         switch (action) {
@@ -65,6 +65,9 @@ public class AnimationHandler : MonoBehaviour
                 break;
             case 2:
                 StartCoroutine(PourRoutine(nextBottle));
+                break;
+            case 3:
+                StartCoroutine(NewBottleRoutine(newPos));
                 break;
             default:
                 break;
@@ -78,6 +81,12 @@ public class AnimationHandler : MonoBehaviour
             if (isPour) yield return new WaitForSeconds(pourDuration + Time.deltaTime * 5); //WIP need fixing with timing
             sortingGroup.sortingOrder = originalSortingOrder;
         }
+    }
+
+    private IEnumerator NewBottleRoutine(Vector3 newPos) {
+        targetPos = newPos;
+        originalPos = targetPos;
+        yield return new WaitForSeconds(0.5f);
     }
 
     private IEnumerator ShakeRoutine() {

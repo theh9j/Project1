@@ -64,6 +64,10 @@ public class UIHandler : MonoBehaviour
         }
     }
 
+    public void AddBottle() {
+        bottleGen.AddBottle();
+    }
+
     public void RemoveLiquid(int i) {
         levelDesigner.RemoveColor(bottle, i, out List<LiquidUnit> liquidUnits);
 
