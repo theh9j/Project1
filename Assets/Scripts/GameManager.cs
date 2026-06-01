@@ -12,41 +12,40 @@ public class GameManager : MonoBehaviour
 
 
     void Start() {
-        bottles = bottle.GenAmount(Random.Range(3, 16));
 
         //StartCoroutine(testCompletion());
         
     }
 
-    IEnumerator testCompletion() {
-        yield return new WaitForSeconds(4);
+    //IEnumerator testCompletion() {
+    //    yield return new WaitForSeconds(4);
 
-        OnCompletion();
-    }
+    //    OnCompletion();
+    //}
 
-    public void OnCompletion() {
-        if (!InGame()) return;
-        int i = 0;
-        foreach (Bottle bot in bottles) {
-            if (!bot.isCompleted && !bot.IsEmpty) return;
-            i++;
+    //public void OnCompletion() {
+    //    if (!InGame()) return;
+    //    int i = 0;
+    //    foreach (Bottle bot in bottles) {
+    //        if (!bot.isCompleted && !bot.IsEmpty) return;
+    //        i++;
 
-        }
+    //    }
 
-        Debug.Log("Game Completed!");
+    //    Debug.Log("Game Completed!");
 
-    }
+    //}
 
     public bool BottleAvailable(Bottle currentBottle) {
         if (currentBottle.isLocked || currentBottle.isCompleted) return false;
         return true;
     }
 
-    public bool InGame() {
-        int bottles = bottle.genAmount;
-        if (bottles == 0) return false;
-        return true;
-    }
+    //public bool InGame() {
+    //    int bottles = bottle.genAmount;
+    //    if (bottles == 0) return false;
+    //    return true;
+    //}
 
     public void TryPour(Bottle to) {
         if (to.IsOccupied) return;

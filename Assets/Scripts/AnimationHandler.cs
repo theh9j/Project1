@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class AnimationHandler : MonoBehaviour
 {
@@ -23,6 +24,8 @@ public class AnimationHandler : MonoBehaviour
     private float shakeAngle = 2f;
 
     private bool isBusy = false;
+    private int originalSortingOrder;
+    private SortingGroup sortingGroup;
 
     void Start() {
 
@@ -30,6 +33,11 @@ public class AnimationHandler : MonoBehaviour
         targetPos = originalPos;
         originalRotation = Quaternion.identity;
         targetRot = originalRotation;
+
+        sortingGroup = currentBottle.GetComponent<SortingGroup>();
+        originalSortingOrder = sortingGroup.sortingOrder;
+
+        //Time.timeScale = 0.25f;
     }
 
     void Update() {
@@ -40,9 +48,11 @@ public class AnimationHandler : MonoBehaviour
 
     public void SelectedHover(bool hover) {
         if (hover) {
+            StartCoroutine(TopPosition(true));
             targetPos = originalPos + Vector3.up * 2f;
         } else {
             targetPos = originalPos;
+            StartCoroutine(TopPosition(false));
         }
     }
 
@@ -59,7 +69,15 @@ public class AnimationHandler : MonoBehaviour
             default:
                 break;
         }
-            
+    }
+
+    private IEnumerator TopPosition(bool isIt, bool isPour = false) {
+        if (isIt) {
+            sortingGroup.sortingOrder = 1000;
+        } else {
+            if (isPour) yield return new WaitForSeconds(pourDuration + Time.deltaTime * 5); //WIP need fixing with timing
+            sortingGroup.sortingOrder = originalSortingOrder;
+        }
     }
 
     private IEnumerator ShakeRoutine() {
@@ -91,7 +109,6 @@ public class AnimationHandler : MonoBehaviour
     private IEnumerator PourRoutine(Bottle nextBottle) {
         isBusy = true;
 
-        
         Transform bottleIndex = nextBottle.transform;
         newPos = bottleIndex.position;
         newRot = bottleIndex.rotation;
@@ -128,6 +145,7 @@ public class AnimationHandler : MonoBehaviour
 
         targetRot = originalRotation;
         SelectedHover(false);
+        StartCoroutine(TopPosition(false, true));
         isBusy = false;
     }
 }

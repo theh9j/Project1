@@ -15,7 +15,8 @@ public class Bottle : MonoBehaviour {
     public bool IsEmpty => liquidUnits.Count == 0;
     private bool IsFull => liquidUnits.Count >= maxCapacity;
     private bool isOccupied = false;
-    private int changes = 1;
+    private int changes;
+    public int lastChanges => changes;
 
     public void BottleInit(List<LiquidUnit> initialLiquids) {
         liquidUnits = new List<LiquidUnit>();
@@ -41,7 +42,7 @@ public class Bottle : MonoBehaviour {
         if (isCompleted || nextBottle.isCompleted) return false;
         if (IsEmpty) return false;
         if (nextBottle.IsFull) return false;
-
+                
         LiquidUnit myTop = GetTopLiquid();
         LiquidUnit targetTop = nextBottle.GetTopLiquid();
 
@@ -107,11 +108,6 @@ public class Bottle : MonoBehaviour {
     public bool IsOccupied {
         get { return isOccupied; }
         set { isOccupied = value; }
-    }
-
-    public int lastChanges {
-        get { return changes; }
-        private set { changes = value;}
     }
 
 }

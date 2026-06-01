@@ -7,9 +7,10 @@ public class InputHandler : MonoBehaviour
     public BottleGen bottleGen;
     public Camera mainCamera;
     public GameManager gameManager;
+    public UIHandler ui;
+    public LevelDesigner levelDesigner;
 
-
-    // Update is called once per frame
+    private Bottle prev;
     void Update()
     {
         if (Keyboard.current.escapeKey.isPressed)
@@ -33,11 +34,32 @@ public class InputHandler : MonoBehaviour
         Bottle bottle = hit.collider.GetComponent<Bottle>();
         Debug.Log(Mouse.current.position.ReadValue().ToString());
 
-        if (!gameManager.BottleAvailable(bottle)) {
-            bottle.anim.Play(1);
-            return;
+        if (ui.admin) {
+            if (!ui.Selection && (prev == null || prev == bottle)) {
+                if (prev == null ) prev = bottle;
+                bottle.anim.SelectedHover(true);
+
+
+                ui.BottleSelectedChangeColor(bottle);
+
+
+
+            } else {
+                prev.anim.SelectedHover(false);
+                prev = null;
+
+                ui.BottleSelectedChangeColor();
+            }
+            
+
+        } else {
+            if (!gameManager.BottleAvailable(bottle)) {
+                bottle.anim.Play(1);
+                return;
+            }
+
+            gameManager.TryPour(bottle);
         }
         
-        gameManager.TryPour(bottle);
     }
 }

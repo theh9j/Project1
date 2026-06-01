@@ -17,8 +17,7 @@ public class BottleGen : MonoBehaviour
     public float xSpacing = 5f;
     public float ySpacing = 2.5f;
 
-    public int genAmount = 5;
-
+    public float pointNemoY = 10f;
 
     public List<Bottle> GenerateBottles(int amount)
     {
@@ -40,7 +39,7 @@ public class BottleGen : MonoBehaviour
 
             for (int i = 0; i < bottleThisRow; i++)
             {
-                Vector2 spawnPoint = new Vector2(startX + i * xSpacing, Vector2.zero.y - rowIndex * ySpacing);
+                Vector2 spawnPoint = new Vector2(startX + i * xSpacing, pointNemoY - rowIndex * ySpacing);
                 GameObject currentBot = Instantiate(bottle, spawnPoint, Quaternion.identity, transform);
                 currentBot.name = $"Bottle_{genCount + 1}";
                 Bottle bot = currentBot.GetComponent<Bottle>();
