@@ -49,11 +49,6 @@ public class UIHandler : MonoBehaviour
             Debug.Log("NaN");
             return;
         }
-        if (result <= 0) {
-            bottleGen.ClearBottles();
-            return; 
-        }
-        bottleGen.ClearBottles();
         bottleGen.GenAmount(result);
     }
 
@@ -118,6 +113,7 @@ public class UIHandler : MonoBehaviour
             adminHandler.text = "Handler Inactive";
         }
         admin = !admin;
+        Selection = false;
     }
 
     

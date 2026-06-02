@@ -60,7 +60,7 @@ public class BottleGen : MonoBehaviour
     }
 
     public void AddBottle() {
-        if (genCount == maxBottleCount+2) {
+        if (genCount == maxBottleCount+2 || rowIndex == rowCount) {
             Debug.Log("Cannot add more bottles, max capacity reached!");
             return;
         }
@@ -72,16 +72,16 @@ public class BottleGen : MonoBehaviour
             float rowWidth = lastRowCount * xSpacing;
             startX = Vector2.zero.x - rowWidth / 2f;
             j = 0;
-            for (int i = (prefCol * rowIndex); i < genCount; i++) {
+            for (int i = genCount - lastRowCount; i < genCount; i++) {
                 Vector2 newLoc = new Vector2(startX + j * xSpacing, pointNemoY - rowIndex * ySpacing);
                 bottles[i].anim.Play(3, null, new Vector3(newLoc.x, newLoc.y, 0f));
                 j++;
             }
             lastRowCount++;
+            if (lastRowCount == colCount) rowIndex++;
         } else {
             startX = Vector2.zero.x;
             j = 0;
-            rowIndex++;
             lastRowCount = 1;
         }
 
@@ -109,10 +109,11 @@ public class BottleGen : MonoBehaviour
 
     public void ClearBottles()
     {
+        genCount = 0;
+        bottles = new List<Bottle>();
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
-            bottles = new List<Bottle>();
         }
     }
 
@@ -123,6 +124,7 @@ public class BottleGen : MonoBehaviour
             Debug.LogError($"Invalid bottle count generation!");
             return;
         }
+        ClearBottles();
         this.amount = amount;
         GenerateBottles();
     }

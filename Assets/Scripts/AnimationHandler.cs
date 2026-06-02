@@ -39,25 +39,31 @@ public class AnimationHandler : MonoBehaviour
 
 
     void Update() {
-        if (visual.position == targetPos) {
-            return;
-        } else if (Mathf.Abs(visual.position.x - targetPos.x) < 0.001) {
-            visual.position = targetPos;
-            return;
+
+        if (Vector3.Distance(visual.position, originalPos) < .001f) {
+            transform.position = originalPos;
+            visual.position = originalPos;
         }
 
+        if (visual.position == targetPos) {
+            return;
+        } else if (Vector3.Distance(visual.position, targetPos) < .001f) {
+            visual.position = targetPos;
+            visual.rotation = targetRot;
+            return;
+        }
         visual.position = Vector3.Lerp(visual.position, targetPos, Time.deltaTime * 5);
         visual.rotation = Quaternion.Lerp(visual.rotation, targetRot, Time.deltaTime * 5);
 
     }
 
-    public void SelectedHover(bool hover) {
+    public void SelectedHover(bool hover, bool wasPour = false) {
         if (hover) {
-            StartCoroutine(TopPosition(true));
-            targetPos = originalPos + Vector3.up * 2f;
+            targetPos = originalPos + Vector3.up * 1.2f;
+            StartCoroutine(TopPosition(hover));
         } else {
             targetPos = originalPos;
-            StartCoroutine(TopPosition(false));
+            StartCoroutine(TopPosition(hover, wasPour));
         }
     }
 
@@ -72,7 +78,7 @@ public class AnimationHandler : MonoBehaviour
                 StartCoroutine(PourRoutine(nextBottle));
                 break;
             case 3:
-                StartCoroutine(Test(newPos));
+                StartCoroutine(AddBottle(newPos));
                 break;
             default:
                 break;
@@ -82,18 +88,16 @@ public class AnimationHandler : MonoBehaviour
     private IEnumerator TopPosition(bool isIt, bool isPour = false) {
         if (isIt) {
             sortingGroup.sortingOrder = 1000;
+        } else {
+            if (isPour) yield return new WaitForSeconds(pourDuration + Time.deltaTime * 5);
+            sortingGroup.sortingOrder = originalSortingOrder;
         }
-        if (isPour) yield return new WaitForSeconds(pourDuration + Time.deltaTime * 5);
-        sortingGroup.sortingOrder = originalSortingOrder;
     }
 
-    private IEnumerator Test(Vector3 newPos) {
+    private IEnumerator AddBottle(Vector3 newPos) {
         yield return new WaitForSeconds(0.01f); // To prevent runs before Start()
         targetPos = newPos;
         originalPos = newPos;
-        yield return new WaitForSeconds(1f);
-        transform.position = newPos;
-        visual.position = newPos;
     }
 
     private IEnumerator ShakeRoutine() {
@@ -131,18 +135,14 @@ public class AnimationHandler : MonoBehaviour
 
         newPos.y = newPos.y + pourHeiOffset;
         if (originalPos.x > newPos.x) {
-            Debug.Log("Right");
             RightPour();
         } else if (originalPos.x < newPos.x) {
-            Debug.Log("Left");
             LeftPour();
         } else {
             if (originalPos.x >= 0) {
-                Debug.Log("Middle-Left");
                 targetPos = originalPos + Vector3.left * 2f;
                 LeftPour(); 
             } else {
-                Debug.Log("Middle-Right");
                 targetPos = originalPos + Vector3.right * 2f;
                 RightPour();
             }
@@ -161,7 +161,6 @@ public class AnimationHandler : MonoBehaviour
 
         targetRot = originalRotation;
         SelectedHover(false);
-        StartCoroutine(TopPosition(false, true));
         IsBusy = false;
     }
 

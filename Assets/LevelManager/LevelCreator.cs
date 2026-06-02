@@ -21,6 +21,9 @@ public class LevelCreator : MonoBehaviour
         //levelDAta.levelTypeIndex
 
         levelData.bottleCount = bottleGen.bottles.Count;
+        foreach (Bottle bottle in bottleGen.bottles) {
+
+        }
         
     }
 }

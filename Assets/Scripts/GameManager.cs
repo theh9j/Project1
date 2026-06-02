@@ -57,7 +57,6 @@ public class GameManager : MonoBehaviour
                 to.IsOccupied = false;
                 return;
             }
-            Debug.Log("Selected bottle");
             from = to;
             from.anim.SelectedHover(true);
             to.IsOccupied = false;
@@ -72,7 +71,6 @@ public class GameManager : MonoBehaviour
         if (res) {
             from.anim.Play(2, to);
             from = null;
-            Debug.Log("Pouring successful");
         } else {
             to.anim.Play(1);
         }
