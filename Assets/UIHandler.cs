@@ -15,6 +15,7 @@ public class UIHandler : MonoBehaviour
     public GameObject[] colorBases = new GameObject[4];
     public TMP_Text adminHandler;
     public TMP_InputField bottleGenInput;
+    public TMP_InputField levelInput;
 
     private TMP_InputField[] colors;
     private TMP_Text[] mys;
@@ -67,6 +68,8 @@ public class UIHandler : MonoBehaviour
     public void AddBottle() {
         bottleGen.AddBottle();
     }
+
+    
 
     public void RemoveLiquid(int i) {
         levelDesigner.RemoveColor(bottle, i, out List<LiquidUnit> liquidUnits);
@@ -163,5 +166,9 @@ public class UIHandler : MonoBehaviour
         } else {
             mys.text = "False";
         }
+    }
+
+    public string LevelInput {
+        get { return levelInput.text; }
     }
 }

@@ -28,7 +28,6 @@ public class AnimationHandler : MonoBehaviour
     private SortingGroup sortingGroup;
 
     void Start() {
-
         originalPos = visual.position;
         targetPos = originalPos;
         originalRotation = Quaternion.identity;
@@ -36,14 +35,20 @@ public class AnimationHandler : MonoBehaviour
 
         sortingGroup = currentBottle.GetComponent<SortingGroup>();
         originalSortingOrder = sortingGroup.sortingOrder;
-
-        //Time.timeScale = 0.25f;
     }
 
+
     void Update() {
+        if (visual.position == targetPos) {
+            return;
+        } else if (Mathf.Abs(visual.position.x - targetPos.x) < 0.001) {
+            visual.position = targetPos;
+            return;
+        }
 
         visual.position = Vector3.Lerp(visual.position, targetPos, Time.deltaTime * 5);
         visual.rotation = Quaternion.Lerp(visual.rotation, targetRot, Time.deltaTime * 5);
+
     }
 
     public void SelectedHover(bool hover) {
@@ -57,7 +62,7 @@ public class AnimationHandler : MonoBehaviour
     }
 
     public void Play(int action, Bottle nextBottle = null, Vector3 newPos = new Vector3()) {
-        if (isBusy) return;
+        if (IsBusy) return;
 
         switch (action) {
             case 1:
@@ -67,7 +72,7 @@ public class AnimationHandler : MonoBehaviour
                 StartCoroutine(PourRoutine(nextBottle));
                 break;
             case 3:
-                StartCoroutine(NewBottleRoutine(newPos));
+                StartCoroutine(Test(newPos));
                 break;
             default:
                 break;
@@ -77,20 +82,22 @@ public class AnimationHandler : MonoBehaviour
     private IEnumerator TopPosition(bool isIt, bool isPour = false) {
         if (isIt) {
             sortingGroup.sortingOrder = 1000;
-        } else {
-            if (isPour) yield return new WaitForSeconds(pourDuration + Time.deltaTime * 5); //WIP need fixing with timing
-            sortingGroup.sortingOrder = originalSortingOrder;
         }
+        if (isPour) yield return new WaitForSeconds(pourDuration + Time.deltaTime * 5); //WIP need fixing with timing
+        sortingGroup.sortingOrder = originalSortingOrder;
     }
 
-    private IEnumerator NewBottleRoutine(Vector3 newPos) {
+    private IEnumerator Test(Vector3 newPos) {
+        yield return new WaitForSeconds(0.01f);
         targetPos = newPos;
-        originalPos = targetPos;
-        yield return new WaitForSeconds(0.5f);
+        originalPos = newPos;
+        yield return new WaitForSeconds(1f);
+        transform.position = newPos;
+        visual.position = newPos;
     }
 
     private IEnumerator ShakeRoutine() {
-        isBusy = true;
+        IsBusy = true;
 
         for (int i = 0; i < 3; i++) {
             visual.rotation = Quaternion.Euler(0, 0, shakeAngle);
@@ -102,7 +109,7 @@ public class AnimationHandler : MonoBehaviour
 
         visual.rotation = originalRotation;
 
-        isBusy = false;
+        IsBusy = false;
     }
 
     private void LeftPour() {
@@ -116,7 +123,7 @@ public class AnimationHandler : MonoBehaviour
     }
 
     private IEnumerator PourRoutine(Bottle nextBottle) {
-        isBusy = true;
+        IsBusy = true;
 
         Transform bottleIndex = nextBottle.transform;
         newPos = bottleIndex.position;
@@ -155,6 +162,12 @@ public class AnimationHandler : MonoBehaviour
         targetRot = originalRotation;
         SelectedHover(false);
         StartCoroutine(TopPosition(false, true));
-        isBusy = false;
+        IsBusy = false;
     }
+
+    public bool IsBusy {
+        get { return isBusy; }
+        private set { isBusy = value; }
+    }
+
 }

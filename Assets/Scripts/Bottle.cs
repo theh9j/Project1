@@ -53,7 +53,7 @@ public class Bottle : MonoBehaviour {
 
     public bool Pour(Bottle nextBottle) {
         
-        if (!CanPourTo(nextBottle)) return false;
+        if (!CanPourTo(nextBottle) || nextBottle.anim.IsBusy) return false;
         changes = 1;
         LiquidColor pourColor = GetTopLiquid().colorId;
 

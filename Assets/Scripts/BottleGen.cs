@@ -5,7 +5,7 @@ public class BottleGen : MonoBehaviour
 {
     [Header("GenObject")]
     public GameObject bottle;
-    List<Bottle> bottles = new List<Bottle>();
+    public List<Bottle> bottles = new List<Bottle>();
 
     [Header("Settings")]
     public int minBottleCount = 2;
@@ -15,11 +15,13 @@ public class BottleGen : MonoBehaviour
     public float xSpacing = 2.5f;
     public float ySpacing = 8.5f;
     public float pointNemoY = 7.5f;
+    public float screenOffset = 50f;
 
 
     private int prefCol = 6;
     private int amount;
     private int lastRowCount = 0;
+    private float spawnX;
     private int rowIndex;
     private int genCount;
 
@@ -54,6 +56,7 @@ public class BottleGen : MonoBehaviour
             }
             rowIndex++;
         }
+        rowIndex--;
     }
 
     public void AddBottle() {
@@ -62,7 +65,6 @@ public class BottleGen : MonoBehaviour
                 Debug.Log("Cannot add more bottles, max capacity reached!");
                 return;
             }
-            rowIndex--;
 
             float rowWidth = lastRowCount * xSpacing;
             float startX = Vector2.zero.x - rowWidth / 2f;
@@ -72,13 +74,29 @@ public class BottleGen : MonoBehaviour
                 bottles[i].anim.Play(3, null, new Vector3(newLoc.x, newLoc.y, 0f));
                 j++;
             }
-            genCount++;
             lastRowCount++;
 
-            Vector2 newBottleVec = new Vector2(startX + j * xSpacing, pointNemoY - rowIndex * ySpacing);
-            GameObject newBottle = Instantiate(bottle, newBottleVec, Quaternion.identity, transform);
-            newBottle.name = $"Bottle_{genCount}";
+            Vector2 newBottleVec = new Vector2(spawnX, pointNemoY - rowIndex * ySpacing);
+
+            GameObject newBottleTrans = Instantiate(
+                bottle, 
+                newBottleVec, 
+                Quaternion.identity, 
+                transform);
+
+            genCount++;
+            newBottleTrans.name = $"Bottle_{genCount}";
+            
+            Bottle newBottle = newBottleTrans.GetComponent<Bottle>();
+
+            newBottle.anim.Play(
+                3, 
+                null, 
+                new Vector3(startX + j * xSpacing, newBottleVec.y, 0f));
+
+            
             bottles.Add(newBottle.GetComponent<Bottle>());
+            
         }
 
     }
@@ -88,6 +106,7 @@ public class BottleGen : MonoBehaviour
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
+            bottles = new List<Bottle>();
         }
     }
 
@@ -118,5 +137,11 @@ public class BottleGen : MonoBehaviour
             11 => 6,
             _ => 6
         };
+    }
+
+    private void Start() {
+        spawnX = Camera.main.ScreenToWorldPoint(
+            new Vector3(Screen.width + screenOffset, 0f, Camera.main.nearClipPlane)
+            ).x;
     }
 }
