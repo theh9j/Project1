@@ -120,10 +120,7 @@ public class UIHandler : MonoBehaviour
         admin = !admin;
     }
 
-    public bool Selection {
-        get { return selected; }
-        private set { selected = value; }
-    }
+    
 
     private void SetColor(LiquidUnit liquid, TMP_InputField color, TMP_Text mys) {
 
@@ -170,5 +167,9 @@ public class UIHandler : MonoBehaviour
 
     public string LevelInput {
         get { return levelInput.text; }
+    }
+    public bool Selection {
+        get { return selected; }
+        private set { selected = value; }
     }
 }

@@ -33,7 +33,7 @@ public class AnimationHandler : MonoBehaviour
         originalRotation = Quaternion.identity;
         targetRot = originalRotation;
 
-        sortingGroup = currentBottle.GetComponent<SortingGroup>();
+        sortingGroup = transform.GetComponent<SortingGroup>();
         originalSortingOrder = sortingGroup.sortingOrder;
     }
 
@@ -83,12 +83,12 @@ public class AnimationHandler : MonoBehaviour
         if (isIt) {
             sortingGroup.sortingOrder = 1000;
         }
-        if (isPour) yield return new WaitForSeconds(pourDuration + Time.deltaTime * 5); //WIP need fixing with timing
+        if (isPour) yield return new WaitForSeconds(pourDuration + Time.deltaTime * 5);
         sortingGroup.sortingOrder = originalSortingOrder;
     }
 
     private IEnumerator Test(Vector3 newPos) {
-        yield return new WaitForSeconds(0.01f);
+        yield return new WaitForSeconds(0.01f); // To prevent runs before Start()
         targetPos = newPos;
         originalPos = newPos;
         yield return new WaitForSeconds(1f);

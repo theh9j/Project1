@@ -37,16 +37,11 @@ public class InputHandler : MonoBehaviour
             if (!ui.Selection && (prev == null || prev == bottle)) {
                 if (prev == null ) prev = bottle;
                 bottle.anim.SelectedHover(true);
-
-
                 ui.BottleSelectedChangeColor(bottle);
-
-
 
             } else {
                 prev.anim.SelectedHover(false);
                 prev = null;
-
                 ui.BottleSelectedChangeColor();
             }
             

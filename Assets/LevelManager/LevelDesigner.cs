@@ -36,6 +36,7 @@ public class LevelDesigner : MonoBehaviour
                     liquidUnits.RemoveAt(i);
                 } else {
                     Debug.LogWarning($"Invalid color input for color at {i}");
+                    break;
                 }
             }
         }
