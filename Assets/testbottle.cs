@@ -69,7 +69,7 @@ public class BottleTest : MonoBehaviour {
         for (int i = 0; i < bottleB.CurrentCapacity(); i++) {
             Debug.Log("Bottle B unit " + i + ": " + bottleB.liquidUnits[i].colorId);
         }
-        Debug.Log(bottleA.isCompleted.ToString());
-        Debug.Log(bottleB.isCompleted.ToString());
+        Debug.Log(bottleA.Completion.ToString());
+        Debug.Log(bottleB.Completion.ToString());
     }
 }

@@ -11,7 +11,9 @@ public class AnimationHandler : MonoBehaviour
 
     private Vector3 newPos;
     private Quaternion newRot;
+    private Vector3 capPos;
 
+    [SerializeField] private Transform bottleCap;
     [SerializeField] private Transform visual;
     [SerializeField] private Bottle currentBottle;
 
@@ -40,6 +42,16 @@ public class AnimationHandler : MonoBehaviour
 
     void Update() {
 
+        if (currentBottle.Completion) {
+            if (bottleCap.position == capPos) return;
+
+            if (Vector3.Distance(bottleCap.position, capPos) < 0.001f) {
+                bottleCap.position = capPos;
+                return;
+            } 
+            bottleCap.position = Vector3.Lerp(bottleCap.position, capPos, Time.deltaTime * 5);
+        }
+
         if (Vector3.Distance(visual.position, originalPos) < .001f) {
             transform.position = originalPos;
             visual.position = originalPos;
@@ -54,6 +66,7 @@ public class AnimationHandler : MonoBehaviour
         }
         visual.position = Vector3.Lerp(visual.position, targetPos, Time.deltaTime * 5);
         visual.rotation = Quaternion.Lerp(visual.rotation, targetRot, Time.deltaTime * 5);
+
 
     }
 
@@ -80,8 +93,25 @@ public class AnimationHandler : MonoBehaviour
             case 3:
                 StartCoroutine(AddBottle(newPos));
                 break;
+            case 4:
+                StartCoroutine(Cap(newPos));
+                break;
             default:
                 break;
+        }
+    }
+
+    private IEnumerator Cap(Vector3 newPos) {
+        yield return new WaitForSeconds(pourDuration * currentBottle.LastChanges);
+        Color cap = bottleCap.GetComponent<SpriteRenderer>().color;
+        cap.a = 0;
+        bottleCap.GetComponent<SpriteRenderer>().color = cap;
+        capPos = newPos;
+        bottleCap.gameObject.SetActive(true);
+        for (int i = 0; i < 5; i++) {
+            yield return new WaitForSeconds(0.1f);
+            cap.a += 0.2f;
+            bottleCap.GetComponent<SpriteRenderer>().color = cap;
         }
     }
 
@@ -152,7 +182,7 @@ public class AnimationHandler : MonoBehaviour
         targetPos = newPos;
         
 
-        yield return new WaitForSeconds(pourDuration * currentBottle.lastChanges);
+        yield return new WaitForSeconds(pourDuration * currentBottle.LastChanges);
         currentBottle.RefreshView();
         nextBottle.RefreshView();
         yield return new WaitForSeconds(0.2f);

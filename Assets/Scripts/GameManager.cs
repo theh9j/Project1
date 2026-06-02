@@ -5,8 +5,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public BottleGen bottle;
-    private List<Bottle> bottles = new List<Bottle>();
+    public BottleGen bottleGen;
     private Bottle from;
     private bool res;
 
@@ -23,48 +22,46 @@ public class GameManager : MonoBehaviour
     //    OnCompletion();
     //}
 
-    //public void OnCompletion() {
-    //    if (!InGame()) return;
-    //    int i = 0;
-    //    foreach (Bottle bot in bottles) {
-    //        if (!bot.isCompleted && !bot.IsEmpty) return;
-    //        i++;
+    public void OnCompletion() {
 
-    //    }
 
-    //    Debug.Log("Game Completed!");
+        Debug.Log("Game Completed!");
 
-    //}
+    }
 
     public bool BottleAvailable(Bottle currentBottle) {
-        if (currentBottle.isLocked || currentBottle.isCompleted) return false;
+        if (currentBottle.isLocked || currentBottle.Completion) return false;
         return true;
     }
 
-    //public bool InGame() {
-    //    int bottles = bottle.genAmount;
-    //    if (bottles == 0) return false;
-    //    return true;
-    //}
+    public void InGame() {
+        int i = 0;
+        foreach (Bottle bottle in bottleGen.bottles) {
+            if (!bottle.IsEmpty || !bottle.Completion) {
+                i++;
+            }
+        }
+        if (i == 0) OnCompletion();
+    }
 
     public void TryPour(Bottle to) {
-        if (to.IsOccupied) return;
-        to.IsOccupied = true;
+        if (to.isOccupied) return;
+        to.isOccupied = true;
 
         if (from == null) {
             if (to.IsEmpty) {
                 to.anim.Play(1);
-                to.IsOccupied = false;
+                to.isOccupied = false;
                 return;
             }
             from = to;
             from.anim.SelectedHover(true);
-            to.IsOccupied = false;
+            to.isOccupied = false;
             return;
         } else if (from == to) {
             from.anim.SelectedHover(false);
             from = null;
-            to.IsOccupied = false;
+            to.isOccupied = false;
             return;
         }
         res = from.Pour(to);
@@ -74,7 +71,7 @@ public class GameManager : MonoBehaviour
         } else {
             to.anim.Play(1);
         }
-        to.IsOccupied = false;
+        to.isOccupied = false;
     }
 
     

@@ -5,18 +5,17 @@ public class Bottle : MonoBehaviour {
 
     public AnimationHandler anim;
     private BottleView bottleView;
-    public bool isLocked = false;
-    public bool isCompleted = false;
-
-    public int maxCapacity = 4;
     public List<LiquidUnit> liquidUnits = new List<LiquidUnit>();
-
-
+    public bool isLocked = false;
+    public int maxCapacity = 4;
+    public bool isOccupied = false;
     public bool IsEmpty => liquidUnits.Count == 0;
+
+
     private bool IsFull => liquidUnits.Count >= maxCapacity;
-    private bool isOccupied = false;
     private int changes;
-    public int lastChanges => changes;
+    private bool isCompleted = false;
+    public int LastChanges => changes;
 
     public void BottleInit(List<LiquidUnit> initialLiquids) {
         liquidUnits = new List<LiquidUnit>();
@@ -24,6 +23,12 @@ public class Bottle : MonoBehaviour {
         foreach (LiquidUnit liquid in initialLiquids) {
             liquidUnits.Add(new LiquidUnit(liquid));
         }
+    }
+
+    public void AttemptComplete() {
+        Completion = true;
+        anim.Play(4, null, transform.position + Vector3.up * 2.5f);
+
     }
 
     public int CurrentCapacity() {
@@ -89,7 +94,7 @@ public class Bottle : MonoBehaviour {
             }
         }
         if (i == 4) {
-            nextbottle.isCompleted = true;
+            nextbottle.AttemptComplete();
         }
     }
 
@@ -105,9 +110,9 @@ public class Bottle : MonoBehaviour {
         bottleView.Refresh(liquidUnits);
     }
 
-    public bool IsOccupied {
-        get { return isOccupied; }
-        set { isOccupied = value; }
+    public bool Completion {
+        get { return isCompleted; }
+        private set { isCompleted = value; }
     }
 
 }
