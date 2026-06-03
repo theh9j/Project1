@@ -119,6 +119,57 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &107534850
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 107534852}
+  - component: {fileID: 107534851}
+  m_Layer: 0
+  m_Name: LevelCreator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &107534851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 107534850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22d453f1b69ead746ae62566ada15b38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelCreator
+  ui: {fileID: 774628082}
+  bottleGen: {fileID: 0}
+  levelData:
+    levelNumber: 0
+    variantIndex: 0
+    bottleCount: 0
+    bottes: []
+--- !u!4 &107534852
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 107534850}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1205701423}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &169360999
 GameObject:
   m_ObjectHideFlags: 0
@@ -380,13 +431,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   bottle: {fileID: 1398085283671719415, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
+  bottles: []
   minBottleCount: 2
   maxBottleCount: 16
   rowCount: 3
   colCount: 6
-  xSpacing: 2.5
+  xSpacing: 2.6
   ySpacing: 8.2
   pointNemoY: 7.5
+  screenOffset: 20
 --- !u!1 &213757993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1306,6 +1359,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 387856696}
   m_CullTransparentMesh: 1
+--- !u!4 &388097241 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3373396530423720878, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
+  m_PrefabInstance: {fileID: 4079664455376602560}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &401695419
 GameObject:
   m_ObjectHideFlags: 0
@@ -2218,6 +2276,97 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 538764595}
   m_CullTransparentMesh: 1
+--- !u!1 &600562132
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 600562133}
+  - component: {fileID: 600562134}
+  m_Layer: 0
+  m_Name: BottleCap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &600562133
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 600562132}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 4.56, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 388097241}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &600562134
+SpriteRenderer:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 600562132}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 11
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: 3743478687710395796, guid: 1416001056307c345a364a2e1fcc4f4d, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_SpriteSortPoint: 0
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -2563,7 +2712,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3038,6 +3187,7 @@ MonoBehaviour:
   - {fileID: 2119412456}
   adminHandler: {fileID: 1288305705}
   bottleGenInput: {fileID: 732077796}
+  levelInput: {fileID: 0}
   admin: 1
 --- !u!1 &791549888
 GameObject:
@@ -3581,7 +3731,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65b938e47364dd3499ea5e5d003f69c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  bottle: {fileID: 189255339}
+  bottleGen: {fileID: 0}
 --- !u!1 &852517653
 GameObject:
   m_ObjectHideFlags: 0
@@ -4440,7 +4590,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1189629682}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 107534851}
+        m_TargetAssemblyTypeName: LevelCreator, Assembly-CSharp
+        m_MethodName: SaveLevel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1189629682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4511,6 +4673,7 @@ Transform:
   - {fileID: 847021334}
   - {fileID: 937750831}
   - {fileID: 1889088418}
+  - {fileID: 107534852}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1216724173
@@ -8664,8 +8827,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1398085283671719415, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2365797125646157300, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
+      propertyPath: bottleCap
+      value: 
+      objectReference: {fileID: 600562133}
     - target: {fileID: 3294365353505116966, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4.65556
@@ -8708,7 +8875,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 3373396530423720878, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 600562133}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
 --- !u!1660057539 &9223372036854775807

@@ -1,21 +1,24 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Bottle : MonoBehaviour {
 
     public AnimationHandler anim;
     private BottleView bottleView;
+    private readonly ColorTranslator colorTranslate = new();
     public List<LiquidUnit> liquidUnits = new List<LiquidUnit>();
+    public UnityEvent onBottleCompletion;
+
+
     public bool isLocked = false;
+    public LiquidColor lockColor;
+
+
     public int maxCapacity = 4;
     public bool isOccupied = false;
-    public bool IsEmpty => liquidUnits.Count == 0;
-
-
-    private bool IsFull => liquidUnits.Count >= maxCapacity;
-    private int changes;
+    public int changes;
     private bool isCompleted = false;
-    public int LastChanges => changes;
 
     public void BottleInit(List<LiquidUnit> initialLiquids) {
         liquidUnits = new List<LiquidUnit>();
@@ -27,8 +30,20 @@ public class Bottle : MonoBehaviour {
 
     public void AttemptComplete() {
         Completion = true;
-        anim.Play(4, null, transform.position + Vector3.up * 2.5f);
+        onBottleCompletion?.Invoke();
+        anim.Play(4, null, transform.position + Vector3.up * 2.75f);
+    }
 
+    public void RemoveConditionalLock() {
+        lockColor = LiquidColor.unknown;
+        isLocked = false;
+        anim.Play(5, null, transform.position + Vector3.up * 10f);
+    }
+
+    public void SetLocker(LiquidColor color) {
+        isLocked = true;
+        lockColor = color;
+        transform.GetChild(3).GetChild(0).GetComponent<SpriteRenderer>().color = colorTranslate.GetColor(color);
     }
 
     public int CurrentCapacity() {
@@ -115,4 +130,6 @@ public class Bottle : MonoBehaviour {
         private set { isCompleted = value; }
     }
 
+    public bool IsEmpty => liquidUnits.Count == 0;
+    private bool IsFull => liquidUnits.Count >= maxCapacity;
 }

@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class BottleGen : MonoBehaviour
 {
     [Header("GenObject")]
     public GameObject bottle;
-    public List<Bottle> bottles = new List<Bottle>();
+    public List<Bottle> bottles = new List<Bottle>();   
+    public UnityEvent<Bottle> newBot;
 
     [Header("Settings")]
     public int minBottleCount = 2;
@@ -18,56 +20,23 @@ public class BottleGen : MonoBehaviour
     public float screenOffset = 50f;
 
 
-    private int prefCol = 6;
-    private int amount;
     private int lastRowCount = 0;
     private float spawnX;
     private int rowIndex;
     private int genCount;
 
-    public void GenerateBottles()
-    {
-        int maxSlot = rowCount * colCount;
-        amount = Mathf.Min(amount, maxSlot);
-
-        genCount = 0;
-        rowIndex = 0;
-        while (genCount < amount && rowIndex < rowCount)
-        {
-            lastRowCount = 0;
-            int remaining = amount - genCount;
-
-            prefCol = GetColumnsForBottleCount(amount);
-            int bottleThisRow = Mathf.Min(remaining, prefCol);
-
-            float rowWidth = (bottleThisRow - 1) * xSpacing;
-
-            float startX = Vector2.zero.x - rowWidth / 2f;
-
-            for (int i = 0; i < bottleThisRow; i++)
-            {
-                Vector2 spawnPoint = new Vector2(startX + i * xSpacing, pointNemoY - rowIndex * ySpacing);
-                GameObject currentBot = Instantiate(bottle, spawnPoint, Quaternion.identity, transform);
-                currentBot.name = $"Bottle_{genCount + 1}";
-                Bottle bot = currentBot.GetComponent<Bottle>();
-                bottles.Add(bot);
-                genCount++;
-                lastRowCount++;
-            }
-            rowIndex++;
-        }
-        rowIndex--;
-    }
-
-    public void AddBottle() {
+    public void AddBottle(int prefCol = 0) {
         if (genCount == maxBottleCount+2 || rowIndex == rowCount) {
             Debug.Log("Cannot add more bottles, max capacity reached!");
             return;
         }
 
+        if (prefCol == 0) prefCol = colCount;
+
+
         float startX;
         int j;
-        if (lastRowCount < colCount) {
+        if (lastRowCount < prefCol && genCount != 0) {
 
             float rowWidth = lastRowCount * xSpacing;
             startX = Vector2.zero.x - rowWidth / 2f;
@@ -78,11 +47,12 @@ public class BottleGen : MonoBehaviour
                 j++;
             }
             lastRowCount++;
-            if (lastRowCount == colCount) rowIndex++;
         } else {
             startX = Vector2.zero.x;
             j = 0;
             lastRowCount = 1;
+            if (genCount != 0) rowIndex++;
+            if (rowIndex == rowCount) return;
         }
 
         Vector2 newBottleVec = new Vector2(spawnX, pointNemoY - rowIndex * ySpacing);
@@ -102,13 +72,14 @@ public class BottleGen : MonoBehaviour
             3,
             null,
             new Vector3(startX + j * xSpacing, newBottleVec.y, 0f));
-
+        newBot?.Invoke(newBottle);
         bottles.Add(newBottle.GetComponent<Bottle>());
     }
 
 
     public void ClearBottles()
     {
+        rowIndex = 0;
         genCount = 0;
         bottles = new List<Bottle>();
         foreach (Transform child in transform)
@@ -124,9 +95,12 @@ public class BottleGen : MonoBehaviour
             Debug.LogError($"Invalid bottle count generation!");
             return;
         }
+
         ClearBottles();
-        this.amount = amount;
-        GenerateBottles();
+        int prefCol = GetColumnsForBottleCount(amount);
+        for (int i = 0; i < amount; i++) {
+            AddBottle(prefCol);
+        }
     }
 
     private int GetColumnsForBottleCount(int count)
