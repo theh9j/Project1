@@ -27,33 +27,35 @@ public class InputHandler : MonoBehaviour
     private void onMouseDown() {
         Vector2 worldPos = mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
+
         if (hit.collider == null) return;
 
-        if (hit.collider.GetComponent<Bottle>() == null) return;
-
         Bottle bottle = hit.collider.GetComponent<Bottle>();
+        if (bottle == null) return;
 
         if (ui.admin) {
-            if (!ui.Selection && (prev == null || prev == bottle)) {
-                if (prev == null ) prev = bottle;
-                bottle.anim.SelectedHover(true);
-                ui.BottleSelectedChangeColor(bottle);
-
-            } else {
+            if (prev == bottle) {
                 prev.anim.SelectedHover(false);
                 prev = null;
                 ui.BottleSelectedChangeColor();
-            }
-            
-
-        } else {
-            if (!gameManager.BottleAvailable(bottle)) {
-                bottle.anim.Play(1);
                 return;
             }
 
-            gameManager.TryPour(bottle);
+            if (prev != null)
+                prev.anim.SelectedHover(false);
+
+            prev = bottle;
+            prev.anim.SelectedHover(true);
+            ui.BottleSelectedChangeColor(prev);
+
+            return;
         }
-        
+
+        if (!gameManager.BottleAvailable(bottle)) {
+            bottle.anim.Play(1);
+            return;
+        }
+
+        gameManager.TryPour(bottle);
     }
 }

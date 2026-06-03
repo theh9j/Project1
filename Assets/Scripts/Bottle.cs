@@ -105,6 +105,7 @@ public class Bottle : MonoBehaviour {
                 }
             }
         }
+        nextBottle.changes = -changes;
         BottleSatisfy(nextBottle);
         return true;
     }

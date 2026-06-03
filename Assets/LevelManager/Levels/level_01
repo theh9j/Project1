@@ -1,0 +1,78 @@
+{
+    "levelNumber": 1,
+    "bottleCount": 4,
+    "bottles": [
+        {
+            "liquids": [
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 2,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 2,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 3,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 8
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": true,
+            "lockCondition": 2
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 2,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 2,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 8
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 3,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 3,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 3,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 8
+        }
+    ]
+}

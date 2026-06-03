@@ -1,140 +1,228 @@
-using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
+using DG.Tweening;
 
-public partial class AnimationHandler : MonoBehaviour
-{
-    private Vector3 originalPos;
-    private Vector3 targetPos;
-    private Quaternion originalRotation;
-    private Quaternion targetRot;
-
-    private Vector3 newPos;
-    private Quaternion newRot;
-    private Vector3 capPos;
-
+public class AnimationHandler : MonoBehaviour {
+    [Header("References")]
     [SerializeField] private Transform bottleCap;
     [SerializeField] private Transform cover;
     [SerializeField] private Transform visual;
     [SerializeField] private Bottle currentBottle;
 
+    [Header("Pour Settings")]
     public float pourCornerOffset = 3.1f;
     public float pourHeiOffset = 4f;
     public float pourDuration = 0.35f;
     public float pourAngle = 95f;
 
-    private float shakeDuration = 0.02f;
-    private float shakeAngle = 2f;
+    [Header("Shake Settings")]
+    [SerializeField] private float shakeDuration = 0.15f;
+    [SerializeField] private float shakeAngle = 2f;
 
-    private bool isBusy = false;
+    private Vector3 originalPos;
+    private Quaternion originalRotation;
+
     private int originalSortingOrder;
     private SortingGroup sortingGroup;
 
-    private IEnumerator RemoveCover(Vector3 newPos) {
-        Color cloth = cover.GetComponent<SpriteRenderer>().color;
-        Color indicator = cover.GetChild(0).GetComponent<SpriteRenderer>().color;
-        for (int i = 0; i < 10; i++) {
-            yield return new WaitForSeconds(0.05f);
-            cloth.a -= .1f;
-            indicator.a -= .1f;
-            cover.GetComponent<SpriteRenderer>().color = cloth;
-            cover.GetChild(0).GetComponent<SpriteRenderer>().color = indicator;
-        }
-        cover.gameObject.SetActive(false);
+    public bool IsBusy { get; private set; }
+
+    void Start() {
+        originalPos = visual.position;
+        originalRotation = visual.rotation;
+
+        sortingGroup = GetComponent<SortingGroup>();
+
+        if (sortingGroup != null)
+            originalSortingOrder = sortingGroup.sortingOrder;
     }
 
-    private IEnumerator Cap(Vector3 newPos) {
-        yield return new WaitForSeconds(pourDuration * currentBottle.changes + .5f);
-        Color cap = bottleCap.GetComponent<SpriteRenderer>().color;
-        cap.a = 0;
-        bottleCap.GetComponent<SpriteRenderer>().color = cap;
-        bottleCap.gameObject.SetActive(true);
-        capPos = newPos;
-        for (int i = 0; i < 10; i++) {
-            yield return new WaitForSeconds(0.05f);
-            cap.a += 0.1f;
-            bottleCap.GetComponent<SpriteRenderer>().color = cap;
-        }
-    }
+    public void SelectedHover(bool hover) {
+        visual.DOKill();
 
-    private IEnumerator AddBottle(Vector3 newPos) {
-        yield return new WaitForEndOfFrame(); // To prevent runs before Start()
-        targetPos = newPos;
-        originalPos = newPos;
-    }
+        if (hover) {
+            BringToFront();
 
-    private IEnumerator ShakeRoutine() {
-        IsBusy = true;
-
-        for (int i = 0; i < 3; i++) {
-            visual.rotation = Quaternion.Euler(0, 0, shakeAngle);
-            yield return new WaitForSeconds(shakeDuration);
-
-            visual.rotation = Quaternion.Euler(0, 0, -shakeAngle);
-            yield return new WaitForSeconds(shakeDuration);
-        }
-
-        visual.rotation = originalRotation;
-
-        IsBusy = false;
-    }
-
-    private void LeftPour() {
-        newPos.x = newPos.x - pourCornerOffset;
-        newRot = Quaternion.Euler(0, 0, -pourAngle);
-    }
-
-    private void RightPour() {
-        newPos.x = newPos.x + pourCornerOffset;
-        newRot = Quaternion.Euler(0, 0, pourAngle);
-    }
-
-    private IEnumerator PourRoutine(Bottle nextBottle) {
-        IsBusy = true;
-
-        Transform bottleIndex = nextBottle.transform;
-        newPos = bottleIndex.position;
-        newRot = bottleIndex.rotation;
-
-        newPos.y = newPos.y + pourHeiOffset;
-        if (originalPos.x > newPos.x) {
-            RightPour();
-        } else if (originalPos.x < newPos.x) {
-            LeftPour();
+            visual.DOMove(originalPos + Vector3.up * 1.2f, 0.2f)
+                .SetEase(Ease.OutQuad);
         } else {
-            if (originalPos.x >= 0) {
-                targetPos = originalPos + Vector3.left * 2f;
-                LeftPour(); 
-            } else {
-                targetPos = originalPos + Vector3.right * 2f;
-                RightPour();
-            }
+            visual.DOMove(originalPos, 0.2f)
+                .SetEase(Ease.OutQuad)
+                .OnComplete(RestoreSorting);
+        }
+    }
+
+    private void PlayShake() {
+        if (visual == null) return;
+
+        visual.DOKill();
+
+        visual.DOShakeRotation(
+            0.2f,
+            new Vector3(0, 0, 8f),
+            12,
+            0
+        )
+        .OnComplete(() => {
+            visual.localRotation = Quaternion.identity;
+        });
+    }
+
+    private void PlayPour(Bottle nextBottle) {
+        if (nextBottle == null) return;
+
+        IsBusy = true;
+        BringToFront();
+
+        visual.DOKill();
+
+        Vector3 targetPos = nextBottle.transform.position;
+        targetPos.y += pourHeiOffset;
+
+        float angle;
+
+        if (originalPos.x > nextBottle.transform.position.x) {
+            targetPos.x += pourCornerOffset;
+            angle = pourAngle;
+        } else {
+            targetPos.x -= pourCornerOffset;
+            angle = -pourAngle;
         }
 
-        targetRot = newRot;
-        targetPos = newPos;
+        Sequence sequence = DOTween.Sequence();
 
-        yield return new WaitForSeconds(pourDuration * currentBottle.changes);
-        currentBottle.RefreshView();
-        nextBottle.RefreshView();
-        yield return new WaitForSeconds(0.2f);
-        newRot = Quaternion.identity;
-        newPos = Vector3.zero;
+        sequence.Append(
+            visual.DOMove(targetPos, pourDuration)
+                .SetEase(Ease.OutQuad)
+        );
 
-        targetRot = originalRotation;
-        SelectedHover(false);
-        IsBusy = false;
+        sequence.Join(
+            visual.DORotate(new Vector3(0, 0, angle), pourDuration)
+                .SetEase(Ease.OutQuad)
+        );
+
+        sequence.AppendInterval(pourDuration * currentBottle.changes);
+
+        sequence.AppendCallback(() => {
+            currentBottle.RefreshView();
+            nextBottle.RefreshView();
+        });
+
+        sequence.AppendInterval(0.2f);
+
+        sequence.Append(
+            visual.DOMove(originalPos, pourDuration)
+                .SetEase(Ease.OutQuad)
+        );
+
+        sequence.Join(
+            visual.DORotateQuaternion(originalRotation, pourDuration)
+                .SetEase(Ease.OutQuad)
+        );
+
+        sequence.OnComplete(() => {
+            RestoreSorting();
+            IsBusy = false;
+        });
     }
 
-    public bool IsBusy {
-        get { return isBusy; }
-        private set { isBusy = value; }
+    private void PlayCap(Vector3 finalPos) {
+        if (bottleCap == null) return;
+
+        bottleCap.DOKill();
+
+        SpriteRenderer capRenderer = bottleCap.GetComponent<SpriteRenderer>();
+
+        Vector3 startPos = finalPos + Vector3.up * 1.5f;
+
+        bottleCap.position = startPos;
+        bottleCap.gameObject.SetActive(true);
+
+        Color color = capRenderer.color;
+        color.a = 0f;
+        capRenderer.color = color;
+
+        Sequence seq = DOTween.Sequence();
+
+        seq.AppendInterval(pourDuration * -currentBottle.changes + .75f);
+
+        seq.Append(capRenderer.DOFade(1f, 0.1f));
+
+        seq.Join(
+            bottleCap.DOMove(finalPos, 0.35f)
+                .SetEase(Ease.InQuad)
+        );
     }
 
-    private bool ConSim(Vector3 a, Vector3 b) {
-        if (Vector3.Distance(a, b) < .005f) return true;
-        return false;
+    private void RemoveCover() {
+        if (cover == null) return;
+
+        cover.DOKill();
+
+        SpriteRenderer cloth = cover.GetComponent<SpriteRenderer>();
+        SpriteRenderer indicator = cover.GetChild(0).GetComponent<SpriteRenderer>();
+
+        Vector3 endPos = cover.position + Vector3.up * 1.5f;
+
+        Sequence seq = DOTween.Sequence();
+
+        seq.Join(
+            cover.DOMove(endPos, 0.45f)
+                .SetEase(Ease.OutQuad)
+        );
+
+        seq.Join(cloth.DOFade(0f, 0.45f));
+
+        if (indicator != null)
+            seq.Join(indicator.DOFade(0f, 0.45f));
+
+        seq.OnComplete(() =>
+        {
+            cover.gameObject.SetActive(false);
+        });
     }
 
+    private void MoveBottleRoot(Vector3 newPos) {
+        transform.DOKill();
+
+        transform.DOMove(newPos, 0.35f)
+            .SetEase(Ease.OutQuad)
+            .OnComplete(() => {
+                originalPos = visual.position;
+            });
+    }
+
+    private void BringToFront() {
+        if (sortingGroup != null)
+            sortingGroup.sortingOrder = 1000;
+    }
+
+    private void RestoreSorting() {
+        if (sortingGroup != null)
+            sortingGroup.sortingOrder = originalSortingOrder;
+    }
+
+    public void Play(int action, Bottle nextBottle = null, Vector3 newPos = default) {
+        if (action == 1) {
+            PlayShake();
+            return;
+        }
+
+        if (IsBusy) return;
+
+        switch (action) {
+            case 2:
+                PlayPour(nextBottle);
+                break;
+            case 3:
+                MoveBottleRoot(newPos);
+                break;
+            case 4:
+                PlayCap(newPos);
+                break;
+            case 5:
+                RemoveCover();
+                break;
+        }
+    }
 }

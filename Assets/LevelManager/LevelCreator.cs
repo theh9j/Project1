@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -7,15 +8,15 @@ public class LevelCreator : MonoBehaviour
 {
     public AdminUIHandler ui;
     public BottleGen bottleGen;
-    public LevelData levelData;
     public LevelTranslator translator;
+    private LevelData levelData;
+    private Dictionary<int, LiquidColor> colorTranslate;
 
     private string path = Application.dataPath + "/LevelManager/Levels/level_";
 
     private void SaveLevel(int result) {
         string json = JsonUtility.ToJson(levelData, true);
-        File.WriteAllText(path + result.ToString(), json);
-
+        File.WriteAllText(path + result.ToString("D2"), json);
     }
 
     public void DataProcess() {
@@ -46,4 +47,59 @@ public class LevelCreator : MonoBehaviour
 
         SaveLevel(result);
     }
+
+    public void LoadLevel(bool randomize = false) {
+        if (!int.TryParse(ui.LevelInput, out int result)) return;
+        if (!File.Exists(path + result.ToString("D2"))) return;
+
+        string json = File.ReadAllText(path + result.ToString("D2"));
+        LevelData data = JsonUtility.FromJson<LevelData>(json);
+
+        LoadData(data, randomize);
+    }
+
+    private void LoadData(LevelData data, bool randomize) {
+        if (randomize) {
+            colorTranslate = translator.Randomizer();
+        } else {
+            colorTranslate = new();
+            for (int i = 0; i < Enum.GetValues(typeof(LiquidColor)).Length; i++) {
+                colorTranslate[i] = ((LiquidColor[])Enum.GetValues(typeof(LiquidColor)))[i];
+            }
+        }
+
+        ui.SetLevel(data.levelNumber.ToString());
+        bottleGen.GenAmount(data.bottleCount);
+
+        List<Bottle> bottleList = bottleGen.bottles;
+
+        for (int i = 0; i < data.bottleCount; i++) {
+
+            if (data.bottles[i].isLocked) {
+                bottleList[i].SetLocker(ColorDebug(data.bottles[i].lockCondition));
+            } 
+            
+
+            for (int j = 0; j < data.bottles[i].liquids.Count; j++) {
+
+                LiquidUnit pendingLiquid = new(
+                    ColorDebug(data.bottles[i].liquids[j].colorId),
+                    data.bottles[i].liquids[j].isMystery
+                    );
+                bottleList[i].liquidUnits.Add(pendingLiquid);
+
+
+            }
+
+        }
+    }
+
+    private LiquidColor ColorDebug(int color) {
+        if (colorTranslate.TryGetValue(color, out LiquidColor result)) {
+            return result;
+        } else {
+            throw new Exception("Critical Error for Color Decode");
+        }
+    }
+
 }

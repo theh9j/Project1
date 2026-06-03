@@ -1,8 +1,6 @@
-using NUnit.Framework;
 using System.Collections.Generic;
-using System.Drawing;
 using TMPro;
-using Unity.Multiplayer.Center.Common;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class AdminUIHandler : MonoBehaviour
@@ -26,6 +24,7 @@ public class AdminUIHandler : MonoBehaviour
     private bool selected = false;
     private TMP_Text lockText;
     private Bottle bottle;
+
     private void Start() {
         lockText = lockInput.transform.Find("Lock/Text (TMP)").GetComponent<TMP_Text>();
         colors = new TMP_InputField[colorBases.Length];
@@ -98,30 +97,37 @@ public class AdminUIHandler : MonoBehaviour
 
         }
     }
+    
+    public void SetLevel(string level) {
+        levelInput.text = level;
+    }
 
-    public void BottleSelectedChangeColor(Bottle currentbottle = null) {
-        
-        Selection = !Selection;
-        if (selected) {
-            bottle = currentbottle;
+    public void BottleSelectedChangeColor(Bottle currentBottle = null) {
+        Selection = currentBottle != null;
+
+        if (Selection) {
+            bottle = currentBottle;
+
             List<LiquidUnit> liquids = bottle.liquidUnits;
 
-            for (int i = 0; i < liquids.Count; i++) {
-                SetColor(liquids[i], colors[i], mys[i]);
+            for (int i = 0; i < colors.Length; i++) {
+                if (i < liquids.Count) {
+                    SetColor(liquids[i], colors[i], mys[i]);
+                } else {
+                    colors[i].text = $"Color{i}";
+                }
             }
-            if (bottle.isLocked) {
-                lockText.text = "Unlock";
-            } else {
-                lockText.text = "Lock";
-            }
+
+            lockText.text = bottle.isLocked ? "Unlock" : "Lock";
         } else {
             bottle = null;
+
             for (int i = 0; i < colors.Length; i++) {
                 colors[i].text = $"Color{i}";
             }
-        }
 
-        
+            lockText.text = "Lock";
+        }
     }
 
     public void SetAdmin() {
