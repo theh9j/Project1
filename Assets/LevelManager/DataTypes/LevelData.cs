@@ -5,9 +5,8 @@ using UnityEngine;
 public class LevelData
 {
     public int levelNumber;
-    public int variantIndex;
 
     public int bottleCount;
 
-    public List<BottleData> bottes = new List<BottleData>();
+    public List<BottleData> bottles = new List<BottleData>();
 }

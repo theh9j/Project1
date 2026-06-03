@@ -9,7 +9,7 @@ public class Bottle : MonoBehaviour {
     private readonly ColorTranslator colorTranslate = new();
     public List<LiquidUnit> liquidUnits = new List<LiquidUnit>();
     public UnityEvent onBottleCompletion;
-    public UnityEvent aBottleCovered;
+    public UnityEvent<Bottle> aBottleCovered;
 
 
     public bool isLocked = false;
@@ -52,8 +52,7 @@ public class Bottle : MonoBehaviour {
         cover.gameObject.SetActive(true);
         cover.GetChild(0).GetComponent<SpriteRenderer>().color = colorTranslate.GetColor(color);
 
-        //Deprecated
-        aBottleCovered?.Invoke();
+        aBottleCovered?.Invoke(this);
     }
 
     public int CurrentCapacity() {

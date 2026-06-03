@@ -17,16 +17,7 @@ public class GameManager : MonoBehaviour
             newBottle.aBottleCovered.AddListener(ConditionalBottleRecord);
         });
 
-
-
     }
-
-
-    //IEnumerator testCompletion() {
-    //    yield return new WaitForSeconds(4);
-
-    //    OnCompletion();
-    //}
 
     public void OnCompletion() {
         conditionalBottles.Clear();
@@ -40,15 +31,12 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    public void ConditionalBottleRecord() {
-        foreach (Bottle bottle in bottleGen.bottles) {
-            if (!bottle.isLocked) return;
-            if (!conditionalBottles.ContainsKey(bottle.lockColor)) {
-                conditionalBottles[bottle.lockColor] = new List<Bottle>();
-            }
-
-            conditionalBottles[bottle.lockColor].Add(bottle);
+    public void ConditionalBottleRecord(Bottle bottle) {
+        if (!conditionalBottles.ContainsKey(bottle.lockColor)) {
+            conditionalBottles[bottle.lockColor] = new List<Bottle>();
         }
+
+        conditionalBottles[bottle.lockColor].Add(bottle);
     }
 
     public void CheckForComplete() {

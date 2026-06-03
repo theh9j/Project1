@@ -1,29 +1,49 @@
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class LevelCreator : MonoBehaviour
 {
     public AdminUIHandler ui;
     public BottleGen bottleGen;
-    public LevelData levelData = new LevelData();
+    public LevelData levelData;
+    public LevelTranslator translator;
 
-    public void SaveLevel() {
+    private string path = Application.dataPath + "/LevelManager/Levels/level_";
+
+    private void SaveLevel(int result) {
         string json = JsonUtility.ToJson(levelData, true);
-        Debug.Log(json);
+        File.WriteAllText(path + result.ToString(), json);
+
     }
 
-    private void DataProcess() {
+    public void DataProcess() {
         if (!int.TryParse(ui.LevelInput, out int result)) return;
-
+        levelData = new();
+        List<Bottle> currentBottleData = bottleGen.bottles;
 
 
         levelData.levelNumber = result;
-        //levelData.levelTypeCount
-        //levelDAta.levelTypeIndex
+        levelData.bottleCount = currentBottleData.Count;
+        Debug.Log(currentBottleData.Count);
+        for (int i = 0; i < currentBottleData.Count; i++) {
 
-        levelData.bottleCount = bottleGen.bottles.Count;
-        foreach (Bottle bottle in bottleGen.bottles) {
+            BottleData bottleData = new();
+            bottleData.isLocked = currentBottleData[i].isLocked;
+            bottleData.lockCondition = translator.TranslatedColor(currentBottleData[i].lockColor);
 
+            for (int j = 0; j < currentBottleData[i].liquidUnits.Count; j++) {
+
+                LiquidData liquidData = new();
+                liquidData.colorId = translator.TranslatedColor(currentBottleData[i].liquidUnits[j].colorId);
+                liquidData.isMystery = currentBottleData[i].liquidUnits[j].isMystery;
+                bottleData.liquids.Add(liquidData);
+
+            }
+            levelData.bottles.Add(bottleData);
         }
-        
+
+        SaveLevel(result);
     }
 }
