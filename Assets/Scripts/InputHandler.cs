@@ -7,7 +7,7 @@ public class InputHandler : MonoBehaviour
     public BottleGen bottleGen;
     public Camera mainCamera;
     public GameManager gameManager;
-    public UIHandler ui;
+    public AdminUIHandler ui;
     public LevelDesigner levelDesigner;
 
     private Bottle prev;

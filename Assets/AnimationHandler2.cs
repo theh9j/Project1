@@ -20,13 +20,13 @@ public partial class AnimationHandler : MonoBehaviour
     void Update() {
 
         if (currentBottle.Completion) {
-            if (ConSim(bottleCap.localPosition, capPos)) {
-                bottleCap.localPosition = capPos;
+            if (ConSim(bottleCap.position, capPos)) {
+                bottleCap.position = capPos;
                 return;
             }
 
-            if (bottleCap.localPosition != capPos) {
-                bottleCap.localPosition = Vector3.Lerp(bottleCap.localPosition, capPos, Time.deltaTime * 5);
+            if (bottleCap.position != capPos) {
+                bottleCap.position = Vector3.Lerp(bottleCap.position, capPos, Time.deltaTime * 5);
             }
         }
 

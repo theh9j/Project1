@@ -33,24 +33,27 @@ public partial class AnimationHandler : MonoBehaviour
 
     private IEnumerator RemoveCover(Vector3 newPos) {
         Color cloth = cover.GetComponent<SpriteRenderer>().color;
-        for (int i = 0; i < 5; i++) {
-            yield return new WaitForSeconds(0.1f);
-            cloth.a -= .2f;
+        Color indicator = cover.GetChild(0).GetComponent<SpriteRenderer>().color;
+        for (int i = 0; i < 10; i++) {
+            yield return new WaitForSeconds(0.05f);
+            cloth.a -= .1f;
+            indicator.a -= .1f;
             cover.GetComponent<SpriteRenderer>().color = cloth;
+            cover.GetChild(0).GetComponent<SpriteRenderer>().color = indicator;
         }
         cover.gameObject.SetActive(false);
     }
 
     private IEnumerator Cap(Vector3 newPos) {
-        yield return new WaitForSeconds(pourDuration * transform.GetComponent<Bottle>().changes + .5f);
+        yield return new WaitForSeconds(pourDuration * currentBottle.changes + .5f);
         Color cap = bottleCap.GetComponent<SpriteRenderer>().color;
         cap.a = 0;
         bottleCap.GetComponent<SpriteRenderer>().color = cap;
         bottleCap.gameObject.SetActive(true);
         capPos = newPos;
-        for (int i = 0; i < 5; i++) {
-            yield return new WaitForSeconds(0.1f);
-            cap.a += 0.2f;
+        for (int i = 0; i < 10; i++) {
+            yield return new WaitForSeconds(0.05f);
+            cap.a += 0.1f;
             bottleCap.GetComponent<SpriteRenderer>().color = cap;
         }
     }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class LevelCreator : MonoBehaviour
 {
-    public UIHandler ui;
+    public AdminUIHandler ui;
     public BottleGen bottleGen;
     public LevelData levelData = new LevelData();
 

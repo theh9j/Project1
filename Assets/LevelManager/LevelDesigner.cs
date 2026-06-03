@@ -9,8 +9,7 @@ public class LevelDesigner : MonoBehaviour
 {
 
     [SerializeField]
-    private UIHandler ui;
-
+    private AdminUIHandler ui;
     private List<LiquidUnit> liquidUnits;
 
     public void SetColors(Bottle bottle, TMP_InputField[] colors, TMP_Text[] mys) {
@@ -59,4 +58,15 @@ public class LevelDesigner : MonoBehaviour
         }
     }
 
+    public void BottleConditioning(Bottle bottle, out bool res, string colorId = null) {
+        res = false;
+        if (colorId == null) {
+            bottle.RemoveConditionalLock();
+        } else {
+            if (Enum.TryParse(colorId.ToLower(), out LiquidColor color)) {
+                bottle.SetLocker(color);
+                res = true;
+            }
+        }
+    }
 }

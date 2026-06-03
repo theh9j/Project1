@@ -14,7 +14,10 @@ public class GameManager : MonoBehaviour
 
         bottleGen.newBot.AddListener((Bottle newBottle) => {
             newBottle.onBottleCompletion.AddListener(CheckForComplete);
+            newBottle.aBottleCovered.AddListener(ConditionalBottleRecord);
         });
+
+
 
     }
 
@@ -37,8 +40,8 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    public void ConditionalBottleRecord(List<Bottle> bottles) {
-        foreach (Bottle bottle in bottles) {
+    public void ConditionalBottleRecord() {
+        foreach (Bottle bottle in bottleGen.bottles) {
             if (!bottle.isLocked) return;
             if (!conditionalBottles.ContainsKey(bottle.lockColor)) {
                 conditionalBottles[bottle.lockColor] = new List<Bottle>();

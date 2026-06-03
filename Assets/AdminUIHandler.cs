@@ -5,7 +5,7 @@ using TMPro;
 using Unity.Multiplayer.Center.Common;
 using UnityEngine;
 
-public class UIHandler : MonoBehaviour
+public class AdminUIHandler : MonoBehaviour
 {
 
     public LevelDesigner levelDesigner;
@@ -16,6 +16,7 @@ public class UIHandler : MonoBehaviour
     public TMP_Text adminHandler;
     public TMP_InputField bottleGenInput;
     public TMP_InputField levelInput;
+    public TMP_InputField lockInput;
 
     private TMP_InputField[] colors;
     private TMP_Text[] mys;
@@ -23,8 +24,10 @@ public class UIHandler : MonoBehaviour
 
     public bool admin = true;
     private bool selected = false;
+    private TMP_Text lockText;
     private Bottle bottle;
     private void Start() {
+        lockText = lockInput.transform.Find("Lock/Text (TMP)").GetComponent<TMP_Text>();
         colors = new TMP_InputField[colorBases.Length];
         mys = new TMP_Text[colorBases.Length];
 
@@ -64,7 +67,17 @@ public class UIHandler : MonoBehaviour
         bottleGen.AddBottle();
     }
 
-    
+    public void LockBottle() {
+        if (!bottle) return;
+        if (lockText.text == "Lock") {
+            
+            levelDesigner.BottleConditioning(bottle, out bool res, lockInput.text);
+            if (res) lockText.text = "Unlock";
+        } else {
+            levelDesigner.BottleConditioning(bottle, out _);
+            lockText.text = "Lock";
+        }
+    }
 
     public void RemoveLiquid(int i) {
         levelDesigner.RemoveColor(bottle, i, out List<LiquidUnit> liquidUnits);
@@ -95,6 +108,11 @@ public class UIHandler : MonoBehaviour
 
             for (int i = 0; i < liquids.Count; i++) {
                 SetColor(liquids[i], colors[i], mys[i]);
+            }
+            if (bottle.isLocked) {
+                lockText.text = "Unlock";
+            } else {
+                lockText.text = "Lock";
             }
         } else {
             bottle = null;
