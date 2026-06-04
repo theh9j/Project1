@@ -1,3 +1,5 @@
+using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -6,8 +8,8 @@ public class BottleGen : MonoBehaviour
 {
     [Header("GenObject")]
     public GameObject bottle;
-    public List<Bottle> bottles = new List<Bottle>();   
     public UnityEvent<Bottle> newBot;
+    private Dictionary<int, List<Bottle>> bottleDict = new();
 
     [Header("Settings")]
     public int minBottleCount = 2;
@@ -19,11 +21,9 @@ public class BottleGen : MonoBehaviour
     public float pointNemoY = 7.5f;
     public float screenOffset = 50f;
 
-
-    private int lastRowCount = 0;
+    int genCount;
     private float spawnX;
-    private int rowIndex;
-    private int genCount;
+    private int rowIndex = 0;
 
     public void AddBottle(int prefCol = 0) {
         if (genCount == maxBottleCount+2 || rowIndex == rowCount) {
@@ -31,61 +31,149 @@ public class BottleGen : MonoBehaviour
             return;
         }
 
-        if (prefCol == 0) prefCol = colCount;
-
+        bool singularAdd = false;
+        if (prefCol == 0) {
+            prefCol = colCount;
+            singularAdd = true;
+            if (bottleDict.Count == 0) {
+                bottleDict.Add(0, new());
+            }
+        }
 
         float startX;
         int j;
-        if (lastRowCount < prefCol && genCount != 0) {
+        int rowAdd = rowIndex;
+        if ((bottleDict[rowIndex].Count < prefCol && genCount != 0) && !singularAdd) {
 
+            int lastRowCount = bottleDict[rowIndex].Count;
             float rowWidth = lastRowCount * xSpacing;
             startX = Vector2.zero.x - rowWidth / 2f;
             j = 0;
-            for (int i = genCount - lastRowCount; i < genCount; i++) {
+            for (int i = 0; i < bottleDict[rowIndex].Count; i++) {
                 Vector2 newLoc = new Vector2(startX + j * xSpacing, pointNemoY - rowIndex * ySpacing);
-                bottles[i].anim.Play(3, null, new Vector3(newLoc.x, newLoc.y, 0f));
+                bottleDict[rowIndex][i].anim.Play(3, null, new Vector3(newLoc.x, newLoc.y, 0f));
                 j++;
             }
             lastRowCount++;
         } else {
-            startX = Vector2.zero.x;
-            j = 0;
-            lastRowCount = 1;
-            if (genCount != 0) rowIndex++;
-            if (rowIndex == rowCount) return;
+
+            int least = rowIndex;
+            int minCount = int.MaxValue;
+
+            foreach (var pair in bottleDict) {
+                if (pair.Value.Count <= minCount) {
+                    minCount = pair.Value.Count;
+                    least = pair.Key;
+                }
+            }
+
+            if (singularAdd && bottleDict.Count != 0 && bottleDict[least].Count < colCount) {
+                
+
+                float rowWidth = bottleDict[least].Count * xSpacing;
+                startX = Vector2.zero.x - rowWidth / 2f;
+                j = 0;
+                for (int i = 0; i < bottleDict[least].Count; i++) {
+                    Vector2 newLoc = new Vector2(startX + j * xSpacing, pointNemoY - least * ySpacing);
+                    bottleDict[least][i].anim.Play(3, null, new Vector3(newLoc.x, newLoc.y, 0f));
+                    j++;
+                }
+                rowAdd = least;
+            } else {
+                startX = Vector2.zero.x;
+                j = 0;
+                if (genCount != 0) {
+                    rowIndex++;
+                    rowAdd = rowIndex;
+                }
+                if (rowIndex == rowCount) return;
+            }
         }
 
-        Vector2 newBottleVec = new Vector2(spawnX, pointNemoY - rowIndex * ySpacing);
+        Vector2 newBottleVec = new Vector2(spawnX, pointNemoY - rowAdd * ySpacing);
 
-        GameObject newBottleTrans = Instantiate(
+        GameObject newBottleObj = Instantiate(
             bottle,
             newBottleVec,
             Quaternion.identity,
             transform);
 
         genCount++;
-        newBottleTrans.name = $"Bottle_{genCount}";
+        newBottleObj.name = $"Bottle_{genCount}";
 
-        Bottle newBottle = newBottleTrans.GetComponent<Bottle>();
+        Bottle newBottle = newBottleObj.GetComponent<Bottle>();
 
         newBottle.anim.Play(
             3,
             null,
             new Vector3(startX + j * xSpacing, newBottleVec.y, 0f));
         newBot?.Invoke(newBottle);
-        bottles.Add(newBottle.GetComponent<Bottle>());
+        if (bottleDict.Count-1 < rowIndex) {
+            DictManager(newBottle);
+        }
+        bottleDict[rowAdd].Add(newBottle.GetComponent<Bottle>());
     }
 
+    private void DictManager(Bottle bottle) {
+        bottleDict.Add(rowIndex, new());
+    }
+
+    public void RemoveBottle(Bottle bottle) {
+        //THIS IS FOR DEBUGGING ONLY, AS SUCH, THIS FEATURE IS RESTRICTED
+
+        if (genCount == 0) return;
+        if (FindBottleInDict(bottle) == 5) return;
+        int row = FindBottleInDict(bottle);
+
+        float y = bottle.transform.position.y;
+
+        bottleDict[row].Remove(bottle);
+        Destroy(bottle.gameObject);
+
+        float rowWidth = (bottleDict[row].Count-1) * xSpacing;
+        float startX = Vector2.zero.x - rowWidth / 2f;
+
+        for (int j = 0; j < bottleDict[row].Count; j++) {
+
+            Vector2 newLoc = new Vector2(startX + j * xSpacing, y);
+            bottleDict[row][j].anim.Play(3, null, new Vector3(newLoc.x, newLoc.y, 0f));
+
+        }
+        genCount--;
+    }
+
+    private int FindBottleInDict(Bottle bottle) {
+        for (int i = 0; i < bottleDict.Count; i++) {
+            for (int k = 0; k < bottleDict[i].Count; k++) {
+                if (bottleDict[i][k] == bottle) return i;
+            }
+        }
+
+        return 5;
+    }
+
+    public List<Bottle> DictionaryToSingularBottleConverter() {
+        List<Bottle> listOfBottle = new();
+        for (int i = 0; i < bottleDict.Count; i++) {
+            for (int k = 0; k < bottleDict[i].Count; k++) {
+                listOfBottle.Add(bottleDict[i][k]);
+
+            }
+        }
+
+        return listOfBottle;
+    }
 
     public void ClearBottles()
     {
-        rowIndex = 0;
-        genCount = 0;
-        bottles = new List<Bottle>();
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
         }
+        rowIndex = 0;
+        genCount = 0;
+        bottleDict = new();
+        bottleDict.Add(0, new());
     }
 
     public void GenAmount(int amount)

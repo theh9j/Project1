@@ -15,14 +15,11 @@ public class AnimationHandler : MonoBehaviour {
     public float pourDuration = 0.35f;
     public float pourAngle = 95f;
 
-    [Header("Shake Settings")]
-    [SerializeField] private float shakeDuration = 0.15f;
-    [SerializeField] private float shakeAngle = 2f;
-
     private Vector3 originalPos;
     private Quaternion originalRotation;
 
     private int originalSortingOrder;
+    private bool killHover;
     private SortingGroup sortingGroup;
 
     public bool IsBusy { get; private set; }
@@ -35,6 +32,7 @@ public class AnimationHandler : MonoBehaviour {
 
         if (sortingGroup != null)
             originalSortingOrder = sortingGroup.sortingOrder;
+
     }
 
     public void SelectedHover(bool hover) {
@@ -42,12 +40,16 @@ public class AnimationHandler : MonoBehaviour {
 
         if (hover) {
             BringToFront();
+            killHover = true;
 
             visual.DOMove(originalPos + Vector3.up * 1.2f, 0.2f)
-                .SetEase(Ease.OutQuad);
+                .SetEase(Ease.OutQuad)
+                .SetLink(gameObject);
         } else {
+            killHover = false;
             visual.DOMove(originalPos, 0.2f)
                 .SetEase(Ease.OutQuad)
+                .SetLink(gameObject)
                 .OnComplete(RestoreSorting);
         }
     }
@@ -58,11 +60,12 @@ public class AnimationHandler : MonoBehaviour {
         visual.DOKill();
 
         visual.DOShakeRotation(
-            0.2f,
-            new Vector3(0, 0, 8f),
-            12,
-            0
+            .8f,
+            new Vector3(0f, 0f, 5f),
+            80,
+            90
         )
+        .SetLink(gameObject)
         .OnComplete(() => {
             visual.localRotation = Quaternion.identity;
         });
@@ -84,9 +87,17 @@ public class AnimationHandler : MonoBehaviour {
         if (originalPos.x > nextBottle.transform.position.x) {
             targetPos.x += pourCornerOffset;
             angle = pourAngle;
-        } else {
+        } else if (originalPos.x < nextBottle.transform.position.x) {
             targetPos.x -= pourCornerOffset;
             angle = -pourAngle;
+        } else {
+            if (originalPos.x >= 0) {
+                targetPos.x -= pourCornerOffset;
+                angle = -pourAngle;
+            } else {
+                targetPos.x += pourCornerOffset;
+                angle = pourAngle;
+            }
         }
 
         Sequence sequence = DOTween.Sequence();
@@ -94,29 +105,33 @@ public class AnimationHandler : MonoBehaviour {
         sequence.Append(
             visual.DOMove(targetPos, pourDuration)
                 .SetEase(Ease.OutQuad)
+                .SetLink(gameObject)
         );
 
         sequence.Join(
             visual.DORotate(new Vector3(0, 0, angle), pourDuration)
+                .SetLink(gameObject)
                 .SetEase(Ease.OutQuad)
         );
 
-        sequence.AppendInterval(pourDuration * currentBottle.changes);
+        sequence.AppendInterval(pourDuration * currentBottle.changes).SetLink(gameObject);
 
         sequence.AppendCallback(() => {
             currentBottle.RefreshView();
             nextBottle.RefreshView();
-        });
+        }).SetLink(gameObject);
 
-        sequence.AppendInterval(0.2f);
+        sequence.AppendInterval(0.2f).SetLink(gameObject);
 
         sequence.Append(
             visual.DOMove(originalPos, pourDuration)
+                .SetLink(gameObject)
                 .SetEase(Ease.OutQuad)
         );
 
         sequence.Join(
             visual.DORotateQuaternion(originalRotation, pourDuration)
+                .SetLink(gameObject)
                 .SetEase(Ease.OutQuad)
         );
 
@@ -144,13 +159,13 @@ public class AnimationHandler : MonoBehaviour {
 
         Sequence seq = DOTween.Sequence();
 
-        seq.AppendInterval(pourDuration * -currentBottle.changes + .75f);
+        seq.AppendInterval(pourDuration * -currentBottle.changes + .75f).SetLink(gameObject);
 
-        seq.Append(capRenderer.DOFade(1f, 0.1f));
+        seq.Append(capRenderer.DOFade(1f, 0.1f).SetLink(gameObject));
 
         seq.Join(
             bottleCap.DOMove(finalPos, 0.35f)
-                .SetEase(Ease.InQuad)
+                .SetEase(Ease.InQuad).SetLink(gameObject)
         );
     }
 
@@ -168,13 +183,14 @@ public class AnimationHandler : MonoBehaviour {
 
         seq.Join(
             cover.DOMove(endPos, 0.45f)
+                .SetLink(gameObject)
                 .SetEase(Ease.OutQuad)
         );
 
-        seq.Join(cloth.DOFade(0f, 0.45f));
+        seq.Join(cloth.DOFade(0f, 0.45f).SetLink(gameObject));
 
         if (indicator != null)
-            seq.Join(indicator.DOFade(0f, 0.45f));
+            seq.Join(indicator.DOFade(0f, 0.45f).SetLink(gameObject));
 
         seq.OnComplete(() =>
         {
@@ -186,10 +202,15 @@ public class AnimationHandler : MonoBehaviour {
         transform.DOKill();
 
         transform.DOMove(newPos, 0.35f)
+            .SetLink(gameObject)
             .SetEase(Ease.OutQuad)
             .OnComplete(() => {
                 originalPos = visual.position;
             });
+    }
+
+    private void UpdatePosition(Vector3 newPos) {
+        originalPos = newPos;
     }
 
     private void BringToFront() {
@@ -203,14 +224,15 @@ public class AnimationHandler : MonoBehaviour {
     }
 
     public void Play(int action, Bottle nextBottle = null, Vector3 newPos = default) {
-        if (action == 1) {
-            PlayShake();
-            return;
-        }
 
-        if (IsBusy) return;
+        if (newPos != default) {
+            UpdatePosition(newPos);
+        } else if (IsBusy) return;
 
         switch (action) {
+            case 1:
+                PlayShake();
+                break;
             case 2:
                 PlayPour(nextBottle);
                 break;

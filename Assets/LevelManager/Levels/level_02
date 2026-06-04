@@ -1,0 +1,116 @@
+{
+    "levelNumber": 2,
+    "bottleCount": 16,
+    "bottles": [
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 2,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        }
+    ]
+}

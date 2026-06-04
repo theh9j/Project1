@@ -23,7 +23,10 @@ public class GameManager : MonoBehaviour
         conditionalBottles.Clear();
 
         Debug.Log("Game Completed!");
+    }
 
+    public void OnGameStart() {
+        conditionalBottles.Clear();
     }
 
     public bool BottleAvailable(Bottle currentBottle) {
@@ -41,7 +44,7 @@ public class GameManager : MonoBehaviour
 
     public void CheckForComplete() {
         int i = 0;
-        foreach (Bottle bottle in bottleGen.bottles) {
+        foreach (Bottle bottle in bottleGen.DictionaryToSingularBottleConverter()) {
             if (!bottle.IsEmpty && !bottle.Completion) {
                 i++;
             }

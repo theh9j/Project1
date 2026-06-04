@@ -9,6 +9,8 @@ public class LevelCreator : MonoBehaviour
     public AdminUIHandler ui;
     public BottleGen bottleGen;
     public LevelTranslator translator;
+    public GameManager gameManager;
+
     private LevelData levelData;
     private Dictionary<int, LiquidColor> colorTranslate;
 
@@ -22,7 +24,7 @@ public class LevelCreator : MonoBehaviour
     public void DataProcess() {
         if (!int.TryParse(ui.LevelInput, out int result)) return;
         levelData = new();
-        List<Bottle> currentBottleData = bottleGen.bottles;
+        List<Bottle> currentBottleData = bottleGen.DictionaryToSingularBottleConverter();
 
 
         levelData.levelNumber = result;
@@ -59,6 +61,7 @@ public class LevelCreator : MonoBehaviour
     }
 
     private void LoadData(LevelData data, bool randomize) {
+        gameManager.OnGameStart();
         if (randomize) {
             colorTranslate = translator.Randomizer();
         } else {
@@ -71,7 +74,7 @@ public class LevelCreator : MonoBehaviour
         ui.SetLevel(data.levelNumber.ToString());
         bottleGen.GenAmount(data.bottleCount);
 
-        List<Bottle> bottleList = bottleGen.bottles;
+        List<Bottle> bottleList = bottleGen.DictionaryToSingularBottleConverter();
 
         for (int i = 0; i < data.bottleCount; i++) {
 

@@ -66,6 +66,11 @@ public class AdminUIHandler : MonoBehaviour
         bottleGen.AddBottle();
     }
 
+    public void DeleteBottle() {
+        if (bottle == null) return;
+        bottleGen.RemoveBottle(bottle);
+    }
+
     public void LockBottle() {
         if (!bottle) return;
         if (lockText.text == "Lock") {
@@ -77,6 +82,7 @@ public class AdminUIHandler : MonoBehaviour
             lockText.text = "Lock";
         }
     }
+
 
     public void RemoveLiquid(int i) {
         levelDesigner.RemoveColor(bottle, i, out List<LiquidUnit> liquidUnits);
