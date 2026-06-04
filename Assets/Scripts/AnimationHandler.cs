@@ -19,7 +19,6 @@ public class AnimationHandler : MonoBehaviour {
     private Quaternion originalRotation;
 
     private int originalSortingOrder;
-    private bool killHover;
     private SortingGroup sortingGroup;
 
     public bool IsBusy { get; private set; }
@@ -40,13 +39,11 @@ public class AnimationHandler : MonoBehaviour {
 
         if (hover) {
             BringToFront();
-            killHover = true;
 
             visual.DOMove(originalPos + Vector3.up * 1.2f, 0.2f)
                 .SetEase(Ease.OutQuad)
                 .SetLink(gameObject);
         } else {
-            killHover = false;
             visual.DOMove(originalPos, 0.2f)
                 .SetEase(Ease.OutQuad)
                 .SetLink(gameObject)
@@ -225,9 +222,7 @@ public class AnimationHandler : MonoBehaviour {
 
     public void Play(int action, Bottle nextBottle = null, Vector3 newPos = default) {
 
-        if (newPos != default) {
-            UpdatePosition(newPos);
-        } else if (IsBusy) return;
+        if (IsBusy) return;
 
         switch (action) {
             case 1:

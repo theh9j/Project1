@@ -45,8 +45,7 @@ public class BottleGen : MonoBehaviour
         int rowAdd = rowIndex;
         if ((bottleDict[rowIndex].Count < prefCol && genCount != 0) && !singularAdd) {
 
-            int lastRowCount = bottleDict[rowIndex].Count;
-            float rowWidth = lastRowCount * xSpacing;
+            float rowWidth = bottleDict[rowIndex].Count * xSpacing;
             startX = Vector2.zero.x - rowWidth / 2f;
             j = 0;
             for (int i = 0; i < bottleDict[rowIndex].Count; i++) {
@@ -54,7 +53,6 @@ public class BottleGen : MonoBehaviour
                 bottleDict[rowIndex][i].anim.Play(3, null, new Vector3(newLoc.x, newLoc.y, 0f));
                 j++;
             }
-            lastRowCount++;
         } else {
 
             int least = rowIndex;
@@ -90,7 +88,7 @@ public class BottleGen : MonoBehaviour
             }
         }
 
-        Vector2 newBottleVec = new Vector2(spawnX, pointNemoY - rowAdd * ySpacing);
+        Vector2 newBottleVec = new(spawnX, pointNemoY - rowAdd * ySpacing);
 
         GameObject newBottleObj = Instantiate(
             bottle,
@@ -157,10 +155,8 @@ public class BottleGen : MonoBehaviour
         for (int i = 0; i < bottleDict.Count; i++) {
             for (int k = 0; k < bottleDict[i].Count; k++) {
                 listOfBottle.Add(bottleDict[i][k]);
-
             }
         }
-
         return listOfBottle;
     }
 
@@ -172,8 +168,9 @@ public class BottleGen : MonoBehaviour
         }
         rowIndex = 0;
         genCount = 0;
-        bottleDict = new();
-        bottleDict.Add(0, new());
+        bottleDict = new() {
+            {0, new() }
+        };
     }
 
     public void GenAmount(int amount)

@@ -8,7 +8,7 @@ public class Bottle : MonoBehaviour {
     private BottleView bottleView;
     private readonly ColorTranslator colorTranslate = new();
     public List<LiquidUnit> liquidUnits = new List<LiquidUnit>();
-    public UnityEvent onBottleCompletion;
+    public UnityEvent<bool> onBottlePour;
     public UnityEvent<Bottle> aBottleCovered;
 
 
@@ -31,7 +31,7 @@ public class Bottle : MonoBehaviour {
 
     public void AttemptComplete() {
         Completion = true;
-        onBottleCompletion?.Invoke();
+        onBottlePour?.Invoke(true);
         anim.Play(4, null, transform.position + Vector3.up * 2.75f);
     }
 
@@ -120,7 +120,7 @@ public class Bottle : MonoBehaviour {
         }
         if (i == 4) {
             nextbottle.AttemptComplete();
-        }
+        } else onBottlePour?.Invoke(false);
     }
 
     private void Awake() {

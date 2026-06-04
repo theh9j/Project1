@@ -13,16 +13,34 @@ public class GameManager : MonoBehaviour
     void Start() {
 
         bottleGen.newBot.AddListener((Bottle newBottle) => {
-            newBottle.onBottleCompletion.AddListener(CheckForComplete);
             newBottle.aBottleCovered.AddListener(ConditionalBottleRecord);
+            newBottle.onBottlePour.AddListener(CheckForImpossibility);
         });
 
     }
 
-    public void OnCompletion() {
+    private bool OnCompletion() {
         conditionalBottles.Clear();
 
         Debug.Log("Game Completed!");
+        return true;
+    }
+
+    private void CheckForImpossibility(bool comp) {
+        if (comp) comp = CheckForComplete();
+        if (comp) return;
+
+        List<Bottle> currentBottles = bottleGen.DictionaryToSingularBottleConverter();
+        HashSet<LiquidColor> compare = new();
+        bool imp = true;
+        foreach (Bottle bottle in currentBottles) {
+            if (!compare.Add(bottle.GetTopLiquid().colorId) || bottle.IsEmpty) {
+                imp = false;
+            }
+        }
+        if (imp) {
+            Debug.Log("Game Over | No Solution");
+        }
     }
 
     public void OnGameStart() {
@@ -42,7 +60,8 @@ public class GameManager : MonoBehaviour
         conditionalBottles[bottle.lockColor].Add(bottle);
     }
 
-    public void CheckForComplete() {
+    public bool CheckForComplete() {
+        bool a = false;
         int i = 0;
         foreach (Bottle bottle in bottleGen.DictionaryToSingularBottleConverter()) {
             if (!bottle.IsEmpty && !bottle.Completion) {
@@ -53,7 +72,8 @@ public class GameManager : MonoBehaviour
                 TryRemoveConditioner(bottle);
             }
         }
-        if (i == 0) OnCompletion();
+        if (i == 0) a = OnCompletion();
+        return a;
     }
 
     public void TryPour(Bottle to) {

@@ -1,0 +1,83 @@
+{
+    "levelNumber": 3,
+    "bottleCount": 5,
+    "bottles": [
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 3,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 3,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 2,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 3,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 2,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 2,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": true,
+            "lockCondition": 3
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 2,
+                    "isMystery": true
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": true
+                },
+                {
+                    "colorId": 3,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        }
+    ]
+}
