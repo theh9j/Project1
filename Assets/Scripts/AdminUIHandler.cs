@@ -67,7 +67,7 @@ public class AdminUIHandler : MonoBehaviour
     }
 
     public void DeleteBottle() {
-        if (bottle == null) return;
+        if (bottle == null || !admin) return;
         bottleGen.RemoveBottle(bottle);
     }
 
@@ -145,43 +145,12 @@ public class AdminUIHandler : MonoBehaviour
         admin = !admin;
         Selection = false;
     }
-
     
 
     private void SetColor(LiquidUnit liquid, TMP_InputField color, TMP_Text mys) {
 
-        switch (liquid.colorId) {
-            case LiquidColor.red:
-                color.text = "Red";
-                break;
-            case LiquidColor.green:
-                color.text = "Green";
-                break;
-            case LiquidColor.blue:
-                color.text = "Blue";
-                break;
-            case LiquidColor.yellow:
-                color.text = "Yellow";
-                break;
-            case LiquidColor.pink:
-                color.text = "Pink";
-                break;
-            case LiquidColor.purple:
-                color.text = "Purple";
-                break;
-            case LiquidColor.grey:
-                color.text = "Grey";
-                break;
-            case LiquidColor.brown:
-                color.text = "Brown";
-                break;
-            case LiquidColor.unknown:
-                color.text = "Unknown";
-                break;
-            default:
-                color.text = "Invalid/Empty";
-                break;
-        }
+        if (color == null || liquid == null) return;
+        color.text = liquid.colorId.ToString();
 
         if (liquid.isMystery) {
             mys.text = "True";

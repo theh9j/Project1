@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0d57d4ff721cbb4ab9adf274e812d24, type: 3}
   m_Name: ColorTranslate
   m_EditorClassIdentifier: Assembly-CSharp::ColorTranslate
-  displayColor: {r: 0, g: 0, b: 0, a: 0}
+  colors: 00000000

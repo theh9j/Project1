@@ -206,9 +206,6 @@ public class AnimationHandler : MonoBehaviour {
             });
     }
 
-    private void UpdatePosition(Vector3 newPos) {
-        originalPos = newPos;
-    }
 
     private void BringToFront() {
         if (sortingGroup != null)

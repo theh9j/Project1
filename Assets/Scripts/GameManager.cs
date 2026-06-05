@@ -2,13 +2,26 @@ using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour
 {
-    public BottleGen bottleGen;
+    [SerializeField] private BottleGen bottleGen;
+    [SerializeField] private UIAnimation uianim;
+    public UnityEvent revive;
+    public UnityEvent<int, int> gameOver;
     private Bottle from;
     private Dictionary<LiquidColor, List<Bottle>> conditionalBottles = new();
+    public int currentLevel = 0;
 
+
+    void Awake() {
+
+        PlayerPrefs.SetInt("Coins", 800);
+        PlayerPrefs.Save();
+
+
+    }
 
     void Start() {
 
@@ -16,11 +29,11 @@ public class GameManager : MonoBehaviour
             newBottle.aBottleCovered.AddListener(ConditionalBottleRecord);
             newBottle.onBottlePour.AddListener(CheckForImpossibility);
         });
-
     }
 
     private bool OnCompletion() {
         conditionalBottles.Clear();
+        gameOver?.Invoke(currentLevel, 60);
 
         Debug.Log("Game Completed!");
         return true;
@@ -39,8 +52,14 @@ public class GameManager : MonoBehaviour
             }
         }
         if (imp) {
-            Debug.Log("Game Over | No Solution");
+            gameOver?.Invoke(currentLevel, 100); //Amount Subject to Change
         }
+    }
+
+    public void Revival() {
+
+
+        revive?.Invoke();
     }
 
     public void OnGameStart() {

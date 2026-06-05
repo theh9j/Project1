@@ -71,7 +71,7 @@ public class LevelCreator : MonoBehaviour
             }
         }
 
-        ui.SetLevel(data.levelNumber.ToString());
+        gameManager.currentLevel = data.levelNumber;
         bottleGen.GenAmount(data.bottleCount);
 
         List<Bottle> bottleList = bottleGen.DictionaryToSingularBottleConverter();
@@ -90,8 +90,6 @@ public class LevelCreator : MonoBehaviour
                     data.bottles[i].liquids[j].isMystery
                     );
                 bottleList[i].liquidUnits.Add(pendingLiquid);
-
-
             }
 
         }

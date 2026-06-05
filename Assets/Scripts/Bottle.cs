@@ -20,6 +20,7 @@ public class Bottle : MonoBehaviour {
     public bool isOccupied = false;
     public int changes;
     private bool isCompleted = false;
+    public int bottlePrice = 900;
 
     public void BottleInit(List<LiquidUnit> initialLiquids) {
         liquidUnits = new List<LiquidUnit>();
