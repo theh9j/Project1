@@ -60,16 +60,16 @@ public class BottleTest : MonoBehaviour {
     private void PourLog(Bottle bottleA, Bottle bottleB) {
         
 
-        Debug.Log("After pour:");
-        Debug.Log("Bottle A count: " + bottleA.CurrentCapacity());
-        Debug.Log("Bottle B count: " + bottleB.CurrentCapacity());
-        for (int i = 0; i < bottleA.CurrentCapacity(); i++) {
-            Debug.Log("Bottle A unit " + i + ": " + bottleA.liquidUnits[i].colorId);
-        }
-        for (int i = 0; i < bottleB.CurrentCapacity(); i++) {
-            Debug.Log("Bottle B unit " + i + ": " + bottleB.liquidUnits[i].colorId);
-        }
-        Debug.Log(bottleA.Completion.ToString());
-        Debug.Log(bottleB.Completion.ToString());
+        //Debug.Log("After pour:");
+        //Debug.Log("Bottle A count: " + bottleA.CurrentCapacity());
+        //Debug.Log("Bottle B count: " + bottleB.CurrentCapacity());
+        //for (int i = 0; i < bottleA.CurrentCapacity(); i++) {
+        //    Debug.Log("Bottle A unit " + i + ": " + bottleA.liquidUnits[i].colorId);
+        //}
+        //for (int i = 0; i < bottleB.CurrentCapacity(); i++) {
+        //    Debug.Log("Bottle B unit " + i + ": " + bottleB.liquidUnits[i].colorId);
+        //}
+        //Debug.Log(bottleA.Completion.ToString());
+        //Debug.Log(bottleB.Completion.ToString());
     }
 }

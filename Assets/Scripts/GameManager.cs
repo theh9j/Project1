@@ -7,17 +7,30 @@ using UnityEngine.Events;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private BottleGen bottleGen;
-    [SerializeField] private UIAnimation uianim;
+    [SerializeField] private LevelCreator levelCreator;
     public UnityEvent revive;
     public UnityEvent<int, int> gameOver;
     private Bottle from;
     private Dictionary<LiquidColor, List<Bottle>> conditionalBottles = new();
+    public Stack<PourData> record = new(); 
+    
     public int currentLevel = 0;
+
+    [Header("Inventory")]
+    public int coins = 1200;
+    public int shuffle = 10;
+    public int undo = 10;
+    public int add = 10;
 
 
     void Awake() {
 
-        PlayerPrefs.SetInt("Coins", 800);
+        PlayerPrefs.SetInt("Coins", coins);
+        PlayerPrefs.SetInt("Shuffle", shuffle);
+        PlayerPrefs.SetInt("Undo", undo);
+        PlayerPrefs.SetInt("Add", add);
+
+
         PlayerPrefs.Save();
 
 
@@ -33,7 +46,7 @@ public class GameManager : MonoBehaviour
 
     private bool OnCompletion() {
         conditionalBottles.Clear();
-        gameOver?.Invoke(currentLevel, 60);
+        gameOver?.Invoke(currentLevel, PlayerPrefs.GetInt("Reward"));
 
         Debug.Log("Game Completed!");
         return true;
@@ -47,23 +60,22 @@ public class GameManager : MonoBehaviour
         HashSet<LiquidColor> compare = new();
         bool imp = true;
         foreach (Bottle bottle in currentBottles) {
-            if (!compare.Add(bottle.GetTopLiquid().colorId) || bottle.IsEmpty) {
-                imp = false;
-            }
+            if (bottle.IsEmpty) { imp = false; break; }
+            if (!compare.Add(bottle.GetTopLiquid().colorId)) imp = false;
         }
         if (imp) {
-            gameOver?.Invoke(currentLevel, 100); //Amount Subject to Change
+            gameOver?.Invoke(currentLevel, 0);
         }
     }
 
     public void Revival() {
-
-
         revive?.Invoke();
     }
 
-    public void OnGameStart() {
+    public void OnGameStart(bool next) {
         conditionalBottles.Clear();
+        if (next) currentLevel++;
+        levelCreator.LoadLevel(true);
     }
 
     public bool BottleAvailable(Bottle currentBottle) {
@@ -115,8 +127,9 @@ public class GameManager : MonoBehaviour
             to.isOccupied = false;
             return;
         }
-        bool res = from.Pour(to);
-        if (res) {
+        PourData move = from.Pour(to);
+        if (move != null) {
+            record.Push(move);
             from.anim.Play(2, to);
             from = null;
         } else {
@@ -124,6 +137,22 @@ public class GameManager : MonoBehaviour
         }
         to.isOccupied = false;
     }
+
+    public bool Undo() {
+        if (record.Count == 0) return false;
+
+        PourData move = record.Pop();
+        for (int i = move.movedLiquids.Count -1; i >= 0; i--) {
+            LiquidUnit liquid = move.to.RemoveTopLiquid();
+            move.from.liquidUnits.Add(liquid);
+        }
+
+        move.from.RefreshView();
+        move.to.RefreshView();
+        return true;
+    }
+
+
 
     private void TryRemoveConditioner(Bottle completedBottle) {
         LiquidColor bottleColor = completedBottle.GetTopLiquid().colorId;

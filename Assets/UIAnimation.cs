@@ -12,7 +12,6 @@ public class UIAnimation : MonoBehaviour
 
     //Common Variables
     [SerializeField] private GameObject gameEndPanel;
-    [SerializeField] private GameManager gameManager;
     private Vector2 centre = new(Screen.width / 2, Screen.height / 2);
 
     //GameOver Variables
@@ -30,9 +29,6 @@ public class UIAnimation : MonoBehaviour
 
 
 
-    void Start() {
-        gameManager.revive.AddListener(Revived);
-    }
 
     public void GameEnd(int level, int amount = 0) {
         gameEndPanel.SetActive(true);
@@ -48,32 +44,6 @@ public class UIAnimation : MonoBehaviour
                 if (amount != 0) GameWin(level, amount); else GameOver();
             });
     }
-
-    public void Revived() {
-
-        gameOverText.DOMove(
-            new(centre.x, Screen.height + 100),
-            .3f
-        );
-        gameOverText.GetComponent<CanvasGroup>().DOFade(0, .8f);
-
-        options.DOMove(
-            new(Screen.width + 100, centre.y * optionEndPoint),
-            .4f
-        );
-            
-        options.GetComponent<CanvasGroup>().DOFade(0, .8f);
-
-        DOTween.Sequence()
-            .AppendInterval(.5f)
-            .Append(
-                gameEndPanel.GetComponent<Image>().DOFade(0, .5f)
-            )
-            .OnComplete( () => {
-                gameOverPanel.SetActive(false);
-                gameEndPanel.SetActive(false);
-            });
-        }
 
     private void GameOver() {
         gameOverPanel.SetActive(true);
@@ -107,7 +77,71 @@ public class UIAnimation : MonoBehaviour
         gameWinPanel.transform.DOMove(
             centre,
             .3f
-            ).From(new Vector2(centre.x * 10, centre.y));
+            ).From(new Vector2(centre.x * 5, centre.y));
 
+    }
+
+    public void Revived() {
+
+        gameOverText.DOMove(
+            new(centre.x, Screen.height + 100),
+            .3f
+        );
+        gameOverText.GetComponent<CanvasGroup>().DOFade(0, .8f);
+
+        options.DOMove(
+            new(Screen.width + 100, centre.y * optionEndPoint),
+            .4f
+        );
+
+        options.GetComponent<CanvasGroup>().DOFade(0, .8f);
+
+        GameContinue();
+    }
+
+    public void NextLevel() {
+        gameWinPanel.transform.DOMove(
+            new(centre.x * 5, centre.y),
+            .6f
+            ).OnComplete(() => {
+                gameWinPanel.SetActive(false);
+            });
+
+        
+        GameContinue();
+
+    }
+
+    private void GameContinue() {
+        DOTween.Sequence()
+            .AppendInterval(.5f)
+            .Append(
+                gameEndPanel.GetComponent<Image>().DOFade(0, .5f)
+            )
+            .OnComplete(() => {
+                gameOverPanel.SetActive(false);
+                gameEndPanel.SetActive(false);
+            });
+    }
+
+    public void DisplayCost(GameObject cost, GameObject notif, bool undo) { //notif pops up, cost disappear if false
+        if (undo) {
+            GameObject temp = cost;
+            cost = notif;
+            notif = temp;
+        }
+
+        DOTween.Sequence()
+            .Append(
+                cost.transform.GetComponent<Image>().DOFade(0f, .5f)
+                    .OnComplete(
+                    () => {
+                        cost.SetActive(false);
+                    })
+            )
+            .AppendInterval(.4f).OnComplete(() => {
+                notif.SetActive(true);
+                notif.transform.GetComponent<Image>().DOFade(1, .5f);
+            });
     }
 }

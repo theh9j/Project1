@@ -246,8 +246,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bottle
   anim: {fileID: 2365797125646157300}
+  manager: {fileID: 0}
   liquidUnits: []
-  onBottleCompletion:
+  onBottlePour:
+    m_PersistentCalls:
+      m_Calls: []
+  aBottleCovered:
     m_PersistentCalls:
       m_Calls: []
   isLocked: 0

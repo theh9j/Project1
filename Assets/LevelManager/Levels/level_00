@@ -1,6 +1,7 @@
 {
     "levelNumber": 0,
     "bottleCount": 3,
+    "rewards": 60,
     "bottles": [
         {
             "liquids": [

@@ -10,6 +10,7 @@ public class Bottle : MonoBehaviour {
     public List<LiquidUnit> liquidUnits = new List<LiquidUnit>();
     public UnityEvent<bool> onBottlePour;
     public UnityEvent<Bottle> aBottleCovered;
+    
 
 
     public bool isLocked = false;
@@ -20,7 +21,6 @@ public class Bottle : MonoBehaviour {
     public bool isOccupied = false;
     public int changes;
     private bool isCompleted = false;
-    public int bottlePrice = 900;
 
     public void BottleInit(List<LiquidUnit> initialLiquids) {
         liquidUnits = new List<LiquidUnit>();
@@ -56,13 +56,32 @@ public class Bottle : MonoBehaviour {
         aBottleCovered?.Invoke(this);
     }
 
-    public int CurrentCapacity() {
-        return liquidUnits.Count;
-    }
-
     public LiquidUnit GetTopLiquid() {
         if (IsEmpty) return null;
-        return liquidUnits[liquidUnits.Count - 1];
+        return liquidUnits[^1];
+    }
+
+    public void Shuffle() {
+        if (liquidUnits.Count <= 1) return;
+
+        for (int i = 0; i < liquidUnits.Count; i++) {
+            int randomIndex = Random.Range(i, liquidUnits.Count);
+
+            LiquidUnit temp = liquidUnits[i];
+            liquidUnits[i] = liquidUnits[randomIndex];
+            liquidUnits[randomIndex] = temp;
+        }
+
+        if (GetTopLiquid().isMystery) {
+            GetTopLiquid().DeMysterize();
+        }
+    }
+
+    public LiquidUnit RemoveTopLiquid() {
+        if (Completion) { Completion = false; anim.PlayUnCap(); }
+        LiquidUnit topLiquid = GetTopLiquid();
+        liquidUnits.RemoveAt(liquidUnits.Count - 1);
+        return topLiquid;
     }
 
     public bool CanPourTo(Bottle nextBottle) {
@@ -81,12 +100,15 @@ public class Bottle : MonoBehaviour {
         return myTop.colorId == targetTop.colorId;
     }
 
-    public bool Pour(Bottle nextBottle) {
-        
-        if (!CanPourTo(nextBottle) || nextBottle.anim.IsBusy) return false;
+    public PourData Pour(Bottle nextBottle) {
+        PourData move = new();
+        if (!CanPourTo(nextBottle) || nextBottle.anim.IsBusy) return move;
         changes = 1;
         LiquidColor pourColor = GetTopLiquid().colorId;
-
+        move = new() {
+            from = this,
+            to = nextBottle
+        };
         while (true) {
             if (IsEmpty) break;
 
@@ -95,9 +117,11 @@ public class Bottle : MonoBehaviour {
             if (GetTopLiquid().colorId != pourColor) break;
 
             LiquidUnit topLiquid = GetTopLiquid();
-
+            
             liquidUnits.RemoveAt(liquidUnits.Count - 1);
+            move.movedLiquids.Add(topLiquid);
             nextBottle.liquidUnits.Add(new LiquidUnit(topLiquid));
+
             changes++;
 
             if (!IsEmpty) {
@@ -108,8 +132,10 @@ public class Bottle : MonoBehaviour {
         }
         nextBottle.changes = -changes;
         BottleSatisfy(nextBottle);
-        return true;
+        return move;
     }
+
+    
 
     private void BottleSatisfy(Bottle nextbottle) {
         int i = 0;

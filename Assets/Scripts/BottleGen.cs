@@ -8,6 +8,7 @@ public class BottleGen : MonoBehaviour
 {
     [Header("GenObject")]
     public GameObject bottle;
+    public GameManager gameManager;
     public UnityEvent<Bottle> newBot;
     private Dictionary<int, List<Bottle>> bottleDict = new();
 
@@ -21,7 +22,7 @@ public class BottleGen : MonoBehaviour
     public float pointNemoY = 7.5f;
     public float screenOffset = 50f;
 
-    int genCount;
+    public int genCount;
     private float spawnX;
     private int rowIndex = 0;
 

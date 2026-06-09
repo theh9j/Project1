@@ -1,6 +1,7 @@
 {
     "levelNumber": 1,
     "bottleCount": 4,
+    "rewards": 60,
     "bottles": [
         {
             "liquids": [
@@ -22,7 +23,7 @@
                 }
             ],
             "isLocked": false,
-            "lockCondition": 8
+            "lockCondition": 0
         },
         {
             "liquids": [
@@ -54,7 +55,7 @@
                 }
             ],
             "isLocked": false,
-            "lockCondition": 8
+            "lockCondition": 0
         },
         {
             "liquids": [
@@ -72,7 +73,7 @@
                 }
             ],
             "isLocked": false,
-            "lockCondition": 8
+            "lockCondition": 0
         }
     ]
 }

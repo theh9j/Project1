@@ -166,6 +166,24 @@ public class AnimationHandler : MonoBehaviour {
         );
     }
 
+    public void PlayUnCap() {
+        if (bottleCap == null) return;
+
+
+        Vector2 capCurrent = bottleCap.position;
+        DOTween.Sequence()
+            .Join(
+            bottleCap.DOMove(
+                capCurrent + Vector2.up * 5,
+                .35f
+                ).SetEase(Ease.OutQuad).SetLink(gameObject)
+            ).Join(
+                bottleCap.GetComponent<SpriteRenderer>().DOFade(0f, .1f).SetLink(gameObject)
+            ).OnComplete(() => {
+                    bottleCap.gameObject.SetActive(false);
+                });
+    }
+
     private void RemoveCover() {
         if (cover == null) return;
 
@@ -178,7 +196,9 @@ public class AnimationHandler : MonoBehaviour {
 
         Sequence seq = DOTween.Sequence();
 
-        seq.Join(
+        seq.AppendInterval(2f);
+
+        seq.Append(
             cover.DOMove(endPos, 0.45f)
                 .SetLink(gameObject)
                 .SetEase(Ease.OutQuad)

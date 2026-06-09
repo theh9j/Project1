@@ -9,7 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0d57d4ff721cbb4ab9adf274e812d24, type: 3}
-  m_Name: ColorTranslate
-  m_EditorClassIdentifier: Assembly-CSharp::ColorTranslate
-  colors: 00000000
+  m_Script: {fileID: 11500000, guid: 8351b866ce761354497d093169fa410b, type: 3}
+  m_Name: Price
+  m_EditorClassIdentifier: Assembly-CSharp::Price
+  bottlePrice: 900
+  shufflePrice: 300
+  undoPrice: 500

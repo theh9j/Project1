@@ -7,7 +7,8 @@ public class InputHandler : MonoBehaviour
     public BottleGen bottleGen;
     public Camera mainCamera;
     public GameManager gameManager;
-    public AdminUIHandler ui;
+    public AdminUIHandler adui;
+    public UIHandler ui;
     public LevelDesigner levelDesigner;
 
     private Bottle prev;
@@ -33,11 +34,11 @@ public class InputHandler : MonoBehaviour
         Bottle bottle = hit.collider.GetComponent<Bottle>();
         if (bottle == null) return;
 
-        if (ui.admin) {
+        if (adui.admin) {
             if (prev == bottle) {
                 prev.anim.SelectedHover(false);
                 prev = null;
-                ui.BottleSelectedChangeColor();
+                adui.BottleSelectedChangeColor();
                 return;
             }
 
@@ -46,7 +47,7 @@ public class InputHandler : MonoBehaviour
 
             prev = bottle;
             prev.anim.SelectedHover(true);
-            ui.BottleSelectedChangeColor(prev);
+            adui.BottleSelectedChangeColor(prev);
 
             return;
         }
@@ -55,6 +56,8 @@ public class InputHandler : MonoBehaviour
             bottle.anim.Play(1);
             return;
         }
+
+
 
         gameManager.TryPour(bottle);
     }

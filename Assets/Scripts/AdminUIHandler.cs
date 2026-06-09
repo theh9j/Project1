@@ -15,6 +15,7 @@ public class AdminUIHandler : MonoBehaviour
     public TMP_InputField bottleGenInput;
     public TMP_InputField levelInput;
     public TMP_InputField lockInput;
+    public TMP_InputField rewardInput;
 
     private TMP_InputField[] colors;
     private TMP_Text[] mys;
@@ -160,9 +161,7 @@ public class AdminUIHandler : MonoBehaviour
         }
     }
 
-    public string LevelInput {
-        get { return levelInput.text; }
-    }
+
     public bool Selection {
         get { return selected; }
         private set { selected = value; }

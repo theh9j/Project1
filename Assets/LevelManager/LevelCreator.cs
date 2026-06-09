@@ -22,25 +22,29 @@ public class LevelCreator : MonoBehaviour
     }
 
     public void DataProcess() {
-        if (!int.TryParse(ui.LevelInput, out int result)) return;
+        if (!int.TryParse(ui.levelInput.text, out int result)) return;
+        if (!int.TryParse(ui.rewardInput.text, out int reward)) reward = 0;
         levelData = new();
         List<Bottle> currentBottleData = bottleGen.DictionaryToSingularBottleConverter();
 
 
         levelData.levelNumber = result;
+        levelData.rewards = reward;
         levelData.bottleCount = currentBottleData.Count;
         Debug.Log(currentBottleData.Count);
         for (int i = 0; i < currentBottleData.Count; i++) {
 
-            BottleData bottleData = new();
-            bottleData.isLocked = currentBottleData[i].isLocked;
-            bottleData.lockCondition = translator.TranslatedColor(currentBottleData[i].lockColor);
+            BottleData bottleData = new() {
+                isLocked = currentBottleData[i].isLocked,
+                lockCondition = translator.TranslatedColor(currentBottleData[i].lockColor)
+            };
 
             for (int j = 0; j < currentBottleData[i].liquidUnits.Count; j++) {
 
-                LiquidData liquidData = new();
-                liquidData.colorId = translator.TranslatedColor(currentBottleData[i].liquidUnits[j].colorId);
-                liquidData.isMystery = currentBottleData[i].liquidUnits[j].isMystery;
+                LiquidData liquidData = new() {
+                    colorId = translator.TranslatedColor(currentBottleData[i].liquidUnits[j].colorId),
+                    isMystery = currentBottleData[i].liquidUnits[j].isMystery
+                };
                 bottleData.liquids.Add(liquidData);
 
             }
@@ -51,7 +55,15 @@ public class LevelCreator : MonoBehaviour
     }
 
     public void LoadLevel(bool randomize = false) {
-        if (!int.TryParse(ui.LevelInput, out int result)) return;
+        int result;
+        if (ui.admin) {
+            if (!int.TryParse(ui.levelInput.text, out result)) {
+                return;
+            }
+        } else {
+            result = gameManager.currentLevel;
+        }
+        
         if (!File.Exists(path + result.ToString("D2"))) return;
 
         string json = File.ReadAllText(path + result.ToString("D2"));
@@ -61,7 +73,6 @@ public class LevelCreator : MonoBehaviour
     }
 
     private void LoadData(LevelData data, bool randomize) {
-        gameManager.OnGameStart();
         if (randomize) {
             colorTranslate = translator.Randomizer();
         } else {
@@ -71,7 +82,8 @@ public class LevelCreator : MonoBehaviour
             }
         }
 
-        gameManager.currentLevel = data.levelNumber;
+        PlayerPrefs.SetInt("Level", data.levelNumber);
+        PlayerPrefs.SetInt("Reward", data.rewards);
         bottleGen.GenAmount(data.bottleCount);
 
         List<Bottle> bottleList = bottleGen.DictionaryToSingularBottleConverter();
@@ -93,6 +105,7 @@ public class LevelCreator : MonoBehaviour
             }
 
         }
+        PlayerPrefs.Save();
     }
 
     private LiquidColor ColorDebug(int color) {
