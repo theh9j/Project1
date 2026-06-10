@@ -184,6 +184,43 @@ public class AnimationHandler : MonoBehaviour {
                 });
     }
 
+    public void AddCoverQ(Color color) {
+        if (cover == null) return;
+
+        SpriteRenderer cloth = cover.GetComponent<SpriteRenderer>();
+        SpriteRenderer indicator = cover.GetChild(0).GetComponent<SpriteRenderer>();
+
+        cloth.DOFade(1f, 0f);
+        indicator.DOFade(1f, 0f);
+        indicator.color = color;
+    }
+
+    public void AddCoverS(Color color) {
+        if (cover == null) return;
+
+        cover.DOKill();
+
+        SpriteRenderer cloth = cover.GetComponent<SpriteRenderer>();
+        SpriteRenderer indicator = cover.GetChild(0).GetComponent<SpriteRenderer>();
+
+        Sequence seq = DOTween.Sequence();
+
+        Vector3 endPos = cover.position + Vector3.down * 1.5f;
+
+        seq.Append(
+            cover.DOMove(
+                endPos,
+                .45f
+                ).SetLink(gameObject)
+                .SetEase(Ease.InQuad)
+            );
+
+        seq.Join(cloth.DOFade(1f, .45f));
+
+        if (indicator != null)
+            seq.Join(indicator.DOFade(1f, .45f).SetLink(gameObject));
+    }
+
     private void RemoveCover() {
         if (cover == null) return;
 

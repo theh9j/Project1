@@ -42,18 +42,18 @@ public class Bottle : MonoBehaviour {
         anim.Play(5, null, transform.position + Vector3.up * 10f);
     }
 
-    public void SetLocker(LiquidColor color) {
+    public void SetLocker(LiquidColor color, bool quick = false) {
         isLocked = true;
         lockColor = color;
         Transform cover = transform.Find("Visual/Cover").transform;
-        Color setAlpha = cover.GetComponent<SpriteRenderer>().color;
-        setAlpha.a = 1;
-        cover.GetComponent<SpriteRenderer>().color = setAlpha;
-        cover.GetChild(0).GetComponent<SpriteRenderer>().color = setAlpha;
         cover.gameObject.SetActive(true);
-        cover.GetChild(0).GetComponent<SpriteRenderer>().color = colorTranslate.GetColor(color);
+        if (quick) {
+            anim.AddCoverQ(colorTranslate.GetColor(color));
+        } else {
+            anim.AddCoverS(colorTranslate.GetColor(color));
+        }
 
-        aBottleCovered?.Invoke(this);
+        aBottleCovered?.Invoke(this);   
     }
 
     public LiquidUnit GetTopLiquid() {
@@ -61,8 +61,15 @@ public class Bottle : MonoBehaviour {
         return liquidUnits[^1];
     }
 
-    public void Shuffle() {
-        if (liquidUnits.Count <= 1) return;
+    public PourData Shuffle() {
+        PourData shuffled = new();
+        if (liquidUnits.Count <= 1) return shuffled;
+
+        shuffled.shuffle = this;
+        for (int i = 0; i < liquidUnits.Count; i++) {
+            shuffled.prior.Add(liquidUnits[i]);
+        }
+
 
         for (int i = 0; i < liquidUnits.Count; i++) {
             int randomIndex = Random.Range(i, liquidUnits.Count);
@@ -75,6 +82,9 @@ public class Bottle : MonoBehaviour {
         if (GetTopLiquid().isMystery) {
             GetTopLiquid().DeMysterize();
         }
+
+        RefreshView();
+        return shuffled;
     }
 
     public LiquidUnit RemoveTopLiquid() {
@@ -101,7 +111,7 @@ public class Bottle : MonoBehaviour {
     }
 
     public PourData Pour(Bottle nextBottle) {
-        PourData move = new();
+        PourData move = null;
         if (!CanPourTo(nextBottle) || nextBottle.anim.IsBusy) return move;
         changes = 1;
         LiquidColor pourColor = GetTopLiquid().colorId;

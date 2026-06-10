@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3681951876840455419}
   - component: {fileID: 3911229529795012491}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BottleCap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4590183072468806701}
   - component: {fileID: 4660993922779011710}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -197,7 +197,7 @@ GameObject:
   - component: {fileID: 2365797125646157300}
   - component: {fileID: 7960786220834411949}
   - component: {fileID: 5657787822905775117}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BottlePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -246,7 +246,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bottle
   anim: {fileID: 2365797125646157300}
-  manager: {fileID: 0}
   liquidUnits: []
   onBottlePour:
     m_PersistentCalls:
@@ -352,7 +351,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4917355780448513823}
   - component: {fileID: 4111151849393297332}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BottleFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -444,7 +443,7 @@ GameObject:
   - component: {fileID: 6554221471165794554}
   - component: {fileID: 442339266179061958}
   - component: {fileID: 9144379211700604879}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LiquidSlot_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -552,7 +551,7 @@ GameObject:
   - component: {fileID: 426486649728334786}
   - component: {fileID: 831653659698621952}
   - component: {fileID: 4481087062690477598}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LiquidSlot_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -669,7 +668,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6655048915798039380}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LiquidRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -705,7 +704,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5925421183737082506}
   - component: {fileID: 6582361443526990437}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Mystery
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -800,7 +799,7 @@ GameObject:
   m_Component:
   - component: {fileID: 498860168613934667}
   - component: {fileID: 2283970539175944260}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Mystery
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -895,7 +894,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6698310397490376859}
   - component: {fileID: 3712725077904377962}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LockColor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -986,7 +985,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9114460675680855074}
   - component: {fileID: 7736862946944899544}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Mystery
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1080,7 +1079,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3373396530423720878}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1115,7 +1114,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8844686752296933810}
   - component: {fileID: 2581682569514572694}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Mystery
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1211,7 +1210,7 @@ GameObject:
   - component: {fileID: 130111277575516992}
   - component: {fileID: 7571660737280434459}
   - component: {fileID: 945002942130733819}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LiquidSlot_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1318,7 +1317,7 @@ GameObject:
   - component: {fileID: 8020622495062092807}
   - component: {fileID: 7403676166631675634}
   - component: {fileID: 5764737207973606689}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LiquidSlot_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1424,7 +1423,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1683845546627626866}
   - component: {fileID: 5674482240720648875}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BottleBack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1514,7 +1513,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1330850450209559763}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BottleRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -61,7 +61,7 @@ public class LevelCreator : MonoBehaviour
                 return;
             }
         } else {
-            result = gameManager.currentLevel;
+            result = PlayerPrefs.GetInt("Level")+1;
         }
         
         if (!File.Exists(path + result.ToString("D2"))) return;
@@ -91,7 +91,7 @@ public class LevelCreator : MonoBehaviour
         for (int i = 0; i < data.bottleCount; i++) {
 
             if (data.bottles[i].isLocked) {
-                bottleList[i].SetLocker(ColorDebug(data.bottles[i].lockCondition));
+                bottleList[i].SetLocker(ColorDebug(data.bottles[i].lockCondition), true);
             } 
             
 

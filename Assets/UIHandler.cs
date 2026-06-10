@@ -12,7 +12,7 @@ public class UIHandler : MonoBehaviour
 
     [SerializeField] private BottleGen bottleGen;
     [SerializeField] private GameManager gameManager;
-    [SerializeField] private Price price;
+    public Price price;
 
     [SerializeField] private TMP_Text frontCoinText;
     [SerializeField] private TMP_Text backCoinText;

@@ -12,7 +12,9 @@ public class GameManager : MonoBehaviour
     public UnityEvent<int, int> gameOver;
     private Bottle from;
     private Dictionary<LiquidColor, List<Bottle>> conditionalBottles = new();
-    public Stack<PourData> record = new(); 
+    private Stack<PourData> record;
+    private PourData move; 
+    
     
     public int currentLevel = 0;
 
@@ -46,7 +48,7 @@ public class GameManager : MonoBehaviour
 
     private bool OnCompletion() {
         conditionalBottles.Clear();
-        gameOver?.Invoke(currentLevel, PlayerPrefs.GetInt("Reward"));
+        gameOver?.Invoke(PlayerPrefs.GetInt("Level"), PlayerPrefs.GetInt("Reward"));
 
         Debug.Log("Game Completed!");
         return true;
@@ -64,7 +66,7 @@ public class GameManager : MonoBehaviour
             if (!compare.Add(bottle.GetTopLiquid().colorId)) imp = false;
         }
         if (imp) {
-            gameOver?.Invoke(currentLevel, 0);
+            gameOver?.Invoke(PlayerPrefs.GetInt("Level"), 0);
         }
     }
 
@@ -73,8 +75,8 @@ public class GameManager : MonoBehaviour
     }
 
     public void OnGameStart(bool next) {
+        record = new();
         conditionalBottles.Clear();
-        if (next) currentLevel++;
         levelCreator.LoadLevel(true);
     }
 
@@ -107,6 +109,16 @@ public class GameManager : MonoBehaviour
         return a;
     }
 
+    public void ShuffleBottle(Bottle bottle) {
+        if (bottle == null) return;
+        if (bottle.IsEmpty) return;
+        if (bottle.Completion) return;
+        if (bottle.isLocked) return;
+
+        PourData shuffled = bottle.Shuffle();
+        record.Push(shuffled);
+    }   
+
     public void TryPour(Bottle to) {
         if (to.isOccupied) return;
         to.isOccupied = true;
@@ -127,7 +139,7 @@ public class GameManager : MonoBehaviour
             to.isOccupied = false;
             return;
         }
-        PourData move = from.Pour(to);
+        move = from.Pour(to);
         if (move != null) {
             record.Push(move);
             from.anim.Play(2, to);
@@ -142,10 +154,29 @@ public class GameManager : MonoBehaviour
         if (record.Count == 0) return false;
 
         PourData move = record.Pop();
+
+        if (move.shuffle != null) {
+            for (int i = 0; i < move.prior.Count; i++) {
+                move.shuffle.liquidUnits[i] = move.prior[i];
+            }
+            move.shuffle.RefreshView();
+            return true;
+        }
+
         for (int i = move.movedLiquids.Count -1; i >= 0; i--) {
             LiquidUnit liquid = move.to.RemoveTopLiquid();
             move.from.liquidUnits.Add(liquid);
         }
+
+        if (record.Count > 0) {
+            if (record.Peek().deconditionalize.Count > 0) {
+                PourData cond = record.Pop();
+                foreach (Bottle bottle in cond.deconditionalize) {
+                    bottle.SetLocker(cond.colorFinishes);
+                }
+            }
+        }
+
 
         move.from.RefreshView();
         move.to.RefreshView();
@@ -158,9 +189,13 @@ public class GameManager : MonoBehaviour
         LiquidColor bottleColor = completedBottle.GetTopLiquid().colorId;
 
         if (conditionalBottles.TryGetValue(bottleColor, out List<Bottle> satisfyBottles)) {
+            move = new();
             foreach (Bottle bottle in satisfyBottles) {
                 bottle.RemoveConditionalLock();
+                move.deconditionalize.Add(bottle);
             }
+            move.colorFinishes = bottleColor;
+            record.Push(move);
         }
     }
 }

@@ -10,6 +10,7 @@ public class InputHandler : MonoBehaviour
     public AdminUIHandler adui;
     public UIHandler ui;
     public LevelDesigner levelDesigner;
+    private InputMode inputMode = InputMode.Normal;
 
     private Bottle prev;
     void Update()
@@ -23,6 +24,19 @@ public class InputHandler : MonoBehaviour
             onMouseDown();
         }
 
+    }
+    public void ToggleShuffleMode() {
+        inputMode = inputMode == InputMode.Shuffle
+            ? InputMode.Normal
+            : InputMode.Shuffle;
+    }
+
+    public bool IsShuffleMode() {
+        return inputMode == InputMode.Shuffle;
+    }
+
+    public void CancelMode() {
+        inputMode = InputMode.Normal;
     }
 
     private void onMouseDown() {
@@ -61,4 +75,9 @@ public class InputHandler : MonoBehaviour
 
         gameManager.TryPour(bottle);
     }
+}
+
+public enum InputMode {
+    Normal,
+    Shuffle
 }
