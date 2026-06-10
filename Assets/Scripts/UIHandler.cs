@@ -12,6 +12,7 @@ public class UIHandler : MonoBehaviour
 
     [SerializeField] private BottleGen bottleGen;
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private InputHandler inputs;
     public Price price;
 
     [SerializeField] private TMP_Text frontCoinText;
@@ -124,7 +125,20 @@ public class UIHandler : MonoBehaviour
     }
 
     public void Shuffle() {
+        if (PlayerPrefs.GetInt("Undo") == 0 && PlayerPrefs.GetInt("Coins") < price.undoPrice) return;
 
+        inputs.ToggleShuffleMode();
+    }
+
+    public void ShuffleUpdate() {
+        if (PlayerPrefs.GetInt("Shuffle") == 0) {
+            PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coins") - price.undoPrice);
+        } else {
+            PlayerPrefs.SetInt("Shuffle", PlayerPrefs.GetInt("Shuffle") - 1);
+        }
+        PlayerPrefs.Save();
+        Coin();
+        UpdateCount(0);
     }
 
     public void Undo() {

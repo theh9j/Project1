@@ -31,10 +31,6 @@ public class InputHandler : MonoBehaviour
             : InputMode.Shuffle;
     }
 
-    public bool IsShuffleMode() {
-        return inputMode == InputMode.Shuffle;
-    }
-
     public void CancelMode() {
         inputMode = InputMode.Normal;
     }
@@ -43,10 +39,11 @@ public class InputHandler : MonoBehaviour
         Vector2 worldPos = mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
 
-        if (hit.collider == null) return;
+        if (hit.collider == null) { CancelMode(); return; }
 
         Bottle bottle = hit.collider.GetComponent<Bottle>();
-        if (bottle == null) return;
+        if (bottle == null) { CancelMode(); return; }
+
 
         if (adui.admin) {
             if (prev == bottle) {
@@ -66,13 +63,17 @@ public class InputHandler : MonoBehaviour
             return;
         }
 
+        if (inputMode == InputMode.Shuffle) {
+            bool res = gameManager.ShuffleBottle(bottle);
+            if (res) ui.ShuffleUpdate();
+            CancelMode();
+            return;
+        }
+
         if (!gameManager.BottleAvailable(bottle)) {
             bottle.anim.Play(1);
             return;
         }
-
-
-
         gameManager.TryPour(bottle);
     }
 }

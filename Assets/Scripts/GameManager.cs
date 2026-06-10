@@ -109,14 +109,15 @@ public class GameManager : MonoBehaviour
         return a;
     }
 
-    public void ShuffleBottle(Bottle bottle) {
-        if (bottle == null) return;
-        if (bottle.IsEmpty) return;
-        if (bottle.Completion) return;
-        if (bottle.isLocked) return;
+    public bool ShuffleBottle(Bottle bottle) {
+        if (bottle == null) return false;
+        if (bottle.IsEmpty) return false;
+        if (bottle.Completion) return false;
+        if (bottle.isLocked) return false;
 
         PourData shuffled = bottle.Shuffle();
-        record.Push(shuffled);
+        record.Push(shuffled);  
+        return true;
     }   
 
     public void TryPour(Bottle to) {
