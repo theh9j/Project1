@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class InputHandler : MonoBehaviour
@@ -24,6 +25,12 @@ public class InputHandler : MonoBehaviour
             onMouseDown();
         }
 
+        if (inputMode == InputMode.Normal) {
+            ui.ShuffleUnderlay(false);
+        } else {
+            ui.ShuffleUnderlay(true);
+        }
+
     }
     public void ToggleShuffleMode() {
         inputMode = inputMode == InputMode.Shuffle
@@ -36,6 +43,7 @@ public class InputHandler : MonoBehaviour
     }
 
     private void onMouseDown() {
+        if (EventSystem.current.IsPointerOverGameObject()) return;
         Vector2 worldPos = mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
 

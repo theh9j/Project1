@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -22,7 +23,7 @@ public class Bottle : MonoBehaviour {
     public int changes;
     private bool isCompleted = false;
 
-    public void BottleInit(List<LiquidUnit> initialLiquids) {
+    public void BottleInit(List<LiquidUnit> initialLiquids) { //DEPRECATED
         liquidUnits = new List<LiquidUnit>();
 
         foreach (LiquidUnit liquid in initialLiquids) {
@@ -56,35 +57,66 @@ public class Bottle : MonoBehaviour {
         aBottleCovered?.Invoke(this);   
     }
 
+    public bool Distinction() {
+        int distinctColors = liquidUnits.Select(x => x.colorId)
+            .Distinct() 
+            .Count();
+        return distinctColors > 1;
+    }
+
     public LiquidUnit GetTopLiquid() {
         if (IsEmpty) return null;
         return liquidUnits[^1];
     }
 
     public PourData Shuffle() {
-        PourData shuffled = new();
-        if (liquidUnits.Count <= 1) return shuffled;
+        if (!Distinction()) return null;
 
-        shuffled.shuffle = this;
+        PourData shuffled = new() { shuffle = this };
         for (int i = 0; i < liquidUnits.Count; i++) {
             shuffled.prior.Add(liquidUnits[i]);
         }
 
+        List<LiquidUnit> original = liquidUnits.Select(
+            x => new LiquidUnit( x.colorId, x.isMystery )).ToList();
 
-        for (int i = 0; i < liquidUnits.Count; i++) {
-            int randomIndex = Random.Range(i, liquidUnits.Count);
+        int attempts = 0;
 
-            LiquidUnit temp = liquidUnits[i];
-            liquidUnits[i] = liquidUnits[randomIndex];
-            liquidUnits[randomIndex] = temp;
+        do {
+            Swap(liquidUnits);
+            attempts++;
         }
+        while (
+            SameOrder(original, liquidUnits) && attempts < 50
+        );
 
         if (GetTopLiquid().isMystery) {
             GetTopLiquid().DeMysterize();
         }
 
         RefreshView();
+        onBottlePour?.Invoke(false);
         return shuffled;
+    }
+
+    private void Swap(List<LiquidUnit> list) {
+        for (int i = list.Count - 1; i > 0; i--) {
+            int random = Random.Range(0, i + 1);
+
+            (list[i], list[random]) = (list[random], list[i]);
+        }
+    }
+
+    private bool SameOrder(List<LiquidUnit> a, List<LiquidUnit> b) {
+        if (a.Count != b.Count) return false;
+
+        for (int i = 0; i < a.Count; i++) {
+            if (a[i].colorId != b[i].colorId) return false;
+            if (a[i].isMystery != b[i].isMystery) return false;
+        }
+
+        return true;
+
     }
 
     public LiquidUnit RemoveTopLiquid() {

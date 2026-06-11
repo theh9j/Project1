@@ -62,6 +62,7 @@ public class GameManager : MonoBehaviour
         HashSet<LiquidColor> compare = new();
         bool imp = true;
         foreach (Bottle bottle in currentBottles) {
+            if (bottle.isLocked) continue;
             if (bottle.IsEmpty) { imp = false; break; }
             if (!compare.Add(bottle.GetTopLiquid().colorId)) imp = false;
         }

@@ -1,9 +1,12 @@
+using DG.Tweening;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Color = UnityEngine.Color;
 
@@ -30,6 +33,7 @@ public class UIHandler : MonoBehaviour
     private TMP_Text addPrice;
 
     [SerializeField] private UIAnimation uianim;
+    [SerializeField] private GameObject underlay;
 
     private Color textColor;
 
@@ -126,8 +130,15 @@ public class UIHandler : MonoBehaviour
 
     public void Shuffle() {
         if (PlayerPrefs.GetInt("Undo") == 0 && PlayerPrefs.GetInt("Coins") < price.undoPrice) return;
+        foreach (Bottle bottle in inputs.bottleGen.DictionaryToSingularBottleConverter()) {
+            if (bottle.IsEmpty) continue;
+            if (bottle.Completion) continue;
+            if (bottle.isLocked) continue;
+            if (!bottle.Distinction()) continue;
 
-        inputs.ToggleShuffleMode();
+            inputs.ToggleShuffleMode();
+            break;
+        }
     }
 
     public void ShuffleUpdate() {
@@ -139,6 +150,35 @@ public class UIHandler : MonoBehaviour
         PlayerPrefs.Save();
         Coin();
         UpdateCount(0);
+    }
+
+    public void ShuffleUnderlay(bool type) {
+        if (type) {
+            if (underlay.activeSelf) return;
+            underlay.SetActive(true);
+            IncreaseBottleZIndex(true);
+            underlay.transform.GetComponent<SpriteRenderer>().DOFade(.95f, .3f);
+        } else {
+            if (!underlay.activeSelf) return;
+            underlay.transform.GetComponent<SpriteRenderer>().DOFade(0f, .4f).OnComplete(() => {
+                underlay.SetActive(false);
+                IncreaseBottleZIndex(false);
+            });
+        }
+    }
+
+    private void IncreaseBottleZIndex(bool a) {
+        List<Bottle> objectBot = inputs.bottleGen.DictionaryToSingularBottleConverter();
+
+        foreach (Bottle bottle in objectBot) {
+            bottle.GetComponent<SortingGroup>().sortingOrder = 10;
+            if (bottle.IsEmpty) continue;
+            if (bottle.Completion) continue;
+            if (bottle.isLocked) continue;
+            if (!bottle.Distinction()) continue;
+
+            if (a) bottle.GetComponent<SortingGroup>().sortingOrder = 15;
+        }
     }
 
     public void Undo() {
