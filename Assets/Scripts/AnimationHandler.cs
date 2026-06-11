@@ -8,7 +8,6 @@ public class AnimationHandler : MonoBehaviour {
     [SerializeField] private Transform bottleCap;
     [SerializeField] private Transform cover;
     [SerializeField] private Transform visual;
-    [SerializeField] private Transform spillar;
     [SerializeField] private Transform spill;
     [SerializeField] private Bottle currentBottle;
     private readonly ColorTranslator colorTranslate = new();
@@ -24,16 +23,12 @@ public class AnimationHandler : MonoBehaviour {
     private Vector3 originalPos;
     private Quaternion originalRotation;
 
-    private Vector3 spillarOG;
-
     private int originalSortingOrder;
     private SortingGroup sortingGroup;
 
     public bool IsBusy { get; private set; }
 
     void Start() {
-        spillarOG = spillar.position;
-
         originalPos = visual.position;
         originalRotation = visual.rotation;
 
@@ -79,39 +74,33 @@ public class AnimationHandler : MonoBehaviour {
     }
 
     private void Spill(Bottle b, float angle) {
+        Transform spillPar = b.anim.spill.parent;
         b.anim.spill.GetComponent<SpriteRenderer>().color = colorTranslate.GetColor(b.GetTopLiquid().colorId);
-        spill.GetComponent<SpriteRenderer>().color = b.anim.spill.GetComponent<SpriteRenderer>().color;
-        Vector3 spillParPos = b.anim.spillarOG;
+        Vector3 spillParPos = spillPar.position;
         float targetY = spillOffset + 3 * spillLenOffset;
 
-        b.anim.spillar.DOKill();
+        spillPar.DOKill();
         b.anim.spill.DOKill();
 
-        b.anim.spillar.gameObject.SetActive(true);
-        spillar.gameObject.SetActive(true);
+        spillPar.gameObject.SetActive(true);
 
-        b.anim.spillar.localScale = new Vector3(0.5f, 0f, 1f);
-        spillar.localScale = new Vector3(.5f, 0f, 1f);
+        spillPar.localScale = new Vector3(0.5f, 0f, 1f);
 
         if (angle < 0) {
             b.anim.spill.localPosition = new Vector3(0.5f, -0.5f, 0f);
-            b.anim.spillar.position = Vector3.left * .2f;
+            spillPar.DOMove(spillParPos + Vector3.left * .2f, 0);
         } else {
             b.anim.spill.localPosition = new Vector3(-0.5f, -0.5f, 0f);
-            b.anim.spillar.position = Vector3.right * .2f;
+            spillPar.DOMove(spillParPos + Vector3.right * .2f, 0);
         }
+
 
         Sequence seq = DOTween.Sequence();
 
-        seq.Append(
-            spillar.DOScaleY(
-                1f,
-                .2f
-                )
-            );
+
 
         seq.Append(
-            b.anim.spillar.DOScaleY(
+            spillPar.DOScaleY(
                 targetY,
                 currentBottle.changes * pourDuration * 0.25f
             ).SetLink(gameObject)
@@ -120,24 +109,18 @@ public class AnimationHandler : MonoBehaviour {
         seq.AppendInterval(currentBottle.changes * pourDuration * 0.5f).SetLink(gameObject);
 
         seq.Append(
-            b.anim.spillar.DOScaleX(
+            spillPar.DOScaleX(
                 0f,
                 currentBottle.changes * pourDuration * 0.25f
             ).SetLink(gameObject)
         );
 
-        seq.Join(
-            spillar.DOScaleX(
-                0f,
-                currentBottle.changes * pourDuration * 0.25f
-        ));
-
         seq.OnComplete(() =>
         {
-            b.anim.spillar.localScale = new Vector3(0.5f, 0f, 1f);
+            spillPar.localScale = new Vector3(0.5f, 0f, 1f);
             if (angle < 0) b.anim.spill.localPosition = new Vector3(0.5f, -0.5f, 0f); else b.anim.spill.localPosition = new Vector3(-0.5f, -0.5f, 0f);
-            b.anim.spillar.position = b.anim.spillarOG;
-            b.anim.spillar.gameObject.SetActive(false);
+            spillPar.position = spillParPos;
+            spillPar.gameObject.SetActive(false);
         });
     }
 
@@ -148,6 +131,7 @@ public class AnimationHandler : MonoBehaviour {
         BringToFront();
 
         visual.DOKill();
+
         Vector3 targetPos = nextBottle.transform.position;
         targetPos.y += pourHeiOffset;
 
@@ -167,12 +151,6 @@ public class AnimationHandler : MonoBehaviour {
                 targetPos.x += pourCornerOffset;
                 angle = pourAngle;
             }
-        }
-
-        if (angle < 0) {
-            spillar.position = spillarOG + new Vector3(.2f, -.2f, 0f);
-        } else {
-            spillar.position = spillarOG + new Vector3(-.2f, -.2f, 0f);
         }
 
         Sequence sequence = DOTween.Sequence();
@@ -215,12 +193,7 @@ public class AnimationHandler : MonoBehaviour {
         sequence.OnComplete(() => {
             RestoreSorting();
             IsBusy = false;
-            spillar.position = spillarOG;
         });
-    }
-
-    private void PourDebug(Vector3 a) {
-        Debug.Log($"{a.x}, {a.y}");
     }
 
     private void PlayCap(Vector3 finalPos) {
