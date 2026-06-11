@@ -99,8 +99,13 @@ public class UIHandler : MonoBehaviour
         PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coins") + PlayerPrefs.GetInt("Reward"));
         PlayerPrefs.Save();
         Coin();
-        gameManager.OnGameStart(true);
+        gameManager.OnGameStart(true, true);
         uianim.NextLevel();
+    }
+
+    public void Replay() {
+        gameManager.OnGameStart(true, false);
+        uianim.Revived();
     }
 
     private void Coin() {

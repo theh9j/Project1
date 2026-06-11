@@ -54,14 +54,14 @@ public class LevelCreator : MonoBehaviour
         SaveLevel(result);
     }
 
-    public void LoadLevel(bool randomize = false) {
+    public void LoadLevel(bool randomize = false, bool next = false) {
         int result;
         if (ui.admin) {
             if (!int.TryParse(ui.levelInput.text, out result)) {
                 return;
             }
         } else {
-            result = PlayerPrefs.GetInt("Level")+1;
+            if (next) result = PlayerPrefs.GetInt("Level") + 1; else result = PlayerPrefs.GetInt("Level");
         }
         
         if (!File.Exists(path + result.ToString("D2"))) return;
@@ -106,6 +106,7 @@ public class LevelCreator : MonoBehaviour
 
         }
         PlayerPrefs.Save();
+        ui.SetLevelnReward();
     }
 
     private LiquidColor ColorDebug(int color) {

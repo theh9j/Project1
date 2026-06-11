@@ -31,12 +31,11 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt("Shuffle", shuffle);
         PlayerPrefs.SetInt("Undo", undo);
         PlayerPrefs.SetInt("Add", add);
-
-
         PlayerPrefs.Save();
 
-
     }
+
+    
 
     void Start() {
 
@@ -44,6 +43,10 @@ public class GameManager : MonoBehaviour
             newBottle.aBottleCovered.AddListener(ConditionalBottleRecord);
             newBottle.onBottlePour.AddListener(CheckForImpossibility);
         });
+
+        if (!PlayerPrefs.HasKey("Level")) PlayerPrefs.SetInt("Level", 1);
+        Debug.Log("Launching");
+        OnGameStart(true, false);
     }
 
     private bool OnCompletion() {
@@ -75,10 +78,14 @@ public class GameManager : MonoBehaviour
         revive?.Invoke();
     }
 
-    public void OnGameStart(bool next) {
+    public void ADGameStart(bool rand) {
+        OnGameStart(rand, false);
+    }
+
+    public void OnGameStart(bool rand, bool next) {
         record = new();
         conditionalBottles.Clear();
-        levelCreator.LoadLevel(true);
+        levelCreator.LoadLevel(rand, next);
     }
 
     public bool BottleAvailable(Bottle currentBottle) {

@@ -38,7 +38,7 @@ public class UIAnimation : MonoBehaviour
             .Append(
             gameEndPanel.GetComponent<Image>().DOFade(
                 .97f, 
-                .5f
+                .35f
                 ))
             .OnComplete(() => {
                 if (amount != 0) GameWin(level, amount); else GameOver();
@@ -51,14 +51,14 @@ public class UIAnimation : MonoBehaviour
         gameOverText.DOMove(
             new(centre.x, centre.y * goTextEndPoint),
             .6f
-        ).From(new Vector2(centre.x, Screen.height + 100));
+        ).From(new Vector2(centre.x, Screen.height + 100)).SetEase(Ease.OutSine);
 
         gameOverText.GetComponent<CanvasGroup>().DOFade(1f, .8f);
 
         options.DOMove(
             new(centre.x, centre.y * optionEndPoint),
             .8f
-        ).From(new Vector2(Screen.width + 100, centre.y * optionEndPoint));
+        ).From(new Vector2(Screen.width * 2, centre.y * optionEndPoint)).SetEase(Ease.OutSine);
 
         options.GetComponent<CanvasGroup>().DOFade(1, .8f);
     }
@@ -77,7 +77,7 @@ public class UIAnimation : MonoBehaviour
         gameWinPanel.transform.DOMove(
             centre,
             .3f
-            ).From(new Vector2(centre.x * 5, centre.y));
+            ).From(new Vector2(Screen.width * 2, centre.y)).SetEase(Ease.OutSine);
 
     }
 
@@ -90,9 +90,9 @@ public class UIAnimation : MonoBehaviour
         gameOverText.GetComponent<CanvasGroup>().DOFade(0, .8f);
 
         options.DOMove(
-            new(Screen.width + 100, centre.y * optionEndPoint),
+            new(Screen.width * 2, centre.y * optionEndPoint),
             .4f
-        );
+        ).SetEase(Ease.InSine);
 
         options.GetComponent<CanvasGroup>().DOFade(0, .8f);
 
@@ -109,7 +109,6 @@ public class UIAnimation : MonoBehaviour
 
         
         GameContinue();
-
     }
 
     private void GameContinue() {
@@ -126,9 +125,7 @@ public class UIAnimation : MonoBehaviour
 
     public void DisplayCost(GameObject cost, GameObject notif, bool undo) { //notif pops up, cost disappear if false
         if (undo) {
-            GameObject temp = cost;
-            cost = notif;
-            notif = temp;
+            (notif, cost) = (cost, notif);
         }
 
         DOTween.Sequence()

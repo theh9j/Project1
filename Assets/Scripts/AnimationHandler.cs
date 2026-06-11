@@ -1,22 +1,30 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using DG.Tweening;
+using System.Collections;
 
 public class AnimationHandler : MonoBehaviour {
     [Header("References")]
     [SerializeField] private Transform bottleCap;
     [SerializeField] private Transform cover;
     [SerializeField] private Transform visual;
+    [SerializeField] private Transform spillar;
+    [SerializeField] private Transform spill;
     [SerializeField] private Bottle currentBottle;
+    private readonly ColorTranslator colorTranslate = new();
 
     [Header("Pour Settings")]
     public float pourCornerOffset = 3.1f;
     public float pourHeiOffset = 4f;
     public float pourDuration = 0.35f;
     public float pourAngle = 95f;
+    public float spillLenOffset = 2f;
+    public float spillOffset = 1f;
 
     private Vector3 originalPos;
     private Quaternion originalRotation;
+
+    private Vector3 spillarOG;
 
     private int originalSortingOrder;
     private SortingGroup sortingGroup;
@@ -24,6 +32,8 @@ public class AnimationHandler : MonoBehaviour {
     public bool IsBusy { get; private set; }
 
     void Start() {
+        spillarOG = spillar.position;
+
         originalPos = visual.position;
         originalRotation = visual.rotation;
 
@@ -68,6 +78,69 @@ public class AnimationHandler : MonoBehaviour {
         });
     }
 
+    private void Spill(Bottle b, float angle) {
+        b.anim.spill.GetComponent<SpriteRenderer>().color = colorTranslate.GetColor(b.GetTopLiquid().colorId);
+        spill.GetComponent<SpriteRenderer>().color = b.anim.spill.GetComponent<SpriteRenderer>().color;
+        Vector3 spillParPos = b.anim.spillarOG;
+        float targetY = spillOffset + 3 * spillLenOffset;
+
+        b.anim.spillar.DOKill();
+        b.anim.spill.DOKill();
+
+        b.anim.spillar.gameObject.SetActive(true);
+        spillar.gameObject.SetActive(true);
+
+        b.anim.spillar.localScale = new Vector3(0.5f, 0f, 1f);
+        spillar.localScale = new Vector3(.5f, 0f, 1f);
+
+        if (angle < 0) {
+            b.anim.spill.localPosition = new Vector3(0.5f, -0.5f, 0f);
+            b.anim.spillar.position = Vector3.left * .2f;
+        } else {
+            b.anim.spill.localPosition = new Vector3(-0.5f, -0.5f, 0f);
+            b.anim.spillar.position = Vector3.right * .2f;
+        }
+
+        Sequence seq = DOTween.Sequence();
+
+        seq.Append(
+            spillar.DOScaleY(
+                1f,
+                .2f
+                )
+            );
+
+        seq.Append(
+            b.anim.spillar.DOScaleY(
+                targetY,
+                currentBottle.changes * pourDuration * 0.25f
+            ).SetLink(gameObject)
+        );
+
+        seq.AppendInterval(currentBottle.changes * pourDuration * 0.5f).SetLink(gameObject);
+
+        seq.Append(
+            b.anim.spillar.DOScaleX(
+                0f,
+                currentBottle.changes * pourDuration * 0.25f
+            ).SetLink(gameObject)
+        );
+
+        seq.Join(
+            spillar.DOScaleX(
+                0f,
+                currentBottle.changes * pourDuration * 0.25f
+        ));
+
+        seq.OnComplete(() =>
+        {
+            b.anim.spillar.localScale = new Vector3(0.5f, 0f, 1f);
+            if (angle < 0) b.anim.spill.localPosition = new Vector3(0.5f, -0.5f, 0f); else b.anim.spill.localPosition = new Vector3(-0.5f, -0.5f, 0f);
+            b.anim.spillar.position = b.anim.spillarOG;
+            b.anim.spillar.gameObject.SetActive(false);
+        });
+    }
+
     private void PlayPour(Bottle nextBottle) {
         if (nextBottle == null) return;
 
@@ -75,7 +148,6 @@ public class AnimationHandler : MonoBehaviour {
         BringToFront();
 
         visual.DOKill();
-
         Vector3 targetPos = nextBottle.transform.position;
         targetPos.y += pourHeiOffset;
 
@@ -97,6 +169,12 @@ public class AnimationHandler : MonoBehaviour {
             }
         }
 
+        if (angle < 0) {
+            spillar.position = spillarOG + new Vector3(.2f, -.2f, 0f);
+        } else {
+            spillar.position = spillarOG + new Vector3(-.2f, -.2f, 0f);
+        }
+
         Sequence sequence = DOTween.Sequence();
 
         sequence.Append(
@@ -109,8 +187,10 @@ public class AnimationHandler : MonoBehaviour {
             visual.DORotate(new Vector3(0, 0, angle), pourDuration)
                 .SetLink(gameObject)
                 .SetEase(Ease.OutQuad)
-        );
-
+                .OnComplete(() => {
+                    Spill(nextBottle, angle);
+                }
+        ));
         sequence.AppendInterval(pourDuration * currentBottle.changes).SetLink(gameObject);
 
         sequence.AppendCallback(() => {
@@ -135,7 +215,12 @@ public class AnimationHandler : MonoBehaviour {
         sequence.OnComplete(() => {
             RestoreSorting();
             IsBusy = false;
+            spillar.position = spillarOG;
         });
+    }
+
+    private void PourDebug(Vector3 a) {
+        Debug.Log($"{a.x}, {a.y}");
     }
 
     private void PlayCap(Vector3 finalPos) {
@@ -212,7 +297,7 @@ public class AnimationHandler : MonoBehaviour {
                 endPos,
                 .45f
                 ).SetLink(gameObject)
-                .SetEase(Ease.InQuad)
+                .SetEase(Ease.OutSine)
             );
 
         seq.Join(cloth.DOFade(1f, .45f));

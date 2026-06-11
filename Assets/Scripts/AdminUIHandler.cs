@@ -105,8 +105,9 @@ public class AdminUIHandler : MonoBehaviour
         }
     }
     
-    public void SetLevel(string level) {
-        levelInput.text = level;
+    public void SetLevelnReward() {
+        levelInput.text = PlayerPrefs.GetInt("Level").ToString();
+        rewardInput.text = PlayerPrefs.GetInt("Reward").ToString();
     }
 
     public void BottleSelectedChangeColor(Bottle currentBottle = null) {
