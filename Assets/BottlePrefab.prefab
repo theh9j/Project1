@@ -813,7 +813,7 @@ Transform:
   m_GameObject: {fileID: 5618613928997942516}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.57, z: 0}
+  m_LocalPosition: {x: 0, y: 3.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -830,7 +830,7 @@ SortingGroup:
   m_Enabled: 1
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 0
   m_SortAtRoot: 0
   m_Sort3DAs2D: 0
 --- !u!1 &5782676253776330980
@@ -1517,13 +1517,13 @@ MonoBehaviour:
   bottleCap: {fileID: 6624243160162590013}
   cover: {fileID: 6288567250377412075}
   visual: {fileID: 5054824331517217384}
-  spillar: {fileID: 5256254323340059861}
   spill: {fileID: 6314123249414286985}
   currentBottle: {fileID: 3877616452783220878}
-  pourCornerOffset: 3.1
+  pourCornerOffset: 3
   pourHeiOffset: 4
-  pourDuration: 0.45
-  pourAngle: 95
+  pourDuration: 0.3
+  pourAngle: 7.5
+  pourDefaultAngle: 75
   spillLenOffset: 1.25
   spillOffset: 3
 --- !u!114 &471898657223734379

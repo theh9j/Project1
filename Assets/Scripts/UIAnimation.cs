@@ -27,9 +27,6 @@ public class UIAnimation : MonoBehaviour
     [SerializeField] private TMP_Text levelIndex;
     [SerializeField] private TMP_Text coinWinsText;
 
-
-
-
     public void GameEnd(int level, int amount = 0) {
         gameEndPanel.SetActive(true);
 

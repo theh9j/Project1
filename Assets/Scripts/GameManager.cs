@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private BottleGen bottleGen;
     [SerializeField] private LevelCreator levelCreator;
+    [SerializeField] private Tutorial tutor;
     public UnityEvent revive;
     public UnityEvent<int, int> gameOver;
     private Bottle from;
@@ -17,24 +18,6 @@ public class GameManager : MonoBehaviour
     
     
     public int currentLevel = 0;
-
-    [Header("Inventory")]
-    public int coins = 1200;
-    public int shuffle = 10;
-    public int undo = 10;
-    public int add = 10;
-
-
-    void Awake() {
-
-        PlayerPrefs.SetInt("Coins", coins);
-        PlayerPrefs.SetInt("Shuffle", shuffle);
-        PlayerPrefs.SetInt("Undo", undo);
-        PlayerPrefs.SetInt("Add", add);
-        PlayerPrefs.Save();
-
-    }
-
     
 
     void Start() {
@@ -44,14 +27,13 @@ public class GameManager : MonoBehaviour
             newBottle.onBottlePour.AddListener(CheckForImpossibility);
         });
 
-        if (!PlayerPrefs.HasKey("Level")) PlayerPrefs.SetInt("Level", 1);
-        Debug.Log("Launching");
+        
         OnGameStart(true, false);
     }
 
     private bool OnCompletion() {
         conditionalBottles.Clear();
-        gameOver?.Invoke(PlayerPrefs.GetInt("Level"), PlayerPrefs.GetInt("Reward"));
+        gameOver?.Invoke(SaveManager.Instance.level, SaveManager.Instance.coinsReward);
 
         Debug.Log("Game Completed!");
         return true;
@@ -70,7 +52,7 @@ public class GameManager : MonoBehaviour
             if (!compare.Add(bottle.GetTopLiquid().colorId)) imp = false;
         }
         if (imp) {
-            gameOver?.Invoke(PlayerPrefs.GetInt("Level"), 0);
+            gameOver?.Invoke(SaveManager.Instance.level, 0);
         }
     }
 
@@ -86,6 +68,7 @@ public class GameManager : MonoBehaviour
         record = new();
         conditionalBottles.Clear();
         levelCreator.LoadLevel(rand, next);
+        tutor.CheckForTutorial();
     }
 
     public bool BottleAvailable(Bottle currentBottle) {

@@ -6,7 +6,7 @@ public class LevelData
 {
     public int levelNumber;
     public int bottleCount;
-    public int rewards;
+    public RewardData rewards = new();
 
     public List<BottleData> bottles = new List<BottleData>();
 }

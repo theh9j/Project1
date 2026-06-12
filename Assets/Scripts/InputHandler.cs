@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -21,17 +22,35 @@ public class InputHandler : MonoBehaviour
             bottleGen.ClearBottles();
         }
 
-        if (Mouse.current.leftButton.wasPressedThisFrame) {
+        if (Mouse.current.leftButton.wasPressedThisFrame && inputMode != InputMode.Tutorial) {
             onMouseDown();
         }
 
-        if (inputMode == InputMode.Normal) {
-            ui.ShuffleUnderlay(false);
-        } else {
+        if (inputMode == InputMode.Shuffle) {
             ui.ShuffleUnderlay(true);
+        } else {
+            ui.ShuffleUnderlay(false);
         }
 
     }
+
+    public IEnumerator WaitForAction() {
+        yield return new WaitUntil(() =>
+            (Mouse.current != null && Mouse.current.leftButton.wasReleasedThisFrame) ||
+            (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasReleasedThisFrame)
+        );
+    }
+
+    public bool CheckForInput() {
+        if ((Mouse.current != null && Mouse.current.leftButton.isPressed) ||
+            (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)) { Debug.Log("Tapped"); return true; }
+        return false;
+    }
+
+    public void ToggleTutorialMode() {
+        inputMode = InputMode.Tutorial;
+    }
+
     public void ToggleShuffleMode() {
         inputMode = inputMode == InputMode.Shuffle
             ? InputMode.Normal
@@ -88,5 +107,6 @@ public class InputHandler : MonoBehaviour
 
 public enum InputMode {
     Normal,
-    Shuffle
+    Shuffle,
+    Tutorial
 }

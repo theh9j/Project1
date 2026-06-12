@@ -16,6 +16,7 @@ public class LevelCreator : MonoBehaviour
 
     private string path = Application.dataPath + "/LevelManager/Levels/level_";
 
+
     private void SaveLevel(int result) {
         string json = JsonUtility.ToJson(levelData, true);
         File.WriteAllText(path + result.ToString("D2"), json);
@@ -23,13 +24,25 @@ public class LevelCreator : MonoBehaviour
 
     public void DataProcess() {
         if (!int.TryParse(ui.levelInput.text, out int result)) return;
-        if (!int.TryParse(ui.rewardInput.text, out int reward)) reward = 0;
+        if (!int.TryParse(ui.coinInput.text, out int reward)) reward = 0;
+
+        //Boosters
+        if (!int.TryParse(ui.shuffleInput.text, out int shuffle)) shuffle = 0;
+        if (!int.TryParse(ui.undoInput.text, out int undo)) undo = 0;
+        if (!int.TryParse(ui.addBottleInput.text, out int addBottle)) addBottle = 0;
+
         levelData = new();
         List<Bottle> currentBottleData = bottleGen.DictionaryToSingularBottleConverter();
 
 
         levelData.levelNumber = result;
-        levelData.rewards = reward;
+        levelData.rewards.coins = reward;
+
+        levelData.rewards.shuffle = shuffle;
+        levelData.rewards.undo = undo;
+        levelData.rewards.addBottle = addBottle;
+
+
         levelData.bottleCount = currentBottleData.Count;
         Debug.Log(currentBottleData.Count);
         for (int i = 0; i < currentBottleData.Count; i++) {
@@ -61,7 +74,7 @@ public class LevelCreator : MonoBehaviour
                 return;
             }
         } else {
-            if (next) result = PlayerPrefs.GetInt("Level") + 1; else result = PlayerPrefs.GetInt("Level");
+            if (next) result = SaveManager.Instance.level += 1; else result = SaveManager.Instance.level;
         }
         
         if (!File.Exists(path + result.ToString("D2"))) return;
@@ -82,8 +95,13 @@ public class LevelCreator : MonoBehaviour
             }
         }
 
-        PlayerPrefs.SetInt("Level", data.levelNumber);
-        PlayerPrefs.SetInt("Reward", data.rewards);
+        SaveManager.Instance.level = data.levelNumber;
+        SaveManager.Instance.coinsReward = data.rewards.coins;
+
+        SaveManager.Instance.shufflesReward = data.rewards.shuffle;
+        SaveManager.Instance.undosReward = data.rewards.undo;
+        SaveManager.Instance.addBottlesReward = data.rewards.addBottle;
+
         bottleGen.GenAmount(data.bottleCount);
 
         List<Bottle> bottleList = bottleGen.DictionaryToSingularBottleConverter();

@@ -20,6 +20,7 @@ public class UIHandler : MonoBehaviour
 
     [SerializeField] private TMP_Text frontCoinText;
     [SerializeField] private TMP_Text backCoinText;
+    [SerializeField] private TMP_Text levelText;
 
     [SerializeField] private GameObject[] toolNotification = new GameObject[3];
     [SerializeField] private GameObject[] costDisplayer = new GameObject[3];
@@ -38,7 +39,8 @@ public class UIHandler : MonoBehaviour
     private Color textColor;
 
     void Start() {
-        Coin();
+        BaseUpd();
+        levelText.text = "Level " + SaveManager.Instance.level.ToString();
 
         gameManager.gameOver.AddListener(CheckForEnough);
         gameManager.revive.AddListener(uianim.Revived);
@@ -61,19 +63,16 @@ public class UIHandler : MonoBehaviour
 
     public void ReviveUsingBottle() {
 
-        int coins = PlayerPrefs.GetInt("Coins");
-        if (coins < price.bottlePrice) return; //It should says that they don't have enough
-        coins = coins - price.bottlePrice;
-        PlayerPrefs.SetInt("Coins", coins);
+        if (SaveManager.Instance.coins < price.bottlePrice) return;
+        SaveManager.Instance.coins -= price.bottlePrice;
 
         bottleGen.AddBottle();
         gameManager.Revival();
-        PlayerPrefs.Save();
-        Coin();
+        BaseUpd();
     }
 
     private void CheckForEnough(int level, int amount = 0) {
-        int coins = PlayerPrefs.GetInt("Coins");
+        int coins = SaveManager.Instance.coins;
 
         Button button = uianim.options.GetChild(0).GetComponent<Button>();
         TMP_Text buttonText = uianim.options.GetChild(0).GetChild(0).GetComponent<TMP_Text>();
@@ -96,11 +95,18 @@ public class UIHandler : MonoBehaviour
     }
 
     public void LevelAdvance() {
-        PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coins") + PlayerPrefs.GetInt("Reward"));
-        PlayerPrefs.Save();
-        Coin();
+        SaveManager.Instance.coins += SaveManager.Instance.coinsReward;
+        SaveManager.Instance.shuffle += SaveManager.Instance.shufflesReward;
+        SaveManager.Instance.undo += SaveManager.Instance.undosReward;
+        SaveManager.Instance.addBottle += SaveManager.Instance.addBottlesReward;
+
+        BaseUpd();
+        for (int i = 0; i < 3; i++) {
+            UpdateCount(i);
+        }
         gameManager.OnGameStart(true, true);
         uianim.NextLevel();
+        levelText.text = "Level " + SaveManager.Instance.level.ToString();
     }
 
     public void Replay() {
@@ -108,8 +114,9 @@ public class UIHandler : MonoBehaviour
         uianim.Revived();
     }
 
-    private void Coin() {
-        string coint = PlayerPrefs.GetInt("Coins").ToString();
+    private void BaseUpd() {
+        
+        string coint = SaveManager.Instance.coins.ToString();
         frontCoinText.text = coint;
         backCoinText.text = coint;
     }
@@ -119,22 +126,21 @@ public class UIHandler : MonoBehaviour
         foreach (Bottle bottle in bottleGen.DictionaryToSingularBottleConverter()) {
             if (bottle.anim.IsBusy) { i++; break; }
         }
-        if (PlayerPrefs.GetInt("Add") == 0 && PlayerPrefs.GetInt("Coins") < price.bottlePrice) i++;
+        if (SaveManager.Instance.addBottle == 0 && SaveManager.Instance.coins < price.bottlePrice) i++;
         if (i != 0) return;
         bottleGen.AddBottle();
 
-        if (PlayerPrefs.GetInt("Add") == 0) {
-            PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coins") - price.undoPrice);
+        if (SaveManager.Instance.addBottle == 0) {
+            SaveManager.Instance.coins -= price.undoPrice;
         } else {
-            PlayerPrefs.SetInt("Add", PlayerPrefs.GetInt("Add") - 1);
+            SaveManager.Instance.addBottle--;
         }
-        PlayerPrefs.Save();
-        Coin();
+        BaseUpd();
         UpdateCount(2);
     }
 
     public void Shuffle() {
-        if (PlayerPrefs.GetInt("Undo") == 0 && PlayerPrefs.GetInt("Coins") < price.undoPrice) return;
+        if (SaveManager.Instance.shuffle == 0 && SaveManager.Instance.coins < price.shufflePrice) return;
         foreach (Bottle bottle in inputs.bottleGen.DictionaryToSingularBottleConverter()) {
             if (bottle.IsEmpty) continue;
             if (bottle.Completion) continue;
@@ -147,13 +153,12 @@ public class UIHandler : MonoBehaviour
     }
 
     public void ShuffleUpdate() {
-        if (PlayerPrefs.GetInt("Shuffle") == 0) {
-            PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coins") - price.undoPrice);
+        if (SaveManager.Instance.shuffle == 0) {
+            SaveManager.Instance.coins -= price.shufflePrice;
         } else {
-            PlayerPrefs.SetInt("Shuffle", PlayerPrefs.GetInt("Shuffle") - 1);
+            SaveManager.Instance.shuffle--;
         }
-        PlayerPrefs.Save();
-        Coin();
+        BaseUpd();
         UpdateCount(0);
     }
 
@@ -187,36 +192,35 @@ public class UIHandler : MonoBehaviour
     }
 
     public void Undo() {
-        if (PlayerPrefs.GetInt("Undo") == 0 && PlayerPrefs.GetInt("Coins") < price.undoPrice) return;
+        if (SaveManager.Instance.undo == 0 && SaveManager.Instance.coins < price.undoPrice) return;
 
         bool res = gameManager.Undo();
         if (!res) return;
 
-        if (PlayerPrefs.GetInt("Undo") == 0) {
-            PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coins") - price.undoPrice);
+        if (SaveManager.Instance.undo == 0) {
+            SaveManager.Instance.coins -= price.undoPrice;
         } else {
-            PlayerPrefs.SetInt("Undo", PlayerPrefs.GetInt("Undo")-1);
+            SaveManager.Instance.undo--;
         }
-        PlayerPrefs.Save();
-        Coin();
+        BaseUpd();
         UpdateCount(1);
     }
 
     private void UpdateCount(int type) {
         switch (type) {
             case 0:
-                if (PlayerPrefs.GetInt("Shuffle") > 0) uianim.DisplayCost(costDisplayer[type], toolNotification[type], false); else uianim.DisplayCost(costDisplayer[type], toolNotification[type], true);
-                shuffleText.text = PlayerPrefs.GetInt("Shuffle").ToString();
+                if (SaveManager.Instance.shuffle > 0) uianim.DisplayCost(costDisplayer[type], toolNotification[type], false); else uianim.DisplayCost(costDisplayer[type], toolNotification[type], true);
+                shuffleText.text = SaveManager.Instance.shuffle.ToString();
                 shufflePrice.text = price.shufflePrice.ToString();
                 break;
             case 1:
-                if (PlayerPrefs.GetInt("Undo") > 0) uianim.DisplayCost(costDisplayer[type], toolNotification[type], false); else uianim.DisplayCost(costDisplayer[type], toolNotification[type], true);
-                undoText.text = PlayerPrefs.GetInt("Undo").ToString();
+                if (SaveManager.Instance.undo > 0) uianim.DisplayCost(costDisplayer[type], toolNotification[type], false); else uianim.DisplayCost(costDisplayer[type], toolNotification[type], true);
+                undoText.text = SaveManager.Instance.undo.ToString();
                 undoPrice.text = price.undoPrice.ToString();
                 break;
             case 2:
-                if (PlayerPrefs.GetInt("Add") > 0) uianim.DisplayCost(costDisplayer[type], toolNotification[type], false); else uianim.DisplayCost(costDisplayer[type], toolNotification[type], true);
-                addText.text = PlayerPrefs.GetInt("Add").ToString();
+                if (SaveManager.Instance.addBottle > 0) uianim.DisplayCost(costDisplayer[type], toolNotification[type], false); else uianim.DisplayCost(costDisplayer[type], toolNotification[type], true);
+                addText.text = SaveManager.Instance.addBottle.ToString();
                 addPrice.text = price.bottlePrice.ToString();
                 break;
         }

@@ -16,7 +16,8 @@ public class AnimationHandler : MonoBehaviour {
     public float pourCornerOffset = 3.1f;
     public float pourHeiOffset = 4f;
     public float pourDuration = 0.35f;
-    public float pourAngle = 95f;
+    public float pourAngle = 7.5f;
+    public float pourDefaultAngle = 80f;
     public float spillLenOffset = 2f;
     public float spillOffset = 1f;
 
@@ -79,12 +80,12 @@ public class AnimationHandler : MonoBehaviour {
         Vector3 spillParPos = spillPar.position;
         float targetY = spillOffset + 3 * spillLenOffset;
 
-        spillPar.DOKill();
-        b.anim.spill.DOKill();
+        //spillPar.DOKill();
+        //b.anim.spill.DOKill();
 
         spillPar.gameObject.SetActive(true);
 
-        spillPar.localScale = new Vector3(0.5f, 0f, 1f);
+        spillPar.localScale = new Vector3(0.2f, 0f, 1f);
 
         if (angle < 0) {
             b.anim.spill.localPosition = new Vector3(0.5f, -0.5f, 0f);
@@ -94,10 +95,7 @@ public class AnimationHandler : MonoBehaviour {
             spillPar.DOMove(spillParPos + Vector3.right * .2f, 0);
         }
 
-
         Sequence seq = DOTween.Sequence();
-
-
 
         seq.Append(
             spillPar.DOScaleY(
@@ -117,7 +115,7 @@ public class AnimationHandler : MonoBehaviour {
 
         seq.OnComplete(() =>
         {
-            spillPar.localScale = new Vector3(0.5f, 0f, 1f);
+            spillPar.localScale = new Vector3(0.2f, 0f, 1f);
             if (angle < 0) b.anim.spill.localPosition = new Vector3(0.5f, -0.5f, 0f); else b.anim.spill.localPosition = new Vector3(-0.5f, -0.5f, 0f);
             spillPar.position = spillParPos;
             spillPar.gameObject.SetActive(false);
@@ -133,23 +131,23 @@ public class AnimationHandler : MonoBehaviour {
         visual.DOKill();
 
         Vector3 targetPos = nextBottle.transform.position;
-        targetPos.y += pourHeiOffset;
+        targetPos.y += pourHeiOffset + currentBottle.changes * .1f;
 
         float angle;
+        angle = (currentBottle.changes * pourAngle) + pourDefaultAngle;
+
 
         if (originalPos.x > nextBottle.transform.position.x) {
             targetPos.x += pourCornerOffset;
-            angle = pourAngle;
         } else if (originalPos.x < nextBottle.transform.position.x) {
             targetPos.x -= pourCornerOffset;
-            angle = -pourAngle;
+            angle = -angle;
         } else {
             if (originalPos.x >= 0) {
                 targetPos.x -= pourCornerOffset;
-                angle = -pourAngle;
+                angle = -angle;
             } else {
                 targetPos.x += pourCornerOffset;
-                angle = pourAngle;
             }
         }
 

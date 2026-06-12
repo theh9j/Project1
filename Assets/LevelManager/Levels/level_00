@@ -1,12 +1,21 @@
 {
     "levelNumber": 0,
     "bottleCount": 3,
-    "rewards": 60,
+    "rewards": {
+        "coins": 60,
+        "shuffle": 0,
+        "addBottle": 0,
+        "undo": 0
+    },
     "bottles": [
         {
             "liquids": [
                 {
-                    "colorId": 0,
+                    "colorId": 1,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 1,
                     "isMystery": false
                 },
                 {
@@ -20,15 +29,15 @@
         {
             "liquids": [
                 {
-                    "colorId": 0,
-                    "isMystery": false
-                },
-                {
-                    "colorId": 0,
-                    "isMystery": false
-                },
-                {
                     "colorId": 2,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 1,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 1,
                     "isMystery": false
                 }
             ],
@@ -38,7 +47,11 @@
         {
             "liquids": [
                 {
-                    "colorId": 3,
+                    "colorId": 2,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 2,
                     "isMystery": false
                 }
             ],
