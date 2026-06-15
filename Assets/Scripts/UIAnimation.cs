@@ -43,6 +43,7 @@ public class UIAnimation : MonoBehaviour
     }
 
     private void GameOver() {
+        
         gameOverPanel.SetActive(true);
 
         gameOverText.DOMove(
@@ -51,6 +52,12 @@ public class UIAnimation : MonoBehaviour
         ).From(new Vector2(centre.x, Screen.height + 100)).SetEase(Ease.OutSine);
 
         gameOverText.GetComponent<CanvasGroup>().DOFade(1f, .8f);
+
+        if (SaveManager.Instance.level < 5) {
+            options.transform.GetChild(0).gameObject.SetActive(false);
+        } else {
+            options.transform.GetChild(0).gameObject.SetActive(true);
+        }
 
         options.DOMove(
             new(centre.x, centre.y * optionEndPoint),

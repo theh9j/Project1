@@ -53,8 +53,8 @@ public class Tutorial : MonoBehaviour
             { 1, () => {StartCoroutine(Level1()); } }, //Coin introduction/tracking
             { 5, () => {StartCoroutine(Level5()); } }, //Boosters introduction
 
-            { 15, () => { StartCoroutine(Level10()); } }, //Mystery colors
-            { 30, () => { StartCoroutine(Level30()); } } //Cover introduction
+            { 10, () => { StartCoroutine(Level10()); } }, //Mystery colors
+            { 20, () => { StartCoroutine(Level20()); } } //Cover introduction
         };
     }
 
@@ -111,7 +111,10 @@ public class Tutorial : MonoBehaviour
         );
     }
 
-    private void ArrowNewPosition(Vector2 selectedPos, float atAngle, bool undoInput = false) {
+    private void ArrowNewPosition(Vector2 selectedPos, float atAngle, bool fromOG = false, bool undoInput = false) {
+        Vector2 from;
+        if (fromOG) from = guide.transform.position;
+        else from = arrow.transform.position;
         Sequence seq = DOTween.Sequence();
 
         seq.Join(
@@ -120,6 +123,7 @@ public class Tutorial : MonoBehaviour
                 .5f
                 )
                 .SetEase(Ease.OutSine)
+                .From(from)
             );
 
         seq.Join(
@@ -183,12 +187,12 @@ public class Tutorial : MonoBehaviour
         yield return StartCoroutine(WaitForInput(lang.hello));
 
         arrowImg.DOFade(1f, .5f).From(0f);
-        ArrowNewPosition(point1Pos, arrowRot1, true);
+        ArrowNewPosition(point1Pos, arrowRot1, true, true);
 
         yield return StartCoroutine(WaitForInput(lang.aa));
-        yield return StartCoroutine(WaitForInput(lang.ab));
-
         input.ToggleTutorialMode();
+        yield return StartCoroutine(WaitForInput(lang.ab));
+        
         ArrowNewPosition(point2Pos, arrowRot2);
 
         yield return StartCoroutine(WaitForInput(lang.ac));
@@ -200,7 +204,7 @@ public class Tutorial : MonoBehaviour
     private IEnumerator Level1() {
         
 
-        Vector2 finalPos = ArrowOffsetCalc(levelDisplay.transform.position, arrowOffset-50, false);
+        Vector2 finalPos = ArrowOffsetCalc(levelDisplay.transform.position, arrowOffset, false);
         float angle = ArrowRotation(finalPos, levelDisplay.transform.position);
 
 
@@ -227,7 +231,7 @@ public class Tutorial : MonoBehaviour
                 })
             );
 
-        ArrowNewPosition(finalPos, angle);
+        ArrowNewPosition(finalPos, angle, true);
 
         seq.Join(arrowImg.DOFade(1f, .5f));
 
@@ -274,7 +278,7 @@ public class Tutorial : MonoBehaviour
             });
 
         arrowImg.DOFade(1f, .5f).From(0f);
-        ArrowNewPosition(shuff, shuffAngle);
+        ArrowNewPosition(shuff, shuffAngle, true);
 
         yield return StartCoroutine(WaitForInput(lang.cc));
 
@@ -290,7 +294,7 @@ public class Tutorial : MonoBehaviour
     }
 
     private IEnumerator Level10() {
-
+        Tutorialize(true);
         guide.DOMove(
             new Vector2(centre.x, centre.y * .6f),
             .4f
@@ -299,10 +303,29 @@ public class Tutorial : MonoBehaviour
 
         yield return StartCoroutine(WaitForInput(lang.da));
         yield return StartCoroutine(WaitForInput(lang.db));
+
+        SeqKill();
     }
 
-    private IEnumerator Level30() {
-        yield return input.WaitForAction();
+    private IEnumerator Level20() {
+
+
+        Tutorialize(true);
+        guide.DOMove(
+            new Vector2(centre.x, centre.y * .6f),
+            .4f
+            ).From(new Vector2(centre.x, centre.y * -1f))
+            .SetEase(Ease.OutBack, 2f);
+
+        yield return StartCoroutine(WaitForInput(lang.ea));
+        yield return StartCoroutine(WaitForInput(lang.eb));
+        yield return StartCoroutine(WaitForInput(lang.ec));
+        yield return StartCoroutine(WaitForInput(lang.ed));
+        yield return StartCoroutine(WaitForInput(lang.ee));
+
+        
+
+        SeqKill();
     }
 
 }

@@ -203,5 +203,5 @@ public class Bottle : MonoBehaviour {
     }
 
     public bool IsEmpty => liquidUnits.Count == 0;
-    private bool IsFull => liquidUnits.Count >= maxCapacity;
+    public bool IsFull => liquidUnits.Count >= maxCapacity;
 }

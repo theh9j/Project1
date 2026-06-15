@@ -1,22 +1,10 @@
 fileFormatVersion: 2
-guid: 8a83b2eacd8fb0b43aecdf44e3e25515
+guid: 7750b21029177e341a7879e8f9c72ada
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4004708080983207187
-    second: Ring_0
-  - first:
-      213: -5400542443128171897
-    second: Ring_1
-  - first:
-      213: 6203491974699578629
-    second: Ring_2
-  - first:
-      213: -6673147589521896033
-    second: Ring_3
-  - first:
-      213: 7168475762293652931
-    second: Ring_4
+      213: 900540503429455123
+    second: gamewinback_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -138,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Ring_0
+      name: gamewinback_0
       rect:
         serializedVersion: 2
-        x: 57
-        y: 313
-        width: 1421
-        height: 440
+        x: 101
+        y: 107
+        width: 821
+        height: 1326
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -153,96 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 31de32428c4939730800000000000000
-      internalID: 4004708080983207187
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Ring_1
-      rect:
-        serializedVersion: 2
-        x: 994
-        y: 198
-        width: 7
-        height: 11
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 782dce2e24b6d05b0800000000000000
-      internalID: -5400542443128171897
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Ring_2
-      rect:
-        serializedVersion: 2
-        x: 995
-        y: 283
-        width: 6
-        height: 6
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 50574fe551b371650800000000000000
-      internalID: 6203491974699578629
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Ring_3
-      rect:
-        serializedVersion: 2
-        x: 995
-        y: 154
-        width: 6
-        height: 7
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: f9d0bc88f973463a0800000000000000
-      internalID: -6673147589521896033
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Ring_4
-      rect:
-        serializedVersion: 2
-        x: 995
-        y: 147
-        width: 6
-        height: 6
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3cdb280c9ba8b7360800000000000000
-      internalID: 7168475762293652931
+      spriteID: 31d93cc01dc5f7c00800000000000000
+      internalID: 900540503429455123
       vertices: []
       indices: 
       edges: []
@@ -251,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 69a1ba27040505246807d36f0a57b841
+    spriteID: abd3feabb26cf9e4683e1adf6f6c7011
     internalID: 0
     vertices: []
     indices: 
@@ -261,11 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Ring_0: 4004708080983207187
-      Ring_1: -5400542443128171897
-      Ring_2: 6203491974699578629
-      Ring_3: -6673147589521896033
-      Ring_4: 7168475762293652931
+      gamewinback_0: 900540503429455123
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

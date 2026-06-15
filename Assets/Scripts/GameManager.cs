@@ -44,17 +44,52 @@ public class GameManager : MonoBehaviour
         if (comp) comp = CheckForComplete();
         if (comp) return;
 
-        List<Bottle> currentBottles = bottleGen.DictionaryToSingularBottleConverter();
-        HashSet<LiquidColor> compare = new();
-        bool imp = true;
-        foreach (Bottle bottle in currentBottles) {
-            if (bottle.isLocked) continue;
-            if (bottle.IsEmpty) { imp = false; break; }
-            if (!compare.Add(bottle.GetTopLiquid().colorId)) imp = false;
-        }
-        if (imp) {
+        if (!IsStillPlayable()) {
             gameOver?.Invoke(SaveManager.Instance.level, 0);
         }
+    }
+
+    private bool IsStillPlayable() {
+        List<Bottle> bottles = bottleGen.DictionaryToSingularBottleConverter();
+
+        foreach (Bottle bottle in bottles) {
+            if (bottle == null) continue;
+            if (bottle.IsEmpty && !bottle.isLocked) return true;
+        }
+
+        foreach (Bottle start in bottles) {
+            if (!CanPourOut(start)) continue;
+
+            foreach (Bottle end in bottles) {
+                if (CanPourIn(start, end)) return true;
+            }
+        }
+        return false;
+    }
+
+    private bool CanPourOut(Bottle bottle) {
+        if (bottle == null) return false;
+        if (bottle.IsEmpty) return false;
+        if (bottle.isLocked) return false;
+        if (bottle.Completion) return false;
+
+        return true;
+    }
+
+    private bool CanPourIn(Bottle start, Bottle end) {
+        if ((start == null) || (end == null)) return false;
+        if (start == end) return false;
+
+        if (end.isLocked) return false;
+        if (end.Completion) return false;
+        if (end.IsFull) return false;
+
+        LiquidUnit startTop = start.GetTopLiquid();
+        LiquidUnit endTop = end.GetTopLiquid();
+
+        if (startTop == null || endTop == null) return false;
+        return startTop.colorId == endTop.colorId;
+
     }
 
     public void Revival() {
@@ -175,8 +210,6 @@ public class GameManager : MonoBehaviour
         move.to.RefreshView();
         return true;
     }
-
-
 
     private void TryRemoveConditioner(Bottle completedBottle) {
         LiquidColor bottleColor = completedBottle.GetTopLiquid().colorId;

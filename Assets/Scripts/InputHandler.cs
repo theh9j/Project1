@@ -22,7 +22,10 @@ public class InputHandler : MonoBehaviour
             bottleGen.ClearBottles();
         }
 
-        if (Mouse.current.leftButton.wasPressedThisFrame && inputMode != InputMode.Tutorial) {
+        if ((
+            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) || 
+            (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)) && 
+            inputMode != InputMode.Tutorial) {
             onMouseDown();
         }
 

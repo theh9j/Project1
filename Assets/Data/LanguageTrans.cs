@@ -24,7 +24,14 @@ public class LanguageTrans
     public string ce = "Finally, this skill allow you to add more empty bottles into the course";
     public string cf = "Now, go ahead and try";
 
-    //Level 7
+    //Level 10
     public string da = "Let's make it a bit harder, shan't we?";
     public string db = "Introducing... mysterious colors! You won't know what they are until they're unlocked";
+
+    //Level 20
+    public string ea = "Wow... you've been making a living yourself, huh?";
+    public string eb = "Alright, I'll provide you with one final challenge... the covers!";
+    public string ec = "These convers prevent you from seeing the content of the bottle";
+    public string ed = "And to open them, you must satisfy the condition of the cover";
+    public string ee = "Try pouring from this bottle... to this bottle";
 }
