@@ -1489,6 +1489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 730e0aa65c233cd45ae613525a998b8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bottle
+  colorTranslate: {fileID: 11400000, guid: a841eed9d719893478567074e005b847, type: 2}
   anim: {fileID: 5197750198765528114}
   liquidUnits: []
   onBottlePour:
@@ -1519,6 +1520,7 @@ MonoBehaviour:
   visual: {fileID: 5054824331517217384}
   spill: {fileID: 6314123249414286985}
   currentBottle: {fileID: 3877616452783220878}
+  colorTranslate: {fileID: 11400000, guid: a841eed9d719893478567074e005b847, type: 2}
   pourCornerOffset: 3
   pourHeiOffset: 4
   pourDuration: 0.3

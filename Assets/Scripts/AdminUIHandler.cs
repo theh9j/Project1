@@ -10,6 +10,7 @@ public class AdminUIHandler : MonoBehaviour
     public BottleGen bottleGen;
 
     [SerializeField]
+    public GameObject AO;
     public GameObject[] colorBases = new GameObject[4];
     public TMP_Text adminHandler;
     public TMP_InputField bottleGenInput;
@@ -35,13 +36,14 @@ public class AdminUIHandler : MonoBehaviour
         colors = new TMP_InputField[colorBases.Length];
         mys = new TMP_Text[colorBases.Length];
 
-
+        
         for (int i = 0; i < colorBases.Length; i++) {
             colors[i] = colorBases[i].GetComponent<TMP_InputField>();
             mys[i] = colorBases[i].transform.Find("Mys/Text (TMP)").GetComponent<TMP_Text>();
         }
 
         if (admin) {
+            AO.SetActive(true);
             adminHandler.text = "Handler Active";
         } else {
             adminHandler.text = "Handler Inactive";
@@ -134,6 +136,8 @@ public class AdminUIHandler : MonoBehaviour
             }
 
             lockText.text = bottle.isLocked ? "Unlock" : "Lock";
+            if (bottle.isLocked) lockInput.text = bottle.lockColor.ToString();
+            else lockInput.text = "";
         } else {
             bottle = null;
 

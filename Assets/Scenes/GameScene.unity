@@ -7176,7 +7176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 320156d174fb1ee4a9698e8e7c2a17d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  arrowOffset: 150
+  arrowOffsetPerc: 7
   tutorial: {fileID: 555948794}
   guide: {fileID: 1676665878}
   guideT: {fileID: 1687402896}
@@ -7873,6 +7873,7 @@ MonoBehaviour:
   bottleGen: {fileID: 189255339}
   levelCreator: {fileID: 107534851}
   tutor: {fileID: 774628085}
+  tutorial: 0
   revive:
     m_PersistentCalls:
       m_Calls: []

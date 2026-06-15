@@ -5,20 +5,21 @@ public class SaveManager : MonoBehaviour
     public static SaveManager Instance;
 
     public int coinSetForAdmin = 9000;
+    public int startLevel = 0;
 
-    public int coins;
-    public int level;
+    [HideInInspector] public int coins;
+    [HideInInspector] public int level;
 
     //Rewards
-    public int coinsReward;
-    public int shufflesReward;
-    public int addBottlesReward;
-    public int undosReward;
+    [HideInInspector] public int coinsReward;
+    [HideInInspector] public int shufflesReward;
+    [HideInInspector] public int addBottlesReward;
+    [HideInInspector] public int undosReward;
 
     //Boosters
-    public int shuffle;
-    public int addBottle;
-    public int undo;
+    [HideInInspector] public int shuffle;
+    [HideInInspector] public int addBottle;
+    [HideInInspector] public int undo;
 
     void Awake() {
         if (Instance != null) {
@@ -50,7 +51,7 @@ public class SaveManager : MonoBehaviour
 
     private void FirstTime() {
         coins = coinSetForAdmin;
-        level = 0;
+        level = startLevel;
 
         //Rewards
         coinsReward = 60;

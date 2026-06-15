@@ -20,6 +20,7 @@ public class LevelCreator : MonoBehaviour
     private void SaveLevel(int result) {
         string json = JsonUtility.ToJson(levelData, true);
         File.WriteAllText(path + result.ToString("D2"), json);
+        Debug.Log("Saved");
     }
 
     public void DataProcess() {
@@ -44,7 +45,6 @@ public class LevelCreator : MonoBehaviour
 
 
         levelData.bottleCount = currentBottleData.Count;
-        Debug.Log(currentBottleData.Count);
         for (int i = 0; i < currentBottleData.Count; i++) {
 
             BottleData bottleData = new() {
@@ -68,18 +68,15 @@ public class LevelCreator : MonoBehaviour
     }
 
     public void LoadLevel(bool randomize = false, bool next = false) {
-        int result;
         if (ui.admin) {
-            if (!int.TryParse(ui.levelInput.text, out result)) {
-                return;
-            }
+            SaveManager.Instance.level = int.TryParse(ui.levelInput.text, out int result) ? result : 0;
         } else {
-            if (next) result = SaveManager.Instance.level += 1; else result = SaveManager.Instance.level;
+            SaveManager.Instance.level = next ? SaveManager.Instance.level+=1 : SaveManager.Instance.level;
         }
         
-        if (!File.Exists(path + result.ToString("D2"))) return;
+        if (!File.Exists(path + SaveManager.Instance.level.ToString("D2"))) return;
 
-        string json = File.ReadAllText(path + result.ToString("D2"));
+        string json = File.ReadAllText(path + SaveManager.Instance.level.ToString("D2"));
         LevelData data = JsonUtility.FromJson<LevelData>(json);
 
         LoadData(data, randomize);

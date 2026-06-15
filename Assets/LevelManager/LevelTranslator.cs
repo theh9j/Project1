@@ -7,17 +7,15 @@ using Random = UnityEngine.Random;
 public class LevelTranslator
 {
     public int TranslatedColor(LiquidColor color) {
-        return (color) switch {
-            LiquidColor.red => 0,
-            LiquidColor.green => 1,
-            LiquidColor.blue => 2,
-            LiquidColor.yellow => 3,
-            LiquidColor.pink => 4,
-            LiquidColor.purple => 5,
-            LiquidColor.grey => 6,
-            LiquidColor.brown => 7,
-            _ => 8
-        };
+
+        LiquidColor[] availableColors = (LiquidColor[])Enum.GetValues(typeof(LiquidColor));
+        for (int i = 1; i < Enum.GetValues(typeof(LiquidColor)).Length; i++) {
+            if (color == availableColors[i]) {
+                return i;
+            }
+        }
+        return Enum.GetValues(typeof(LiquidColor)).Length;
+
     }
 
     public Dictionary<int, LiquidColor> Randomizer() {

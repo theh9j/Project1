@@ -34,7 +34,7 @@ public class Star : MonoBehaviour {
     }
 
     private void GenerateStars() {
-        DOTween.SetTweensCapacity(300, 300);
+        DOTween.SetTweensCapacity(1000, 1000);
         for (int i = 0; i < starCount; i++) {
             GameObject star = Instantiate(starPrefab, transform);
 

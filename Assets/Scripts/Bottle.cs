@@ -5,9 +5,9 @@ using UnityEngine.Events;
 
 public class Bottle : MonoBehaviour {
 
+    [SerializeField] private LiquidColorVisualData colorTranslate;
     public AnimationHandler anim;
     private BottleView bottleView;
-    private readonly ColorTranslator colorTranslate = new();
     public List<LiquidUnit> liquidUnits = new List<LiquidUnit>();
     public UnityEvent<bool> onBottlePour;
     public UnityEvent<Bottle> aBottleCovered;
@@ -23,13 +23,6 @@ public class Bottle : MonoBehaviour {
     public int changes;
     private bool isCompleted = false;
 
-    public void BottleInit(List<LiquidUnit> initialLiquids) { //DEPRECATED
-        liquidUnits = new List<LiquidUnit>();
-
-        foreach (LiquidUnit liquid in initialLiquids) {
-            liquidUnits.Add(new LiquidUnit(liquid));
-        }
-    }
 
     public void AttemptComplete() {
         Completion = true;

@@ -10,7 +10,7 @@ public class AnimationHandler : MonoBehaviour {
     [SerializeField] private Transform visual;
     [SerializeField] private Transform spill;
     [SerializeField] private Bottle currentBottle;
-    private readonly ColorTranslator colorTranslate = new();
+    [SerializeField] private LiquidColorVisualData colorTranslate;
 
     [Header("Pour Settings")]
     public float pourCornerOffset = 3.1f;
@@ -29,7 +29,9 @@ public class AnimationHandler : MonoBehaviour {
 
     public bool IsBusy { get; private set; }
 
+
     void Start() {
+
         originalPos = visual.position;
         originalRotation = visual.rotation;
 
@@ -254,38 +256,37 @@ public class AnimationHandler : MonoBehaviour {
     public void AddCoverS(Color color) {
         if (cover == null) return;
 
-        cover.DOKill();
-
         SpriteRenderer cloth = cover.GetComponent<SpriteRenderer>();
         SpriteRenderer indicator = cover.GetChild(0).GetComponent<SpriteRenderer>();
 
         Sequence seq = DOTween.Sequence();
 
-        Vector3 endPos = cover.position + Vector3.down * 1.5f;
+        Vector2 startPt = visual.position + Vector3.up * 1.5f;
 
         seq.Append(
             cover.DOMove(
-                endPos,
+                visual.position,
                 .45f
                 ).SetLink(gameObject)
                 .SetEase(Ease.OutSine)
+                .From(startPt)
             );
 
         seq.Join(cloth.DOFade(1f, .45f));
 
         if (indicator != null)
-            seq.Join(indicator.DOFade(1f, .45f).SetLink(gameObject));
+            seq.Join(indicator.DOFade(1f, .45f).SetLink(gameObject)).OnStart(() => {
+                indicator.color = color;
+            });
     }
 
     private void RemoveCover() {
         if (cover == null) return;
 
-        cover.DOKill();
-
         SpriteRenderer cloth = cover.GetComponent<SpriteRenderer>();
         SpriteRenderer indicator = cover.GetChild(0).GetComponent<SpriteRenderer>();
 
-        Vector3 endPos = cover.position + Vector3.up * 1.5f;
+        Vector3 endPos = visual.position + Vector3.up * 1.5f;
 
         Sequence seq = DOTween.Sequence();
 

@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private BottleGen bottleGen;
     [SerializeField] private LevelCreator levelCreator;
     [SerializeField] private Tutorial tutor;
+    public bool tutorial = true;
     public UnityEvent revive;
     public UnityEvent<int, int> gameOver;
     private Bottle from;
@@ -68,7 +69,7 @@ public class GameManager : MonoBehaviour
         record = new();
         conditionalBottles.Clear();
         levelCreator.LoadLevel(rand, next);
-        tutor.CheckForTutorial();
+        tutor.CheckForTutorial(tutorial);
     }
 
     public bool BottleAvailable(Bottle currentBottle) {

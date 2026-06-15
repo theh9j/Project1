@@ -14,7 +14,7 @@ using Image = UnityEngine.UI.Image;
 public class Tutorial : MonoBehaviour
 {
     [Header("Settings")]
-    public float arrowOffset = 3f;
+    public float arrowOffsetPerc = 3f;
 
     [SerializeField] private Transform tutorial;
     [SerializeField] private Transform guide;
@@ -26,6 +26,10 @@ public class Tutorial : MonoBehaviour
     [SerializeField] private GameObject levelDisplay;
     [SerializeField] private GameObject coinDisplay;
     [SerializeField] private GameObject boosterDisplay;
+    [SerializeField] private Transform shuffleDis;
+    [SerializeField] private Transform undoDis;
+    [SerializeField] private Transform addDis;
+
     [SerializeField] private InputHandler input;
 
     //Tutorial Items
@@ -37,22 +41,31 @@ public class Tutorial : MonoBehaviour
     private Vector2 centre = new(Screen.width / 2, Screen.height / 2);
     private List<Bottle> bottles = new();
     private Image arrowImg;
+    private float arrowOffset;
 
     void Awake() {
         arrowImg = arrow.GetComponent<Image>();
 
+        arrowOffset = (Camera.main.orthographicSize * 2f) * arrowOffsetPerc;
+
         tutorialMap = new() {
             { 0, () => {StartCoroutine(Level0()); } }, //Introduction
-            { 1, () => {StartCoroutine(Level1()); } }, //Level tracking
-            { 2, () => {StartCoroutine(Level2()); } }, //Coin introduction/tracking
+            { 1, () => {StartCoroutine(Level1()); } }, //Coin introduction/tracking
             { 5, () => {StartCoroutine(Level5()); } }, //Boosters introduction
 
-            { 15, () => { } }, //Mystery colors
-            { 30, () => { } } //Cover introduction
+            { 15, () => { StartCoroutine(Level10()); } }, //Mystery colors
+            { 30, () => { StartCoroutine(Level30()); } } //Cover introduction
         };
     }
 
-    public void CheckForTutorial() {
+    private IEnumerator WaitForInput(string text) {
+        yield return StartCoroutine(TextType(text));
+        yield return input.WaitForAction();
+        yield return input.WaitForRelease();
+    }
+
+    public void CheckForTutorial(bool tutorial) {
+        if (!tutorial) return;
         if (tutorialMap.TryGetValue(SaveManager.Instance.level, out Action method)) {
             input.ToggleTutorialMode();
             method?.Invoke();
@@ -73,9 +86,53 @@ public class Tutorial : MonoBehaviour
 
         return targetScreenPos + dirFromCenter * offset;
     }
+
     private float ArrowRotation(Vector2 start, Vector2 end) {
         Vector2 direction = end - start;
         return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+    }
+
+    private void SeqKill() {
+        Sequence seq = DOTween.Sequence();
+
+        seq.Append(
+            guide.DOMove(
+                new Vector2(centre.x, Screen.height * -.1f),
+                .4f
+                )
+            );
+
+        seq.Join(
+            arrowImg.DOFade(0f, .4f)
+            .OnComplete(() => {
+                Tutorialize(false);
+                input.CancelMode();
+            })
+        );
+    }
+
+    private void ArrowNewPosition(Vector2 selectedPos, float atAngle, bool undoInput = false) {
+        Sequence seq = DOTween.Sequence();
+
+        seq.Join(
+            arrow.DOMove(
+                selectedPos,
+                .5f
+                )
+                .SetEase(Ease.OutSine)
+            );
+
+        seq.Join(
+            arrow.DORotate(
+                new Vector3(0, 0, atAngle),
+                .5f
+                )
+            );
+
+        if ( undoInput ) 
+            seq.OnComplete(() => {
+                input.CancelMode();
+            });
     }
 
     private IEnumerator TextType(string text) {
@@ -123,91 +180,25 @@ public class Tutorial : MonoBehaviour
             ).From(new Vector2(centre.x, centre.y * -1f))
             .SetEase(Ease.OutBack, 2f);
 
-        yield return StartCoroutine(TextType(lang.hello));
-        yield return null;
-        yield return input.WaitForAction();
+        yield return StartCoroutine(WaitForInput(lang.hello));
 
-        Sequence seq;
-        
-        seq = DOTween.Sequence();
+        arrowImg.DOFade(1f, .5f).From(0f);
+        ArrowNewPosition(point1Pos, arrowRot1, true);
 
-        seq.Append(
-            arrowImg.DOFade(1f, .5f)
-            .From(0f)
-            );
-
-        seq.Join(
-            arrow.DOMove(
-                point1Pos,
-                .5f
-                ).From(new Vector2(centre.x * .1f, centre.y))
-                .SetEase(Ease.OutSine)
-            );
-
-        seq.Join(
-            arrow.DORotate(
-                new Vector3(0, 0, arrowRot1),
-                .5f
-                )
-            ).OnComplete(() => {
-                input.CancelMode();
-            });
-
-        yield return seq.WaitForCompletion();
-        yield return StartCoroutine(TextType(lang.aa));
-        yield return null;
-        yield return input.WaitForAction();
-        yield return StartCoroutine(TextType(lang.ab));
-        yield return null;
-        yield return input.WaitForAction();
+        yield return StartCoroutine(WaitForInput(lang.aa));
+        yield return StartCoroutine(WaitForInput(lang.ab));
 
         input.ToggleTutorialMode();
+        ArrowNewPosition(point2Pos, arrowRot2);
 
-        seq = DOTween.Sequence();
+        yield return StartCoroutine(WaitForInput(lang.ac));
+        yield return StartCoroutine(WaitForInput(lang.ad));
 
-        seq.Join(
-            arrow.DOMove(
-                point2Pos,
-                .5f
-                )
-                .SetEase(Ease.OutSine)
-            );
-
-        seq.Join(
-            arrow.DORotate(
-                new Vector3(0, 0, arrowRot2),
-                .5f
-                )
-            );
-
-        yield return seq.WaitForCompletion();
-        yield return StartCoroutine(TextType(lang.ac));
-        yield return null;
-        yield return input.WaitForAction();
-        yield return StartCoroutine(TextType(lang.ad));
-        yield return input.WaitForAction();
-
-        input.CancelMode();
-
-        seq = DOTween.Sequence();
-
-        seq.Append(
-            guide.DOMove(
-                new Vector2(centre.x, Screen.height * -.1f),
-                .4f
-                )
-            );
-
-        seq.Join(
-            arrowImg.DOFade(0f, .4f)
-            .OnComplete(() => {
-                Tutorialize(false);
-            })
-            );
+        SeqKill();
     }
 
     private IEnumerator Level1() {
-        levelDisplay.SetActive(true);
+        
 
         Vector2 finalPos = ArrowOffsetCalc(levelDisplay.transform.position, arrowOffset-50, false);
         float angle = ArrowRotation(finalPos, levelDisplay.transform.position);
@@ -218,70 +209,96 @@ public class Tutorial : MonoBehaviour
         guide.DOMove(
             new Vector2(centre.x, centre.y * .6f),
             .4f
-            )
+            ).From(new Vector2(centre.x, centre.y * -1f))
             .SetEase(Ease.OutBack, 2f);
 
-        yield return StartCoroutine(TextType(lang.ba));
-        yield return null;
-        yield return input.WaitForAction();
+        yield return StartCoroutine(WaitForInput(lang.ba));
 
         Sequence seq = DOTween.Sequence();
 
         seq.Append(
-            arrow.DOMove(
-                finalPos,
+            levelDisplay.transform.DOMove(
+                levelDisplay.transform.position,
                 .5f
-                ).SetEase(Ease.OutSine)
+                ).From(new Vector2(centre.x, Screen.height * 1.2f))
+                .SetEase(Ease.OutBack, 2f)
+                .OnStart(() => {
+                    levelDisplay.SetActive(true);
+                })
             );
 
-        seq.Join(
-            arrow.DORotate(
-                new Vector3(0, 0, angle),
-                .5f
-                )
-            );
+        ArrowNewPosition(finalPos, angle);
 
         seq.Join(arrowImg.DOFade(1f, .5f));
 
-        yield return seq.WaitForCompletion();
-        yield return StartCoroutine(TextType(lang.bb));
-        yield return input.WaitForAction();
+        yield return StartCoroutine(WaitForInput(lang.bb));
 
-        input.CancelMode();
+        SeqKill();
 
-        seq = DOTween.Sequence();
-
-        seq.Append(
-            guide.DOMove(
-                new Vector2(centre.x, Screen.height * -.1f),
-                .4f
-                )
-            );
-
-        seq.Join(
-            arrowImg.DOFade(0f, .4f)
-            .OnComplete(() => {
-                Tutorialize(false);
-            })
-        );
-
-    }
-
-    private IEnumerator Level2() {
-        yield return input.WaitForAction();
     }
 
     private IEnumerator Level5() {
         coinDisplay.SetActive(true);
-        boosterDisplay.SetActive(true);
+        Vector2 shuff = ArrowOffsetCalc(shuffleDis.position, arrowOffset, false);
+        float shuffAngle = ArrowRotation(shuff, shuffleDis.position);
 
-        yield return input.WaitForAction();
+        Vector2 und = ArrowOffsetCalc(undoDis.position, arrowOffset, false);
+        float undAngle = ArrowRotation(und, undoDis.position);
 
+        Vector2 addB = ArrowOffsetCalc(addDis.position, arrowOffset, false);
+        float addBAngle = ArrowRotation(addB, addDis.position);
+        Tutorialize(true);
 
+        guide.DOMove(
+            new Vector2(centre.x, centre.y * .6f),
+            .4f
+            ).From(new Vector2(centre.x, centre.y * -1f))
+            .SetEase(Ease.OutBack, 2f);
+
+        yield return StartCoroutine(WaitForInput(lang.ca));
+        yield return StartCoroutine(WaitForInput(lang.cb));
+
+        guide.DOMove(
+            new Vector2(centre.x, centre.y * .8f),
+            .3f
+            )
+            .SetEase(Ease.OutBack, 2f);
+
+        boosterDisplay.transform.DOMove(
+            boosterDisplay.transform.position,
+            .5f
+            ).From(new Vector2(centre.x, centre.y * -1f))
+            .SetEase(Ease.OutBack, 2f)
+            .OnStart(() => {
+                boosterDisplay.SetActive(true);
+            });
+
+        arrowImg.DOFade(1f, .5f).From(0f);
+        ArrowNewPosition(shuff, shuffAngle);
+
+        yield return StartCoroutine(WaitForInput(lang.cc));
+
+        ArrowNewPosition(und, undAngle);
+
+        yield return StartCoroutine(WaitForInput(lang.cd));
+
+        ArrowNewPosition(addB, addBAngle);
+
+        yield return StartCoroutine(WaitForInput(lang.ce));
+        yield return StartCoroutine(WaitForInput(lang.cf));
+        SeqKill();
     }
 
-    private IEnumerator Level15() {
-        yield return input.WaitForAction();
+    private IEnumerator Level10() {
+
+        guide.DOMove(
+            new Vector2(centre.x, centre.y * .6f),
+            .4f
+            ).From(new Vector2(centre.x, centre.y * -1f))
+            .SetEase(Ease.OutBack, 2f);
+
+        yield return StartCoroutine(WaitForInput(lang.da));
+        yield return StartCoroutine(WaitForInput(lang.db));
     }
 
     private IEnumerator Level30() {

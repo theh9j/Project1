@@ -36,6 +36,13 @@ public class InputHandler : MonoBehaviour
 
     public IEnumerator WaitForAction() {
         yield return new WaitUntil(() =>
+            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) ||
+            (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+        );
+    }
+
+    public IEnumerator WaitForRelease() {
+        yield return new WaitUntil(() => 
             (Mouse.current != null && Mouse.current.leftButton.wasReleasedThisFrame) ||
             (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasReleasedThisFrame)
         );

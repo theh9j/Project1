@@ -16,10 +16,15 @@ public class LanguageTrans
     public string ba = "Wow, you're pretty amazing yourself, keep on cooking";
     public string bb = "Oh yeah, starting from this level, you can find what level you're from here";
 
-    //Level 2
-    public string ca = "Surely your eyes have already caught the shinies when finishing a level, yeah?";
-    public string cb = "I've decided to put here so that you can keep track of it, oh yeah, take some of mine too";
-    public string cc = "Not sure what it's used for now though, maybe to chew on?";
-
     //Level 5
+    public string ca = "Moving on to the next levels will be really difficult without help from others";
+    public string cb = "So... I'm going to give you some tools to help yourself with";
+    public string cc = "This is the shuffle tool, it allows you to swap the positions of the colors in your bottle";
+    public string cd = "And this is your undo skill, if you accidentally done something heinous, why not just y'know, undo it?";
+    public string ce = "Finally, this skill allow you to add more empty bottles into the course";
+    public string cf = "Now, go ahead and try";
+
+    //Level 7
+    public string da = "Let's make it a bit harder, shan't we?";
+    public string db = "Introducing... mysterious colors! You won't know what they are until they're unlocked";
 }
