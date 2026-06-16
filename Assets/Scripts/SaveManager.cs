@@ -3,6 +3,7 @@ using UnityEngine;
 public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance;
+    [SerializeField] private LevelCreator levelSave;
 
     public int coinSetForAdmin = 9000;
     public int startLevel = 0;
@@ -41,7 +42,7 @@ public class SaveManager : MonoBehaviour
 
         coins = PlayerPrefs.GetInt("Coins"); //Base amount for first time playing
         level = PlayerPrefs.GetInt("Level");
-        coinsReward = PlayerPrefs.GetInt("CoinsReward"); //STC
+        coinsReward = PlayerPrefs.GetInt("CoinsReward");
 
 
         shuffle = PlayerPrefs.GetInt("Shuffle");
@@ -76,6 +77,7 @@ public class SaveManager : MonoBehaviour
         PlayerPrefs.SetInt("FirstLaunch", 1);
 
         PlayerPrefs.Save();
+        levelSave.DataProcess(true);
     }
 
     void OnApplicationQuit() {

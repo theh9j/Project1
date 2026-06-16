@@ -1,16 +1,12 @@
 using DG.Tweening;
-using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Color = UnityEngine.Color;
 
-public class UIHandler : MonoBehaviour
+public partial class UIHandler : MonoBehaviour
 {
 
     [SerializeField] private BottleGen bottleGen;
@@ -38,6 +34,8 @@ public class UIHandler : MonoBehaviour
 
     private Color textColor;
 
+    
+
     void Start() {
         BaseUpd();
         levelText.text = "Level " + SaveManager.Instance.level.ToString();
@@ -57,16 +55,6 @@ public class UIHandler : MonoBehaviour
         for (int i = 0; i < 3; i++) {
             UpdateCount(i);
         }
-    }
-
-    public void ReviveUsingBottle() {
-
-        if (SaveManager.Instance.coins < price.bottlePrice) return;
-        SaveManager.Instance.coins -= price.bottlePrice;
-
-        bottleGen.AddBottle();
-        gameManager.Revival();
-        BaseUpd();
     }
 
     private void CheckForEnough(int level, int amount = 0) {
@@ -90,6 +78,16 @@ public class UIHandler : MonoBehaviour
             );
 
         uianim.GameEnd(level, amount);
+    }
+
+    public void ReviveUsingBottle() {
+
+        if (SaveManager.Instance.coins < price.bottlePrice) return;
+        SaveManager.Instance.coins -= price.bottlePrice;
+
+        bottleGen.AddBottle();
+        gameManager.Revival();
+        BaseUpd();
     }
 
     public void LevelAdvance() {
@@ -119,26 +117,13 @@ public class UIHandler : MonoBehaviour
         backCoinText.text = coint;
     }
 
-    public void AddBottle() {
-        int i = 0;
-        foreach (Bottle bottle in bottleGen.DictionaryToSingularBottleConverter()) {
-            if (bottle.anim.IsBusy) { i++; break; }
-        }
-        if (SaveManager.Instance.addBottle == 0 && SaveManager.Instance.coins < price.bottlePrice) i++;
-        if (i != 0) return;
+    public void AddBottlePipeline() {
         bottleGen.AddBottle();
-
-        if (SaveManager.Instance.addBottle == 0) {
-            SaveManager.Instance.coins -= price.undoPrice;
-        } else {
-            SaveManager.Instance.addBottle--;
-        }
         BaseUpd();
         UpdateCount(2);
     }
 
-    public void Shuffle() {
-        if (SaveManager.Instance.shuffle == 0 && SaveManager.Instance.coins < price.shufflePrice) return;
+    private void ShufflePipeline() {
         foreach (Bottle bottle in inputs.bottleGen.DictionaryToSingularBottleConverter()) {
             if (bottle.IsEmpty) continue;
             if (bottle.Completion) continue;
@@ -146,8 +131,9 @@ public class UIHandler : MonoBehaviour
             if (!bottle.Distinction()) continue;
 
             inputs.ToggleShuffleMode();
-            break;
+            return;
         }
+        uianim.WarningMessage("No Bottles to Shuffle");
     }
 
     public void ShuffleUpdate() {
@@ -189,17 +175,8 @@ public class UIHandler : MonoBehaviour
         }
     }
 
-    public void Undo() {
-        if (SaveManager.Instance.undo == 0 && SaveManager.Instance.coins < price.undoPrice) return;
-
-        bool res = gameManager.Undo();
-        if (!res) return;
-
-        if (SaveManager.Instance.undo == 0) {
-            SaveManager.Instance.coins -= price.undoPrice;
-        } else {
-            SaveManager.Instance.undo--;
-        }
+    private void UndoPipeline(bool max) {
+        if (!max) uianim.WarningMessage("Out of Undo Turns");
         BaseUpd();
         UpdateCount(1);
     }
@@ -223,5 +200,4 @@ public class UIHandler : MonoBehaviour
                 break;
         }
     }
- 
 }

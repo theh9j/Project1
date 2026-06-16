@@ -2,7 +2,9 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
+using Application = UnityEngine.Application;
 
 public class LevelCreator : MonoBehaviour
 {
@@ -14,23 +16,43 @@ public class LevelCreator : MonoBehaviour
     private LevelData levelData;
     private Dictionary<int, LiquidColor> colorTranslate;
 
-    private string path = Application.dataPath + "/LevelManager/Levels/level_";
-
+    private string levelPath = Application.dataPath + "/LevelManager/Levels/level_";
+    private string personalPath = Application.dataPath + "/Data/";
 
     private void SaveLevel(int result) {
         string json = JsonUtility.ToJson(levelData, true);
-        File.WriteAllText(path + result.ToString("D2"), json);
+        File.WriteAllText(levelPath + result.ToString("D2"), json);
         Debug.Log("Saved");
     }
 
-    public void DataProcess() {
-        if (!int.TryParse(ui.levelInput.text, out int result)) return;
-        if (!int.TryParse(ui.coinInput.text, out int reward)) reward = 0;
+    private void SaveLayout() {
+        string json = JsonUtility.ToJson(levelData, true);
+        File.WriteAllText(personalPath + "layout", json);
+    }
 
-        //Boosters
-        if (!int.TryParse(ui.shuffleInput.text, out int shuffle)) shuffle = 0;
-        if (!int.TryParse(ui.undoInput.text, out int undo)) undo = 0;
-        if (!int.TryParse(ui.addBottleInput.text, out int addBottle)) addBottle = 0;
+    public void DataProcess(bool layout = false) {
+        int result;
+        int reward;
+        int shuffle;
+        int undo;
+        int addBottle;
+
+        if (!layout) {
+            if (!int.TryParse(ui.levelInput.text, out result)) return;
+            if (!int.TryParse(ui.coinInput.text, out reward)) reward = 0;
+            
+            if (!int.TryParse(ui.shuffleInput.text, out shuffle)) shuffle = 0;
+            if (!int.TryParse(ui.undoInput.text, out undo)) undo = 0;
+            if (!int.TryParse(ui.addBottleInput.text, out addBottle)) addBottle = 0;
+        } else {
+            result = SaveManager.Instance.level;
+            reward = SaveManager.Instance.coinsReward;
+
+            shuffle = SaveManager.Instance.shufflesReward;
+            undo = SaveManager.Instance.undosReward;
+            addBottle = SaveManager.Instance.addBottlesReward;
+        }
+        
 
         levelData = new();
         List<Bottle> currentBottleData = bottleGen.DictionaryToSingularBottleConverter();
@@ -63,22 +85,28 @@ public class LevelCreator : MonoBehaviour
             }
             levelData.bottles.Add(bottleData);
         }
-
-        SaveLevel(result);
+        if (!layout) SaveLevel(result);
+        else SaveLayout();
     }
 
-    public void LoadLevel(bool randomize = false, bool next = false) {
+
+
+    //LEVEL LOADING
+
+
+
+    public void LoadLevel(bool randomize = false, bool next = false, bool launch = false) { //NEED FURTHER IMPROVEMENT TO PREVENT SOFTLOCK
         if (ui.admin) {
             SaveManager.Instance.level = int.TryParse(ui.levelInput.text, out int result) ? result : 0;
         } else {
             SaveManager.Instance.level = next ? SaveManager.Instance.level+=1 : SaveManager.Instance.level;
         }
-        
-        if (!File.Exists(path + SaveManager.Instance.level.ToString("D2"))) return;
+        if (next) { if (!File.Exists(levelPath + SaveManager.Instance.level.ToString("D2"))) return; } 
+        else { if (!File.Exists(personalPath + "layout")) next = !next; };
 
-        string json = File.ReadAllText(path + SaveManager.Instance.level.ToString("D2"));
+        string json = (!next) ? File.ReadAllText(personalPath + "layout") : File.ReadAllText(levelPath + SaveManager.Instance.level.ToString("D2"));
         LevelData data = JsonUtility.FromJson<LevelData>(json);
-
+        Debug.Log(json);
         LoadData(data, randomize);
     }
 
@@ -121,8 +149,11 @@ public class LevelCreator : MonoBehaviour
 
         }
         PlayerPrefs.Save();
+        Debug.Log("Level Loaded");
         ui.SetLevelnReward();
     }
+
+    
 
     private LiquidColor ColorDebug(int color) {
         if (colorTranslate.TryGetValue(color, out LiquidColor result)) {

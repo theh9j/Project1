@@ -202,9 +202,8 @@ public class Tutorial : MonoBehaviour
     }
 
     private IEnumerator Level1() {
-        
 
-        Vector2 finalPos = ArrowOffsetCalc(levelDisplay.transform.position, arrowOffset, false);
+        Vector2 finalPos = ArrowOffsetCalc(levelDisplay.transform.position, arrowOffset * .5f, false);
         float angle = ArrowRotation(finalPos, levelDisplay.transform.position);
 
 

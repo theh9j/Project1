@@ -62,26 +62,26 @@ public class Bottle : MonoBehaviour {
         return liquidUnits[^1];
     }
 
-    public PourData Shuffle() {
+    public PourData Shuffle(List<Bottle> allBottles) {
         if (!Distinction()) return null;
 
         PourData shuffled = new() { shuffle = this };
+
         for (int i = 0; i < liquidUnits.Count; i++) {
             shuffled.prior.Add(liquidUnits[i]);
         }
 
-        List<LiquidUnit> original = liquidUnits.Select(
-            x => new LiquidUnit( x.colorId, x.isMystery )).ToList();
+        List<LiquidUnit> original = liquidUnits
+            .Select(x => new LiquidUnit(x.colorId, x.isMystery))
+            .ToList();
 
         int attempts = 0;
 
         do {
-            Swap(liquidUnits);
+            SmartSwap(liquidUnits, allBottles);
             attempts++;
         }
-        while (
-            SameOrder(original, liquidUnits) && attempts < 50
-        );
+        while (SameOrder(original, liquidUnits) && attempts < 50);
 
         if (GetTopLiquid().isMystery) {
             GetTopLiquid().DeMysterize();
@@ -89,7 +89,45 @@ public class Bottle : MonoBehaviour {
 
         RefreshView();
         onBottlePour?.Invoke(false);
+
         return shuffled;
+    }
+
+    private void SmartSwap(List<LiquidUnit> list, List<Bottle> allBottles) {
+        LiquidColor originalTopColor = GetTopLiquid().colorId;
+
+        List<LiquidColor> usefulColors = new();
+
+        foreach (Bottle bottle in allBottles) {
+            if (bottle == this) continue;
+            if (bottle.IsEmpty) continue;
+            if (bottle.isLocked) continue;
+            if (bottle.Completion) continue;
+
+            LiquidColor otherTopColor = bottle.GetTopLiquid().colorId;
+
+            if (otherTopColor == originalTopColor) continue;
+
+            for (int i = 0; i < list.Count; i++) {
+                if (list[i].colorId == otherTopColor &&
+                    !usefulColors.Contains(otherTopColor)) {
+                    usefulColors.Add(otherTopColor);
+                }
+            }
+        }
+
+        Swap(list);
+
+        if (usefulColors.Count == 0) return;
+
+        LiquidColor chosenColor = usefulColors[Random.Range(0, usefulColors.Count)];
+
+        for (int i = 0; i < list.Count; i++) {
+            if (list[i].colorId == chosenColor) {
+                (list[i], list[^1]) = (list[^1], list[i]);
+                return;
+            }
+        }
     }
 
     private void Swap(List<LiquidUnit> list) {

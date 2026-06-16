@@ -1,0 +1,11 @@
+{
+    "levelNumber": 0,
+    "bottleCount": 0,
+    "rewards": {
+        "coins": 60,
+        "shuffle": 2,
+        "addBottle": 2,
+        "undo": 0
+    },
+    "bottles": []
+}

@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviour
         if (bottle.Completion) return false;
         if (bottle.isLocked) return false;
 
-        PourData shuffled = bottle.Shuffle();
+        PourData shuffled = bottle.Shuffle(bottleGen.DictionaryToSingularBottleConverter());
         record.Push(shuffled);  
         return true;
     }   
