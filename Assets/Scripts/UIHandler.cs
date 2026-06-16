@@ -100,13 +100,13 @@ public partial class UIHandler : MonoBehaviour
         for (int i = 0; i < 3; i++) {
             UpdateCount(i);
         }
-        gameManager.OnGameStart(true, true);
+        gameManager.OnGameStart(true, true, false);
         uianim.NextLevel();
         levelText.text = "Level " + SaveManager.Instance.level.ToString();
     }
 
     public void Replay() {
-        gameManager.OnGameStart(true, false);
+        gameManager.OnGameStart(true, false, true);
         uianim.Revived();
     }
 

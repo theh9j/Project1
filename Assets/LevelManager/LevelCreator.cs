@@ -95,18 +95,24 @@ public class LevelCreator : MonoBehaviour
 
 
 
-    public void LoadLevel(bool randomize = false, bool next = false, bool launch = false) { //NEED FURTHER IMPROVEMENT TO PREVENT SOFTLOCK
+    public void LoadLevel(bool randomize = false, bool next = false, bool launch = false) {
         if (ui.admin) {
             SaveManager.Instance.level = int.TryParse(ui.levelInput.text, out int result) ? result : 0;
         } else {
             SaveManager.Instance.level = next ? SaveManager.Instance.level+=1 : SaveManager.Instance.level;
         }
-        if (next) { if (!File.Exists(levelPath + SaveManager.Instance.level.ToString("D2"))) return; } 
-        else { if (!File.Exists(personalPath + "layout")) next = !next; };
 
-        string json = (!next) ? File.ReadAllText(personalPath + "layout") : File.ReadAllText(levelPath + SaveManager.Instance.level.ToString("D2"));
+        string json;
+
+        if (!launch) {
+            if (!File.Exists(levelPath + SaveManager.Instance.level.ToString("D2"))) return;
+            json = File.ReadAllText(levelPath + SaveManager.Instance.level.ToString("D2"));
+        } else {
+            if (!File.Exists(personalPath + "layout")) return;
+            json = File.ReadAllText(personalPath + "layout");
+        }
+
         LevelData data = JsonUtility.FromJson<LevelData>(json);
-        Debug.Log(json);
         LoadData(data, randomize);
     }
 

@@ -13,7 +13,7 @@ public class UIAnimation : MonoBehaviour
 {
 
     //Common Variables
-    [SerializeField] private GameObject gamePause;
+    public GameObject gamePause;
     private Vector2 centre = new(Screen.width / 2, Screen.height / 2);
     private Func<Transform> actions;
 
@@ -136,7 +136,7 @@ public class UIAnimation : MonoBehaviour
         GameContinue();
     }
 
-    private void GameContinue() {
+    public void GameContinue() {
         DOTween.Sequence()
             .AppendInterval(.5f)
             .Append(

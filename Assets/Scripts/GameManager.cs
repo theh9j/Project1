@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
         });
 
         
-        OnGameStart(true, false);
+        OnGameStart(true, false, true);
     }
 
     private bool OnCompletion() {
@@ -97,13 +97,13 @@ public class GameManager : MonoBehaviour
     }
 
     public void ADGameStart(bool rand) {
-        OnGameStart(rand, false);
+        OnGameStart(rand, false, false);
     }
 
-    public void OnGameStart(bool rand, bool next) {
+    public void OnGameStart(bool rand, bool next, bool byLayout) {
         record = new();
         conditionalBottles.Clear();
-        levelCreator.LoadLevel(rand, next);
+        levelCreator.LoadLevel(rand, next, byLayout);
         tutor.CheckForTutorial(tutorial);
     }
 
