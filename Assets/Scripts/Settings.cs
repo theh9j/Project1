@@ -14,20 +14,24 @@ public class Settings : MonoBehaviour
     [SerializeField] private Button musicButton;
     [SerializeField] private Button replayButton;
 
-    [SerializeField] private Transform slash;
-
     [SerializeField] private UIAnimation anim;
     [SerializeField] private GameManager gameManager;
 
     private Vector2 centre = new(Screen.width / 2, Screen.height / 2);
+    private Vector2[] OGcoords = new Vector2[3];
     private Sequence seq;
 
     private bool settingActive = false;
     private bool settingBusy = false;
-    private bool test;
 
     void Start() {
+        OGcoords[0] = audioButton.transform.parent.position;
+        OGcoords[1] = musicButton.transform.parent.position;
+        OGcoords[2] = replayButton.transform.parent.position;
+
         setting.onClick.AddListener(() => {
+            if (settingBusy) return;
+            settingBusy = true;
             if (!settingActive) Open(); else Close();
         });
 
@@ -36,12 +40,79 @@ public class Settings : MonoBehaviour
         });
 
         audioButton.onClick.AddListener(() => {
-            Audio();
+            SFX();
         });
 
         musicButton.onClick.AddListener(() => {
             Music();
         });
+    }
+
+    private void Open() {
+        seq = DOTween.Sequence();
+        List<Transform> buttons = new() { audioButton.transform, musicButton.transform, replayButton.transform };
+
+        seq.AppendCallback(() => { anim.OpenGamePauseBG(.2f); });
+
+        for (int i = 0; i < buttons.Count; i++) {
+            int index = i;
+
+            seq.Append(
+                buttons[index].DOMove(
+                    OGcoords[index],
+                    .15f
+                ).From(new Vector2(Screen.width + 150, buttons[index].position.y))
+                .OnStart(() => {
+                    buttons[index].gameObject.SetActive(true);
+                })
+                .SetEase(Ease.OutBack, 3f)
+                );
+
+        }
+        seq.AppendInterval(.5f);
+        seq.OnComplete(() => {
+            settingBusy = false;
+            settingActive = true;
+        });
+    }
+
+    private void Close() {
+        seq = DOTween.Sequence();
+        List<Transform> buttons = new() { audioButton.transform, musicButton.transform, replayButton.transform };
+
+        for (int i = buttons.Count-1; i >= 0; i--) {
+            int index = i;
+            seq.Append(
+                buttons[index].DOMove(
+                    new Vector2(Screen.width + 150, buttons[index].position.y),
+                    .15f
+                ).OnComplete(() => {
+                    buttons[index].gameObject.SetActive(false);
+                })
+                .SetEase(Ease.InBack, 3f));
+        }
+        seq.AppendCallback(() => { anim.GameContinue(.2f); });
+        seq.AppendInterval(.5f);
+        seq.OnComplete(() => {
+            settingBusy = false;
+            settingActive = false;
+        });
+
+    }
+
+    private void Replay() {
+        gameManager.OnGameStart(true, false, false);
+        Close();
+    }
+
+    private void SFX() {
+        bool isMuted = AudioManager.Instance.ToggleMuteSFX();
+        ButtonUnavailable(audioButton.transform, isMuted);
+    }
+
+    private void Music() {
+        bool isMuted = AudioManager.Instance.ToggleMuteBG();
+        ButtonUnavailable(musicButton.transform, isMuted);
     }
 
     private void ButtonUnavailable(Transform button, bool avail) {
@@ -52,75 +123,4 @@ public class Settings : MonoBehaviour
             slash.SetActive(false);
         }
     }
-
-    private void Open() {
-        if (settingBusy) return;
-        seq = DOTween.Sequence();
-        settingBusy = true;
-        List<Transform> buttons = new() { audioButton.transform, musicButton.transform, replayButton.transform };
-        anim.OpenGamePauseBG(.2f);
-
-        foreach (Transform button in buttons) {
-            seq.Append(
-                button.DOMove(
-                    new Vector2(button.position.x, button.position.y),
-                    .15f
-                ).From(new Vector2(Screen.width + 150, button.position.y))
-                .OnStart(() => {
-                    button.gameObject.SetActive(true);
-                })
-                .SetEase(Ease.OutBack, 3f)
-                );
-
-            seq.AppendInterval(.05f);
-        }
-        settingActive = true;
-        seq.OnComplete(() => {
-            settingBusy = false;
-        });
-    }
-
-    private void Close() {
-        if (settingBusy) return;
-        seq = DOTween.Sequence();
-        settingBusy = true;
-        List<Transform> buttons = new() { replayButton.transform, musicButton.transform, audioButton.transform };
-
-        foreach (Transform button in buttons) {
-            Vector2 originalCoord = button.position;
-            seq.Append(
-                button.DOMove(
-                    new Vector2(Screen.width + 150, button.position.y),
-                    .15f
-                ).OnComplete(() => {
-                    button.gameObject.SetActive(false);
-                    button.position = originalCoord;
-                })
-                .SetEase(Ease.InBack, 3f));
-
-        }
-        anim.GameContinue();
-        settingActive = false;
-        seq.OnComplete(() => {
-            settingBusy = false;
-        });
-
-    }
-
-    private void Replay() {
-        gameManager.OnGameStart(true, false, false);
-        Close();
-    }
-
-    private void Audio() {
-        //Audio Processing
-        test = !test;
-        ButtonUnavailable(audioButton.transform, test);
-    }
-
-    private void Music() {
-        //Music Processing
-        ButtonUnavailable(musicButton.transform, true);
-    }
-
 }

@@ -22,6 +22,9 @@ public class SaveManager : MonoBehaviour
     [HideInInspector] public int addBottle;
     [HideInInspector] public int undo;
 
+    [HideInInspector] public bool music;
+    [HideInInspector] public bool sfx;
+
     void Awake() {
         if (Instance != null) {
             Destroy(Instance);
@@ -48,6 +51,10 @@ public class SaveManager : MonoBehaviour
         shuffle = PlayerPrefs.GetInt("Shuffle");
         addBottle = PlayerPrefs.GetInt("Add");
         undo = PlayerPrefs.GetInt("Undo");
+
+        //SETTINGS
+        music = PlayerPrefs.GetInt("Music") != 0;
+        sfx = PlayerPrefs.GetInt("SFX") != 0;
     }
 
     private void FirstTime() {
@@ -63,6 +70,10 @@ public class SaveManager : MonoBehaviour
         shuffle = 5;
         addBottle = 5;
         undo = 5;
+
+        //Settings
+        music = true;
+        sfx = true;
     }
 
     public void SaveData() {
@@ -73,6 +84,9 @@ public class SaveManager : MonoBehaviour
         PlayerPrefs.SetInt("Shuffle", shuffle);
         PlayerPrefs.SetInt("Add", addBottle);
         PlayerPrefs.SetInt("Undo", undo);
+
+        PlayerPrefs.SetInt("Music", music ? 1 : 0);
+        PlayerPrefs.SetInt("SFX", sfx ? 1 : 0);
 
         PlayerPrefs.SetInt("FirstLaunch", 1);
 

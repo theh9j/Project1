@@ -162,7 +162,6 @@ public class LevelCreator : MonoBehaviour
         if (colorTranslate.TryGetValue(color, out LiquidColor result)) {
             return result;
         } else {
-            Debug.Log(color);
             throw new Exception("Critical Error for Color Decode");
         }
     }

@@ -228,7 +228,6 @@ public class Bottle : MonoBehaviour {
     }
 
     private void Start() {
-        Debug.Log(lockColor.ToString());
         RefreshView();
     }
 

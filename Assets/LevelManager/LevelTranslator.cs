@@ -9,11 +9,11 @@ public class LevelTranslator
     public int TranslatedColor(LiquidColor color) {
 
         LiquidColor[] availableColors = (LiquidColor[])Enum.GetValues(typeof(LiquidColor));
-        for (int i = 1; i < Enum.GetValues(typeof(LiquidColor)).Length; i++) {
+        for (int i = 0; i < Enum.GetValues(typeof(LiquidColor)).Length; i++) {
             if (color == availableColors[i]) {
                 return i;
             }
-        }
+        } 
         return Enum.GetValues(typeof(LiquidColor)).Length;
 
     }
@@ -31,7 +31,7 @@ public class LevelTranslator
             decoder[i] = color;
             availableColors.RemoveAt(randomIndex);
         }
-        availableColors.Add(LiquidColor.unknown);
+
         return decoder;
     }
 }

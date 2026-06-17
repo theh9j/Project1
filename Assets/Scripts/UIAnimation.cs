@@ -125,7 +125,7 @@ public class UIAnimation : MonoBehaviour
 
         options.GetComponent<CanvasGroup>().DOFade(0, .8f);
 
-        GameContinue();
+        GameContinue(.5f);
     }
 
     public void NextLevel() {
@@ -137,12 +137,12 @@ public class UIAnimation : MonoBehaviour
             });
 
         
-        GameContinue();
+        GameContinue(.5f);
     }
 
-    public void GameContinue() {
+    public void GameContinue(float wait) {
         DOTween.Sequence()
-            .AppendInterval(.5f)
+            .AppendInterval(wait)
             .Append(
                 gamePause.GetComponent<Image>().DOFade(0, .5f)
             )
