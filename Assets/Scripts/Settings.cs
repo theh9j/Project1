@@ -17,7 +17,6 @@ public class Settings : MonoBehaviour
     [SerializeField] private UIAnimation anim;
     [SerializeField] private GameManager gameManager;
 
-    private Vector2 centre = new(Screen.width / 2, Screen.height / 2);
     private Vector2[] OGcoords = new Vector2[3];
     private Sequence seq;
 

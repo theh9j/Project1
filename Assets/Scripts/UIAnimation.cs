@@ -28,6 +28,8 @@ public class UIAnimation : MonoBehaviour
     //GameWin Variables
     [SerializeField] private GameObject gameWinPanel;
     [SerializeField] private TMP_Text levelIndex;
+    [SerializeField] private Button continueButton;
+
     [SerializeField] private TMP_Text coinWinsText;
 
     [SerializeField] private TMP_Text[] shuffleReTexts = new TMP_Text[2];
@@ -43,6 +45,12 @@ public class UIAnimation : MonoBehaviour
     [SerializeField] private Transform warningSelf;
     [SerializeField] private TMP_Text[] warnings = new TMP_Text[2];
     private Sequence warn;
+
+    void Start() {
+        actions += ShuffleReward;
+        actions += UndoReward;
+        actions += AddBottleReward;
+    }
 
     public Sequence OpenGamePauseBG(float wait) {
         gamePause.SetActive(true);
@@ -89,6 +97,7 @@ public class UIAnimation : MonoBehaviour
     }
 
     private void GameWin(int level, int amount) {
+        continueButton.interactable = false;
         gameWinPanel.SetActive(true);
         string levelt = $"Level {level}";
 
@@ -103,11 +112,10 @@ public class UIAnimation : MonoBehaviour
         gameWinPanel.transform.DOMove(
             centre,
             .3f
-            ).From(new Vector2(Screen.width * 2, centre.y)).SetEase(Ease.OutSine);
-
-        DOTween.Sequence().AppendInterval(.5f).OnComplete(() => {
-            UpdateRewards();
-        });
+            ).From(new Vector2(Screen.width * 2, centre.y)).SetEase(Ease.OutSine)
+            .OnComplete(() => {
+                UpdateRewards();
+            });
     }
 
     public void Revived() {
@@ -152,7 +160,7 @@ public class UIAnimation : MonoBehaviour
             });
     }
 
-    public void DisplayCost(GameObject cost, GameObject notif, bool undo) { //notif pops up, cost disappear if false
+    public void DisplayCost(GameObject cost, GameObject notif, bool undo) { 
         if (undo) {
             (notif, cost) = (cost, notif);
         }
@@ -179,7 +187,7 @@ public class UIAnimation : MonoBehaviour
                 seq.Append(
                     action().DOMove(
                         action().position,
-                        .7f
+                        .4f
                         ).From(new Vector2(action().position.x, action().position.y * .8f))
                         .OnStart(() => {
                             action().gameObject.SetActive(true);
@@ -188,11 +196,13 @@ public class UIAnimation : MonoBehaviour
                     );
 
                 seq.Join(
-                        action().GetComponent<CanvasGroup>().DOFade(1f, .7f).From(0)
+                        action().GetComponent<CanvasGroup>().DOFade(1f, .4f).From(0)
                     );
 
-                seq.AppendInterval(.1f);
             }
+            seq.OnComplete(() => {
+                continueButton.interactable = true;
+            });
         }
     }
 
@@ -232,11 +242,7 @@ public class UIAnimation : MonoBehaviour
         }
     }
 
-    void Start() {
-        actions += ShuffleReward;
-        actions += UndoReward;
-        actions += AddBottleReward;
-    }
+    
 
     public void PopupConfirmation(Transform popup) {
         Vector2 popupPos = new(centre.x, centre.y * .3f);

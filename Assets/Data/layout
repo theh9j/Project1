@@ -1,6 +1,6 @@
 {
-    "levelNumber": 3,
-    "bottleCount": 5,
+    "levelNumber": 0,
+    "bottleCount": 3,
     "rewards": {
         "coins": 60,
         "shuffle": 0,
@@ -11,19 +11,15 @@
         {
             "liquids": [
                 {
-                    "colorId": 6,
+                    "colorId": 1,
                     "isMystery": false
                 },
                 {
-                    "colorId": 6,
+                    "colorId": 1,
                     "isMystery": false
                 },
                 {
-                    "colorId": 4,
-                    "isMystery": false
-                },
-                {
-                    "colorId": 5,
+                    "colorId": 2,
                     "isMystery": false
                 }
             ],
@@ -33,19 +29,15 @@
         {
             "liquids": [
                 {
-                    "colorId": 4,
+                    "colorId": 2,
                     "isMystery": false
                 },
                 {
-                    "colorId": 5,
+                    "colorId": 1,
                     "isMystery": false
                 },
                 {
-                    "colorId": 6,
-                    "isMystery": false
-                },
-                {
-                    "colorId": 3,
+                    "colorId": 1,
                     "isMystery": false
                 }
             ],
@@ -55,49 +47,14 @@
         {
             "liquids": [
                 {
-                    "colorId": 5,
+                    "colorId": 2,
                     "isMystery": false
                 },
                 {
-                    "colorId": 5,
-                    "isMystery": false
-                },
-                {
-                    "colorId": 6,
-                    "isMystery": false
-                },
-                {
-                    "colorId": 3,
+                    "colorId": 2,
                     "isMystery": false
                 }
             ],
-            "isLocked": false,
-            "lockCondition": 0
-        },
-        {
-            "liquids": [
-                {
-                    "colorId": 4,
-                    "isMystery": false
-                },
-                {
-                    "colorId": 3,
-                    "isMystery": false
-                },
-                {
-                    "colorId": 4,
-                    "isMystery": false
-                },
-                {
-                    "colorId": 3,
-                    "isMystery": false
-                }
-            ],
-            "isLocked": false,
-            "lockCondition": 0
-        },
-        {
-            "liquids": [],
             "isLocked": false,
             "lockCondition": 0
         }

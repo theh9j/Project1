@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class GameManager : MonoBehaviour
     public bool tutorial = true;
     public UnityEvent revive;
     public UnityEvent<int, int> gameOver;
+    public UnityEvent nextStep;
     private Bottle from;
     private Dictionary<LiquidColor, List<Bottle>> conditionalBottles = new();
     private Stack<PourData> record;
@@ -148,6 +150,10 @@ public class GameManager : MonoBehaviour
     }   
 
     public void TryPour(Bottle to) {
+        if (SaveManager.Instance.level == 0 && tutor.firstEver) {
+            if (TutorialTryPour(to)) nextStep?.Invoke();
+            return;
+        }
         if (to.isOccupied) return;
         to.isOccupied = true;
 
@@ -176,6 +182,33 @@ public class GameManager : MonoBehaviour
             to.anim.Play(1);
         }
         to.isOccupied = false;
+    }
+
+
+    private bool TutorialTryPour(Bottle to) {
+        Debug.Log("Reply");
+        List<Bottle> bottles = bottleGen.DictionaryToSingularBottleConverter();
+        if (to != bottles[0] || to != bottles[2]) return false;
+        if (from == null && to == bottles[0]) {
+            Debug.Log("Hello");
+            from = to;
+            from.anim.SelectedHover(true);
+            to.isOccupied = false;
+            return true;
+        }
+        if (from != null && to == bottles[2]) {
+            move = from.Pour(to);
+            if (move != null) {
+                record.Push(move);
+                from.anim.Play(2, to);
+                from = null;
+                tutor.firstEver = false;
+                return true;
+            } else {
+                to.anim.Play(1);
+            }
+        }
+        return false;
     }
 
     public bool Undo() {

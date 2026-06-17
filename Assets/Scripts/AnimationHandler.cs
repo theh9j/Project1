@@ -82,8 +82,6 @@ public class AnimationHandler : MonoBehaviour {
         Vector3 spillParPos = spillPar.position;
         float targetY = spillOffset + 3 * spillLenOffset;
 
-        //spillPar.DOKill();
-        //b.anim.spill.DOKill();
 
         spillPar.gameObject.SetActive(true);
 

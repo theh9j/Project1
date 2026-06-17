@@ -10,6 +10,7 @@ using UnityEngine.UI;
 using static System.Net.Mime.MediaTypeNames;
 using Sequence = DG.Tweening.Sequence;
 using Image = UnityEngine.UI.Image;
+using UnityEngine.Events;
 
 public class Tutorial : MonoBehaviour
 {
@@ -34,7 +35,10 @@ public class Tutorial : MonoBehaviour
 
     //Tutorial Items
     [SerializeField] private BottleGen bottleGen;
+    [SerializeField] private GameManager mana;
     public readonly LanguageTrans lang = new();
+    public bool firstEver = false;
+    
 
 
     //Common variables
@@ -87,6 +91,16 @@ public class Tutorial : MonoBehaviour
         return targetScreenPos + dirFromCenter * offset;
     }
 
+    private Tween ArrowBounce() {
+        Vector3 dir = arrow.right;
+        Tween bounceTween;
+        return bounceTween = arrow.DOMove(
+            arrow.position + (Vector3)dir * 30f,
+            .5f
+            ).SetEase(Ease.InOutSine)
+            .SetLoops(-1, LoopType.Yoyo);
+    }
+
     private float ArrowRotation(Vector2 start, Vector2 end) {
         Vector2 direction = end - start;
         return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -111,7 +125,7 @@ public class Tutorial : MonoBehaviour
         );
     }
 
-    private void ArrowNewPosition(Vector2 selectedPos, float atAngle, bool fromOG = false, bool undoInput = false) {
+    private Sequence ArrowNewPosition(Vector2 selectedPos, float atAngle, bool fromOG = false, bool undoInput = false) {
         Vector2 from;
         if (fromOG) from = guide.transform.position;
         else from = arrow.transform.position;
@@ -137,6 +151,8 @@ public class Tutorial : MonoBehaviour
             seq.OnComplete(() => {
                 input.CancelMode();
             });
+
+        return seq;
     }
 
     private IEnumerator TextType(string text) {
@@ -159,6 +175,11 @@ public class Tutorial : MonoBehaviour
         levelDisplay.SetActive(false);
         coinDisplay.SetActive(false);
         boosterDisplay.SetActive(false);
+        firstEver = true;
+        mana.nextStep.AddListener(() => {
+
+        });
+
 
         yield return new WaitForSeconds(1f);
         bottles = bottleGen.DictionaryToSingularBottleConverter();
@@ -174,9 +195,10 @@ public class Tutorial : MonoBehaviour
 
         Vector2 point1Pos = ArrowOffsetCalc(firstBottleCoord, arrowOffset, true);
         Vector2 point2Pos = ArrowOffsetCalc(secondBottleCoord, arrowOffset, true);
-
+        Tween current = null;
         float arrowRot1 = ArrowRotation(point1Pos, firstBottleCoord);
         float arrowRot2 = ArrowRotation(point2Pos, secondBottleCoord);
+        arrow.DORotate(new Vector3(0, 0, arrowRot1), 0);
 
         guide.DOMove(
             new Vector2(centre.x, centre.y * .6f),
@@ -185,19 +207,26 @@ public class Tutorial : MonoBehaviour
             .SetEase(Ease.OutBack, 2f);
 
         yield return StartCoroutine(WaitForInput(lang.hello));
+        
+        ArrowNewPosition(point1Pos, arrowRot1, true, true).OnComplete(() => {
+            arrowImg.DOFade(1f, .3f).From(0f);
+            current = ArrowBounce();
+        });
 
-        arrowImg.DOFade(1f, .5f).From(0f);
-        ArrowNewPosition(point1Pos, arrowRot1, true, true);
 
         yield return StartCoroutine(WaitForInput(lang.aa));
-        input.ToggleTutorialMode();
         yield return StartCoroutine(WaitForInput(lang.ab));
         
-        ArrowNewPosition(point2Pos, arrowRot2);
+        ArrowNewPosition(point2Pos, arrowRot2)
+            .OnStart(() => { current?.Kill(); })
+            .OnComplete(() => { current = ArrowBounce(); });
+        
 
         yield return StartCoroutine(WaitForInput(lang.ac));
+        input.ToggleTutorialMode();
         yield return StartCoroutine(WaitForInput(lang.ad));
 
+        current.Kill();
         SeqKill();
     }
 
@@ -205,7 +234,8 @@ public class Tutorial : MonoBehaviour
 
         Vector2 finalPos = ArrowOffsetCalc(levelDisplay.transform.position, arrowOffset * .5f, false);
         float angle = ArrowRotation(finalPos, levelDisplay.transform.position);
-
+        Tween current = null;
+        arrow.DORotate(new Vector3(0, 0, angle), 0);
 
         Tutorialize(true);
 
@@ -230,12 +260,14 @@ public class Tutorial : MonoBehaviour
                 })
             );
 
-        ArrowNewPosition(finalPos, angle, true);
-
-        seq.Join(arrowImg.DOFade(1f, .5f));
+        ArrowNewPosition(finalPos, angle, true).OnComplete(() => {
+            arrowImg.DOFade(1f, .3f).From(0f);
+            current = ArrowBounce();
+        });
 
         yield return StartCoroutine(WaitForInput(lang.bb));
 
+        current?.Kill();
         SeqKill();
 
     }
@@ -250,6 +282,9 @@ public class Tutorial : MonoBehaviour
 
         Vector2 addB = ArrowOffsetCalc(addDis.position, arrowOffset, false);
         float addBAngle = ArrowRotation(addB, addDis.position);
+
+        Tween current = null;
+        arrow.DORotate(new Vector3(0, 0, shuffAngle), 0);
         Tutorialize(true);
 
         guide.DOMove(
@@ -276,19 +311,19 @@ public class Tutorial : MonoBehaviour
                 boosterDisplay.SetActive(true);
             });
 
-        arrowImg.DOFade(1f, .5f).From(0f);
-        ArrowNewPosition(shuff, shuffAngle, true);
+        ArrowNewPosition(shuff, shuffAngle, true).OnComplete(() => { arrowImg.DOFade(1f, .3f).From(0f); current = ArrowBounce(); });
 
         yield return StartCoroutine(WaitForInput(lang.cc));
 
-        ArrowNewPosition(und, undAngle);
+        ArrowNewPosition(und, undAngle).OnStart(() => { current?.Kill(); }).OnComplete(() => { current = ArrowBounce(); });
 
         yield return StartCoroutine(WaitForInput(lang.cd));
 
-        ArrowNewPosition(addB, addBAngle);
+        ArrowNewPosition(addB, addBAngle).OnStart(() => { current?.Kill(); }).OnComplete(() => { current = ArrowBounce(); });
 
         yield return StartCoroutine(WaitForInput(lang.ce));
         yield return StartCoroutine(WaitForInput(lang.cf));
+        current?.Kill();
         SeqKill();
     }
 
