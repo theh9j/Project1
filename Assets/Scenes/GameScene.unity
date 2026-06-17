@@ -5946,7 +5946,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -2}
   m_SizeDelta: {x: 160, y: 160}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &543380886
@@ -8101,6 +8101,7 @@ GameObject:
   - component: {fileID: 774628083}
   - component: {fileID: 774628084}
   - component: {fileID: 774628085}
+  - component: {fileID: 774628086}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -8323,6 +8324,24 @@ MonoBehaviour:
   addDis: {fileID: 1706901469}
   input: {fileID: 937750832}
   bottleGen: {fileID: 189255339}
+--- !u!114 &774628086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774628077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3f78ccf829e2114b8a3d7c7bc39bfd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  setting: {fileID: 1903879925}
+  audioButton: {fileID: 970673729}
+  musicButton: {fileID: 140114244}
+  replayButton: {fileID: 0}
+  anim: {fileID: 774628084}
+  gameManager: {fileID: 847021335}
 --- !u!1 &782674252
 GameObject:
   m_ObjectHideFlags: 0
@@ -10383,7 +10402,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 385, y: 514}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 125, y: 125}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &970673729
 MonoBehaviour:
@@ -10449,8 +10468,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 4800741761136664645, guid: e6aac49077798a24d8d90b127f9d8835, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4

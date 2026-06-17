@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
         });
 
         
-        OnGameStart(true, false, true);
+        OnGameStart(false, false, true);
     }
 
     private bool OnCompletion() {

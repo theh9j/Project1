@@ -11,7 +11,7 @@ public class Bottle : MonoBehaviour {
     public List<LiquidUnit> liquidUnits = new List<LiquidUnit>();
     public UnityEvent<bool> onBottlePour;
     public UnityEvent<Bottle> aBottleCovered;
-    
+
 
 
     public bool isLocked = false;
@@ -31,7 +31,7 @@ public class Bottle : MonoBehaviour {
     }
 
     public void RemoveConditionalLock() {
-        lockColor = LiquidColor.unknown;
+        lockColor = LiquidColor.red;
         isLocked = false;
         anim.Play(5, null, transform.position + Vector3.up * 10f);
     }
@@ -227,7 +227,8 @@ public class Bottle : MonoBehaviour {
         bottleView = GetComponent<BottleView>();
     }
 
-    private void Start() { 
+    private void Start() {
+        Debug.Log(lockColor.ToString());
         RefreshView();
     }
 

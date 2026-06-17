@@ -44,19 +44,23 @@ public class UIAnimation : MonoBehaviour
     [SerializeField] private TMP_Text[] warnings = new TMP_Text[2];
     private Sequence warn;
 
-    public void GameEnd(int level, int amount = 0) {
+    public Sequence OpenGamePauseBG(float wait) {
         gamePause.SetActive(true);
 
-        DOTween.Sequence()
-            .AppendInterval(2.5f)
+        return DOTween.Sequence()
+            .AppendInterval(wait)
             .Append(
             gamePause.GetComponent<Image>().DOFade(
-                .97f, 
+                .97f,
                 .35f
-                ))
-            .OnComplete(() => {
-                if (amount != 0) GameWin(level, amount); else GameOver();
-            });
+                ));
+    }
+
+    public void GameEnd(int level, int amount = 0) {
+
+        OpenGamePauseBG(2.5f).OnComplete(() => {
+            if (amount != 0) GameWin(level, amount); else GameOver();
+        });
     }
 
     private void GameOver() {

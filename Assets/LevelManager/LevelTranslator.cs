@@ -31,7 +31,7 @@ public class LevelTranslator
             decoder[i] = color;
             availableColors.RemoveAt(randomIndex);
         }
-
+        availableColors.Add(LiquidColor.unknown);
         return decoder;
     }
 }

@@ -11,15 +11,15 @@
         {
             "liquids": [
                 {
-                    "colorId": 6,
+                    "colorId": 2,
                     "isMystery": true
                 },
                 {
-                    "colorId": 6,
+                    "colorId": 2,
                     "isMystery": true
                 },
                 {
-                    "colorId": 3,
+                    "colorId": 7,
                     "isMystery": false
                 }
             ],
@@ -29,15 +29,15 @@
         {
             "liquids": [
                 {
-                    "colorId": 3,
+                    "colorId": 7,
                     "isMystery": true
                 },
                 {
-                    "colorId": 6,
+                    "colorId": 2,
                     "isMystery": false
                 },
                 {
-                    "colorId": 6,
+                    "colorId": 2,
                     "isMystery": false
                 }
             ],
@@ -47,11 +47,11 @@
         {
             "liquids": [
                 {
-                    "colorId": 3,
+                    "colorId": 7,
                     "isMystery": false
                 },
                 {
-                    "colorId": 3,
+                    "colorId": 7,
                     "isMystery": false
                 }
             ],

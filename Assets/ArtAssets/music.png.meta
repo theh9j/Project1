@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 265986916f2a4954ea5fc9ee594aa6a7
+guid: 5cadf6fb4502c364e94bd7abdf17e279
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5158294962618580581
-    second: coin 1_0
+      213: 5044122071167073304
+    second: music_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,23 +126,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: coin 1_0
+      name: music_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 27
-        width: 360
-        height: 333
+        x: 193
+        y: 206
+        width: 639
+        height: 645
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b91ce62bf0e0a68b0800000000000000
-      internalID: -5158294962618580581
+      spriteID: 81cfe9f7c42500640800000000000000
+      internalID: 5044122071167073304
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 0248e482b0c44c4419ca63342fc32d94
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      coin 1_0: -5158294962618580581
+      music_0: 5044122071167073304
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

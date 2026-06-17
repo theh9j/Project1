@@ -102,7 +102,6 @@ public partial class UIHandler : MonoBehaviour
         }
         gameManager.OnGameStart(true, true, false);
         uianim.NextLevel();
-        levelText.text = "Level " + SaveManager.Instance.level.ToString();
     }
 
     public void Replay() {
@@ -110,8 +109,8 @@ public partial class UIHandler : MonoBehaviour
         uianim.Revived();
     }
 
-    private void BaseUpd() {
-        
+    public void BaseUpd() {
+        levelText.text = "Level " + SaveManager.Instance.level.ToString();
         string coint = SaveManager.Instance.coins.ToString();
         frontCoinText.text = coint;
         backCoinText.text = coint;

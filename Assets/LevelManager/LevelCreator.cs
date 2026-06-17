@@ -8,10 +8,10 @@ using Application = UnityEngine.Application;
 
 public class LevelCreator : MonoBehaviour
 {
-    public AdminUIHandler ui;
-    public BottleGen bottleGen;
-    public LevelTranslator translator;
-    public GameManager gameManager;
+    [SerializeField] private AdminUIHandler adminui;
+    [SerializeField] private UIHandler ui;
+    [SerializeField] private BottleGen bottleGen;
+    [SerializeField] private LevelTranslator translator;
 
     private LevelData levelData;
     private Dictionary<int, LiquidColor> colorTranslate;
@@ -38,12 +38,12 @@ public class LevelCreator : MonoBehaviour
         int addBottle;
 
         if (!layout) {
-            if (!int.TryParse(ui.levelInput.text, out result)) return;
-            if (!int.TryParse(ui.coinInput.text, out reward)) reward = 0;
+            if (!int.TryParse(adminui.levelInput.text, out result)) return;
+            if (!int.TryParse(adminui.coinInput.text, out reward)) reward = 0;
             
-            if (!int.TryParse(ui.shuffleInput.text, out shuffle)) shuffle = 0;
-            if (!int.TryParse(ui.undoInput.text, out undo)) undo = 0;
-            if (!int.TryParse(ui.addBottleInput.text, out addBottle)) addBottle = 0;
+            if (!int.TryParse(adminui.shuffleInput.text, out shuffle)) shuffle = 0;
+            if (!int.TryParse(adminui.undoInput.text, out undo)) undo = 0;
+            if (!int.TryParse(adminui.addBottleInput.text, out addBottle)) addBottle = 0;
         } else {
             result = SaveManager.Instance.level;
             reward = SaveManager.Instance.coinsReward;
@@ -96,20 +96,19 @@ public class LevelCreator : MonoBehaviour
 
 
     public void LoadLevel(bool randomize = false, bool next = false, bool launch = false) {
-        if (ui.admin) {
-            SaveManager.Instance.level = int.TryParse(ui.levelInput.text, out int result) ? result : 0;
+        if (adminui.admin) {
+            SaveManager.Instance.level = int.TryParse(adminui.levelInput.text, out int result) ? result : 0;
         } else {
             SaveManager.Instance.level = next ? SaveManager.Instance.level+=1 : SaveManager.Instance.level;
         }
 
         string json;
 
-        if (!launch) {
+        if (File.Exists(personalPath + "layout") && launch) {
+            json = File.ReadAllText(personalPath + "layout");
+        } else {
             if (!File.Exists(levelPath + SaveManager.Instance.level.ToString("D2"))) return;
             json = File.ReadAllText(levelPath + SaveManager.Instance.level.ToString("D2"));
-        } else {
-            if (!File.Exists(personalPath + "layout")) return;
-            json = File.ReadAllText(personalPath + "layout");
         }
 
         LevelData data = JsonUtility.FromJson<LevelData>(json);
@@ -154,17 +153,16 @@ public class LevelCreator : MonoBehaviour
             }
 
         }
-        PlayerPrefs.Save();
         Debug.Log("Level Loaded");
-        ui.SetLevelnReward();
+        adminui.SetLevelnReward();
+        ui.BaseUpd();
     }
-
-    
 
     private LiquidColor ColorDebug(int color) {
         if (colorTranslate.TryGetValue(color, out LiquidColor result)) {
             return result;
         } else {
+            Debug.Log(color);
             throw new Exception("Critical Error for Color Decode");
         }
     }
