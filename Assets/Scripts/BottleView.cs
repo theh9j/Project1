@@ -6,10 +6,11 @@ public class BottleView : MonoBehaviour
 {
     [SerializeField]
     private LiquidSlotView[] liquidSlots;
-
-    private readonly ColorTranslator colorTranslator = new ColorTranslator();
+    [SerializeField] private AnimationHandler anim;
+    [SerializeField] private LiquidColorVisualData colorTranslator;
 
     public void Refresh(List<LiquidUnit> liquidUnits) {
+        float fillAmount = 0.25f;
         for (int i = 0; i < liquidSlots.Length; i++) {
             if (i >= liquidUnits.Count) {
                 liquidSlots[i].Clear();
@@ -34,5 +35,7 @@ public class BottleView : MonoBehaviour
                 i
             );
         }
+        Color a = Color.red;
+        anim.SetPourLiquid(a, fillAmount * liquidUnits.Count);
     }
 }

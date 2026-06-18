@@ -3,7 +3,7 @@ using UnityEngine.Rendering;
 using DG.Tweening;
 using System.Collections;
 
-public class AnimationHandler : MonoBehaviour {
+public partial class AnimationHandler : MonoBehaviour {
     [Header("References")]
     [SerializeField] private Transform bottleCap;
     [SerializeField] private Transform cover;
@@ -11,13 +11,14 @@ public class AnimationHandler : MonoBehaviour {
     [SerializeField] private Transform spill;
     [SerializeField] private Bottle currentBottle;
     [SerializeField] private LiquidColorVisualData colorTranslate;
+    [SerializeField] private Material material;
 
     [Header("Pour Settings")]
     public float pourCornerOffset = 3.1f;
     public float pourHeiOffset = 4f;
     public float pourDuration = 0.35f;
     public float pourAngle = 7.5f;
-    public float pourDefaultAngle = 80f;
+    public float pourDefaultAngle = 69f;
     public float spillLenOffset = 2f;
     public float spillOffset = 1f;
 
@@ -28,7 +29,7 @@ public class AnimationHandler : MonoBehaviour {
     private SortingGroup sortingGroup;
 
     public bool IsBusy { get; private set; }
-
+    
 
     void Start() {
 
@@ -136,23 +137,27 @@ public class AnimationHandler : MonoBehaviour {
         float angle;
         angle = (currentBottle.changes * pourAngle) + pourDefaultAngle;
 
-
+        
         if (originalPos.x > nextBottle.transform.position.x) {
             targetPos.x += pourCornerOffset;
+            SetDirection(true);
         } else if (originalPos.x < nextBottle.transform.position.x) {
             targetPos.x -= pourCornerOffset;
+            SetDirection(false);
             angle = -angle;
         } else {
             if (originalPos.x >= 0) {
                 targetPos.x -= pourCornerOffset;
+                SetDirection(false);
                 angle = -angle;
             } else {
                 targetPos.x += pourCornerOffset;
+                SetDirection(true);
             }
         }
 
         Sequence sequence = DOTween.Sequence();
-
+        
         sequence.Append(
             visual.DOMove(targetPos, pourDuration)
                 .SetEase(Ease.OutQuad)
@@ -165,8 +170,8 @@ public class AnimationHandler : MonoBehaviour {
                 .SetEase(Ease.OutQuad)
                 .OnComplete(() => {
                     Spill(nextBottle, angle);
-                }
-        ));
+                })
+                );
         sequence.AppendInterval(pourDuration * currentBottle.changes).SetLink(gameObject);
 
         sequence.AppendCallback(() => {

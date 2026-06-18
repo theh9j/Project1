@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
         });
 
         
-        OnGameStart(false, false, true);
+        //OnGameStart(false, false, true);
     }
 
     private bool OnCompletion() {
@@ -175,7 +175,7 @@ public class GameManager : MonoBehaviour
         }
         move = from.Pour(to);
         if (move != null) {
-            record.Push(move);
+            //record.Push(move);
             from.anim.Play(2, to);
             from = null;
         } else {
