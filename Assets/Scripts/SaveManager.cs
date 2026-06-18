@@ -7,6 +7,7 @@ public class SaveManager : MonoBehaviour
 
     public int coinSetForAdmin = 9000;
     public int startLevel = 0;
+    public bool save = false;
 
     [HideInInspector] public int coins;
     [HideInInspector] public int level;
@@ -38,7 +39,7 @@ public class SaveManager : MonoBehaviour
     }
 
     public void LoadData() {
-        PlayerPrefs.DeleteKey("FirstLaunch"); //For debug
+        if (!save) PlayerPrefs.DeleteKey("FirstLaunch");
 
 
         if (!PlayerPrefs.HasKey("FirstLaunch")) { FirstTime(); return; }
@@ -77,6 +78,8 @@ public class SaveManager : MonoBehaviour
     }
 
     public void SaveData() {
+
+        levelSave.CheckForSafeSave();
         PlayerPrefs.SetInt("Coins", coins);
         PlayerPrefs.SetInt("Level", level);
         PlayerPrefs.SetInt("CoinsReward", coinsReward);
@@ -91,7 +94,7 @@ public class SaveManager : MonoBehaviour
         PlayerPrefs.SetInt("FirstLaunch", 1);
 
         PlayerPrefs.Save();
-        levelSave.DataProcess(true);
+        
     }
 
     void OnApplicationQuit() {

@@ -33,9 +33,6 @@ public partial class UIHandler : MonoBehaviour
     [SerializeField] private GameObject underlay;
 
     private Color textColor;
-
-    
-
     void Start() {
         BaseUpd();
         levelText.text = "Level " + SaveManager.Instance.level.ToString();

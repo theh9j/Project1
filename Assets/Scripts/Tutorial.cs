@@ -46,6 +46,16 @@ public class Tutorial : MonoBehaviour
     private List<Bottle> bottles = new();
     private Image arrowImg;
     private float arrowOffset;
+    private Tween current = null;
+    private int next;
+
+    //Level indentification
+    private Coroutine level0;
+    private Coroutine level1;
+    private Coroutine level5;
+    private Coroutine level10;
+    private Coroutine level20;
+
 
     void Awake() {
         arrowImg = arrow.GetComponent<Image>();
@@ -53,12 +63,30 @@ public class Tutorial : MonoBehaviour
         arrowOffset = (Camera.main.orthographicSize * 2f) * arrowOffsetPerc;
 
         tutorialMap = new() {
-            { 0, () => {StartCoroutine(Level0()); } }, //Introduction
-            { 1, () => {StartCoroutine(Level1()); } }, //Coin introduction/tracking
-            { 5, () => {StartCoroutine(Level5()); } }, //Boosters introduction
+            { 0, () => {
+                if (level0 != null) { StopCoroutine(level0); level0 = null; }
+                level0 = StartCoroutine(Level0()); 
+            }}, //Introduction
 
-            { 10, () => { StartCoroutine(Level10()); } }, //Mystery colors
-            { 20, () => { StartCoroutine(Level20()); } } //Cover introduction
+            { 1, () => {
+                if (level1 != null) { StopCoroutine(level1); level1 = null; } 
+                level1 = StartCoroutine(Level1()); 
+            }},//Coin introduction/tracking
+
+            { 5, () => {
+                if (level5 != null) { StopCoroutine(level5); level5 = null; }
+                level5 = StartCoroutine(Level5()); 
+            }}, //Boosters introduction
+
+            { 10, () => { 
+                if (level10 != null) { StopCoroutine(level10); level10 = null; }
+                level10 = StartCoroutine(Level10()); 
+            }}, //Mystery colors
+
+            { 20, () => {
+                if (level20 != null) { StopCoroutine(level20); level20 = null; }
+                level20 = StartCoroutine(Level20()); 
+            }} //Cover introduction
         };
     }
 
@@ -71,12 +99,23 @@ public class Tutorial : MonoBehaviour
     public void CheckForTutorial(bool tutorial) {
         if (!tutorial) return;
         if (tutorialMap.TryGetValue(SaveManager.Instance.level, out Action method)) {
+            Tutorialize(false);
             input.ToggleTutorialMode();
             method?.Invoke();
         }
     }
 
     private void Tutorialize(bool set) {
+        if (!set) {
+            current?.Kill();
+            current = null;
+            arrow.DOMove(
+                guide.transform.position,
+                0
+                );
+            arrowImg.DOFade(0, 0);
+        }
+        
         tutorial.gameObject.SetActive(set);
     }
 
@@ -147,10 +186,10 @@ public class Tutorial : MonoBehaviour
                 )
             );
 
-        if ( undoInput ) 
-            seq.OnComplete(() => {
-                input.CancelMode();
-            });
+        if ( undoInput ) {
+            input.CancelMode();
+        }
+            
 
         return seq;
     }
@@ -170,14 +209,23 @@ public class Tutorial : MonoBehaviour
         }
     }
 
-    private IEnumerator Level0() {
+    private IEnumerator WaitForEvent() {
+        yield return new WaitUntil(() => next > 0);
+        next = 0;
+        input.ToggleTutorialMode();
+    }
 
+    private IEnumerator Level0() {
         levelDisplay.SetActive(false);
         coinDisplay.SetActive(false);
         boosterDisplay.SetActive(false);
+        current = null;
         firstEver = true;
-        mana.nextStep.AddListener(() => {
+        next = 0;
+        mana.nextStep?.RemoveAllListeners();
 
+        mana.nextStep.AddListener(() => {
+            next++;
         });
 
 
@@ -195,7 +243,6 @@ public class Tutorial : MonoBehaviour
 
         Vector2 point1Pos = ArrowOffsetCalc(firstBottleCoord, arrowOffset, true);
         Vector2 point2Pos = ArrowOffsetCalc(secondBottleCoord, arrowOffset, true);
-        Tween current = null;
         float arrowRot1 = ArrowRotation(point1Pos, firstBottleCoord);
         float arrowRot2 = ArrowRotation(point2Pos, secondBottleCoord);
         arrow.DORotate(new Vector3(0, 0, arrowRot1), 0);
@@ -213,17 +260,16 @@ public class Tutorial : MonoBehaviour
             current = ArrowBounce();
         });
 
-
         yield return StartCoroutine(WaitForInput(lang.aa));
+        yield return WaitForEvent();
         yield return StartCoroutine(WaitForInput(lang.ab));
-        
-        ArrowNewPosition(point2Pos, arrowRot2)
+
+        ArrowNewPosition(point2Pos, arrowRot2, undoInput: true)
             .OnStart(() => { current?.Kill(); })
             .OnComplete(() => { current = ArrowBounce(); });
-        
 
         yield return StartCoroutine(WaitForInput(lang.ac));
-        input.ToggleTutorialMode();
+        yield return WaitForEvent();
         yield return StartCoroutine(WaitForInput(lang.ad));
 
         current.Kill();
@@ -231,10 +277,11 @@ public class Tutorial : MonoBehaviour
     }
 
     private IEnumerator Level1() {
-
+        levelDisplay.SetActive(false);
+        coinDisplay.SetActive(false);
+        boosterDisplay.SetActive(false);
         Vector2 finalPos = ArrowOffsetCalc(levelDisplay.transform.position, arrowOffset * .5f, false);
         float angle = ArrowRotation(finalPos, levelDisplay.transform.position);
-        Tween current = null;
         arrow.DORotate(new Vector3(0, 0, angle), 0);
 
         Tutorialize(true);
@@ -273,6 +320,7 @@ public class Tutorial : MonoBehaviour
     }
 
     private IEnumerator Level5() {
+        boosterDisplay.SetActive(false);
         coinDisplay.SetActive(true);
         Vector2 shuff = ArrowOffsetCalc(shuffleDis.position, arrowOffset, false);
         float shuffAngle = ArrowRotation(shuff, shuffleDis.position);
@@ -282,8 +330,6 @@ public class Tutorial : MonoBehaviour
 
         Vector2 addB = ArrowOffsetCalc(addDis.position, arrowOffset, false);
         float addBAngle = ArrowRotation(addB, addDis.position);
-
-        Tween current = null;
         arrow.DORotate(new Vector3(0, 0, shuffAngle), 0);
         Tutorialize(true);
 
@@ -328,7 +374,6 @@ public class Tutorial : MonoBehaviour
     }
 
     private IEnumerator Level10() {
-        Tutorialize(true);
         guide.DOMove(
             new Vector2(centre.x, centre.y * .6f),
             .4f
@@ -342,9 +387,6 @@ public class Tutorial : MonoBehaviour
     }
 
     private IEnumerator Level20() {
-
-
-        Tutorialize(true);
         guide.DOMove(
             new Vector2(centre.x, centre.y * .6f),
             .4f

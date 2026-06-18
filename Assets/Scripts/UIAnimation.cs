@@ -21,6 +21,7 @@ public class UIAnimation : MonoBehaviour
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] public Transform options;
     [SerializeField] private Transform gameOverText;
+    [SerializeField] private InputHandler input;
 
     public float goTextEndPoint = 1.9f;
     public float optionEndPoint = .4f;
@@ -53,15 +54,33 @@ public class UIAnimation : MonoBehaviour
     }
 
     public Sequence OpenGamePauseBG(float wait) {
+        Image img = gamePause.GetComponent<Image>();
+
+        img.DOKill();
         gamePause.SetActive(true);
+
+        return DOTween.Sequence()
+            .AppendInterval(wait).OnStart(() => { input.GamePause(); })
+            .Append(
+                img.DOFade(.97f, .35f)
+            );
+    }
+
+    public Sequence GameContinue(float wait) {
+        Image img = gamePause.GetComponent<Image>();
+
+        img.DOKill();
 
         return DOTween.Sequence()
             .AppendInterval(wait)
             .Append(
-            gamePause.GetComponent<Image>().DOFade(
-                .97f,
-                .35f
-                ));
+                img.DOFade(0f, .5f)
+            )
+            .OnComplete(() => {
+                gameOverPanel.SetActive(false);
+                gamePause.SetActive(false);
+                input.UndoModes();
+            });
     }
 
     public void GameEnd(int level, int amount = 0) {
@@ -148,17 +167,6 @@ public class UIAnimation : MonoBehaviour
         GameContinue(.5f);
     }
 
-    public void GameContinue(float wait) {
-        DOTween.Sequence()
-            .AppendInterval(wait)
-            .Append(
-                gamePause.GetComponent<Image>().DOFade(0, .5f)
-            )
-            .OnComplete(() => {
-                gameOverPanel.SetActive(false);
-                gamePause.SetActive(false);
-            });
-    }
 
     public void DisplayCost(GameObject cost, GameObject notif, bool undo) { 
         if (undo) {

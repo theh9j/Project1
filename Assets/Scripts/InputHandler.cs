@@ -13,6 +13,7 @@ public class InputHandler : MonoBehaviour
     public UIHandler ui;
     public LevelDesigner levelDesigner;
     private InputMode inputMode = InputMode.Normal;
+    private InputMode previousInput = InputMode.Invalid;
 
     private Bottle prev;
     void Update()
@@ -39,36 +40,33 @@ public class InputHandler : MonoBehaviour
 
     public IEnumerator WaitForAction() {
         yield return new WaitUntil(() =>
-            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) ||
-            (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+            ((Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) ||
+            (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame))
         );
     }
 
     public IEnumerator WaitForRelease() {
         yield return new WaitUntil(() => 
-            (Mouse.current != null && Mouse.current.leftButton.wasReleasedThisFrame) ||
-            (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasReleasedThisFrame)
+            ((Mouse.current != null && Mouse.current.leftButton.wasReleasedThisFrame) ||
+            (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasReleasedThisFrame))
         );
     }
 
     public bool CheckForInput() {
         if ((Mouse.current != null && Mouse.current.leftButton.isPressed) ||
-            (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)) { Debug.Log("Tapped"); return true; }
+            (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)) { return true; }
         return false;
     }
 
-    public void ToggleTutorialMode() {
-        inputMode = InputMode.Tutorial;
+    private void ToggleModes(InputMode preferInput) {
+        previousInput = inputMode;
+        inputMode = preferInput;
     }
 
-    public void ToggleShuffleMode() {
-        inputMode = inputMode == InputMode.Shuffle
-            ? InputMode.Normal
-            : InputMode.Shuffle;
-    }
-
-    public void CancelMode() {
-        inputMode = InputMode.Normal;
+    public void UndoModes() {
+        if (previousInput == InputMode.Invalid || previousInput == InputMode.Paused) return;
+        inputMode = previousInput;
+        previousInput = InputMode.Invalid;
     }
 
     private void onMouseDown() {
@@ -76,10 +74,16 @@ public class InputHandler : MonoBehaviour
         Vector2 worldPos = mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
 
-        if (hit.collider == null) { CancelMode(); return; }
+        if (hit.collider == null) {
+            if (inputMode == InputMode.Shuffle) CancelMode();
+            return; 
+        }
 
         Bottle bottle = hit.collider.GetComponent<Bottle>();
-        if (bottle == null) { CancelMode(); return; }
+        if (bottle == null) {
+            if (inputMode == InputMode.Shuffle) CancelMode();
+            return; 
+        }
 
 
         if (adui.admin) {
@@ -113,10 +117,28 @@ public class InputHandler : MonoBehaviour
         }
         gameManager.TryPour(bottle);
     }
+    public void ToggleTutorialMode() {
+        ToggleModes(InputMode.Tutorial);
+    }
+
+    public void ToggleShuffleMode() {
+        if (inputMode == InputMode.Shuffle) UndoModes();
+        else ToggleModes(InputMode.Shuffle);
+    }
+
+    public void CancelMode() {
+        ToggleModes(InputMode.Normal);
+    }
+
+    public void GamePause() {
+        ToggleModes(InputMode.Paused);
+    }
 }
 
 public enum InputMode {
+    Invalid,
     Normal,
     Shuffle,
+    Paused,
     Tutorial
 }

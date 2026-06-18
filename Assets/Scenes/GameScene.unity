@@ -2249,7 +2249,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4945,8 +4945,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -3}
-  m_SizeDelta: {x: 206, y: 206}
+  m_AnchoredPosition: {x: 0, y: -1}
+  m_SizeDelta: {x: 170, y: 170}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &455243417
 MonoBehaviour:
@@ -6731,7 +6731,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.39215687, g: 0.39215687, b: 0.39215687, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -8367,6 +8367,7 @@ MonoBehaviour:
   optionEndPoint: 0.4
   gameWinPanel: {fileID: 1787474031}
   levelIndex: {fileID: 1957947174}
+  continueButton: {fileID: 650220857}
   coinWinsText: {fileID: 400696803}
   shuffleReTexts:
   - {fileID: 1440927202}
@@ -8396,7 +8397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 320156d174fb1ee4a9698e8e7c2a17d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  arrowOffsetPerc: 7
+  arrowOffsetPerc: 8
   tutorial: {fileID: 555948794}
   guide: {fileID: 1676665878}
   guideT: {fileID: 1687402896}
@@ -8409,6 +8410,8 @@ MonoBehaviour:
   addDis: {fileID: 1706901469}
   input: {fileID: 937750832}
   bottleGen: {fileID: 189255339}
+  mana: {fileID: 847021335}
+  firstEver: 0
 --- !u!114 &774628086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9251,6 +9254,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   gameOver:
+    m_PersistentCalls:
+      m_Calls: []
+  nextStep:
     m_PersistentCalls:
       m_Calls: []
   currentLevel: 0
@@ -21392,7 +21398,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 160, y: 160}
+  m_SizeDelta: {x: 130, y: 130}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1903879925
 MonoBehaviour:
@@ -23906,7 +23912,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   levelSave: {fileID: 107534851}
   coinSetForAdmin: 9000
-  startLevel: 1
+  startLevel: 0
   coins: 0
   level: 0
   coinsReward: 0

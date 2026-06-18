@@ -186,11 +186,8 @@ public class GameManager : MonoBehaviour
 
 
     private bool TutorialTryPour(Bottle to) {
-        Debug.Log("Reply");
         List<Bottle> bottles = bottleGen.DictionaryToSingularBottleConverter();
-        if (to != bottles[0] || to != bottles[2]) return false;
         if (from == null && to == bottles[0]) {
-            Debug.Log("Hello");
             from = to;
             from.anim.SelectedHover(true);
             to.isOccupied = false;

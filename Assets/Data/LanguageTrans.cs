@@ -10,7 +10,7 @@ public class LanguageTrans
     public string aa = "To start playing, you can tap on this bottle here to select it";
     public string ab = "Once you've selected a bottle, you can continue by pouring it to the next bottle";
     public string ac = "NOTE: You can only pour into a bottle that shares the same liquid color at the top!";
-    public string ad = "Let's try it yourself!";
+    public string ad = "Lets try finish this level yourself!";
 
     //Level 1
     public string ba = "Wow, you're pretty amazing yourself, keep on cooking";

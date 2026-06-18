@@ -48,10 +48,11 @@ public class Settings : MonoBehaviour
     }
 
     private void Open() {
+        seq?.Kill();
         seq = DOTween.Sequence();
         List<Transform> buttons = new() { audioButton.transform, musicButton.transform, replayButton.transform };
 
-        seq.AppendCallback(() => { anim.OpenGamePauseBG(.2f); });
+        seq.Append(anim.OpenGamePauseBG(.2f));
 
         for (int i = 0; i < buttons.Count; i++) {
             int index = i;
@@ -64,11 +65,9 @@ public class Settings : MonoBehaviour
                 .OnStart(() => {
                     buttons[index].gameObject.SetActive(true);
                 })
-                .SetEase(Ease.OutBack, 3f)
-                );
+                .SetEase(Ease.OutBack, 3f));
 
         }
-        seq.AppendInterval(.5f);
         seq.OnComplete(() => {
             settingBusy = false;
             settingActive = true;
@@ -76,6 +75,7 @@ public class Settings : MonoBehaviour
     }
 
     private void Close() {
+        seq?.Kill();
         seq = DOTween.Sequence();
         List<Transform> buttons = new() { audioButton.transform, musicButton.transform, replayButton.transform };
 
@@ -90,8 +90,8 @@ public class Settings : MonoBehaviour
                 })
                 .SetEase(Ease.InBack, 3f));
         }
-        seq.AppendCallback(() => { anim.GameContinue(.2f); });
-        seq.AppendInterval(.5f);
+
+        seq.Append(anim.GameContinue(.2f));
         seq.OnComplete(() => {
             settingBusy = false;
             settingActive = false;
