@@ -10,20 +10,36 @@ public partial class AnimationHandler : MonoBehaviour {
     [SerializeField] private Transform spill;
     [SerializeField] private Bottle currentBottle;
     [SerializeField] private LiquidColorVisualData colorTranslate;
-    [SerializeField] private SpriteRenderer sprite;
-    private Material material;
+
+    [Header("Liquid Shader")]
+    [SerializeField] private Transform liquidRoot;
+    [SerializeField] private SpriteRenderer liquidRenderer;
 
     [Header("Pour Settings")]
+    [SerializeField] private float pourStartAngle = 65f;
+    [SerializeField] private float pourEndAngle = 95f;
     public float pourCornerOffset = 3.1f;
     public float pourHeiOffset = 4f;
     public float pourDuration = 0.35f;
     public float pourAngle = 7.5f;
-    public float pourDefaultAngle = 69f;
-    public float spillLenOffset = 2f;
-    public float spillOffset = 1f;
+    public float pourDefaultAngle = 60f;
+    public float spillLenOffset = 1.25f;
+    public float spillOffset = 3f;
+
+    [Header("Liquid Width Scaling")]
+    [SerializeField] private float liquidWidthSpeed = 12f;
+    [SerializeField] private float bottleInnerWidth = 2f;
+    [SerializeField] private float bottleInnerHeight = 8f;
+    [SerializeField] private float widthPadding = 1.1f;
+
+    private Material material;
 
     private Vector3 originalPos;
     private Quaternion originalRotation;
+
+    private Vector3 liquidBaseScale;
+    private float baseProjectedWidth;
+    private float currentWidthMultiplier = 1f;
 
     private SortingGroup sortingGroup;
     private int originalSortingOrder;
@@ -32,9 +48,6 @@ public partial class AnimationHandler : MonoBehaviour {
     public bool IsBusy { get; private set; }
 
     private void Start() {
-        material = new Material(sprite.sharedMaterial);
-        sprite.material = material;
-
         originalPos = visual.position;
         originalRotation = visual.rotation;
 
@@ -43,23 +56,56 @@ public partial class AnimationHandler : MonoBehaviour {
         if (sortingGroup != null)
             originalSortingOrder = sortingGroup.sortingOrder;
 
+        if (liquidRenderer != null) {
+            material = new Material(liquidRenderer.sharedMaterial);
+            liquidRenderer.material = material;
+        }
+
+        if (liquidRoot != null) {
+            liquidBaseScale = liquidRoot.localScale;
+            baseProjectedWidth = bottleInnerWidth;
+        }
     }
 
     private void Update() {
-        if (material == null || visual == null) return;
+        UpdateLiquidUprightScale();
+    }
+
+    private void UpdateLiquidUprightScale() {
+        if (liquidRoot == null || visual == null)
+            return;
 
         float angle = visual.eulerAngles.z;
 
         if (angle > 180f)
             angle -= 360f;
 
-        float tilt = Mathf.Clamp01(Mathf.Abs(angle) / 90f);
+        float rad = angle * Mathf.Deg2Rad;
 
-        material.SetFloat("_TiltAmount", tilt);
-        UpdateLiquidSurface();
+        float projectedWidth =
+            Mathf.Abs(Mathf.Cos(rad)) * bottleInnerWidth +
+            Mathf.Abs(Mathf.Sin(rad)) * bottleInnerHeight;
+
+        float targetMultiplier =
+            projectedWidth / baseProjectedWidth * widthPadding;
+
+        currentWidthMultiplier = Mathf.Lerp(
+            currentWidthMultiplier,
+            targetMultiplier,
+            Time.deltaTime * liquidWidthSpeed
+        );
+
+        // Keep liquid upright in world space.
+        liquidRoot.rotation = Quaternion.identity;
+
+        liquidRoot.localScale = new Vector3(
+            liquidBaseScale.x * currentWidthMultiplier,
+            liquidBaseScale.y,
+            liquidBaseScale.z
+        );
     }
 
-    public void SetPourLiquid(Color[] colors, float fillAmount, int liquidCount) {
+    public void SetPourLiquid(Color[] colors, float fillAmount) {
         if (material == null) return;
 
         material.SetColor("_Color0", colors.Length > 0 ? colors[0] : Color.clear);
@@ -68,33 +114,36 @@ public partial class AnimationHandler : MonoBehaviour {
         material.SetColor("_Color3", colors.Length > 3 ? colors[3] : Color.clear);
 
         material.SetFloat("_FillAmount", Mathf.Clamp01(fillAmount));
-        material.SetFloat("_TiltAmount", 0f);
-
-        bool hasLiquid = liquidCount > 0;
-        Color topColor = hasLiquid ? colors[liquidCount - 1] : Color.clear;
-
-        SetLiquidSurface(topColor, fillAmount, hasLiquid);
     }
 
-    public void SetPourLiquidColors(Color[] colors, int liquidCount) {
+    public void SetPourLiquidColors(Color[] colors) {
         if (material == null) return;
 
         material.SetColor("_Color0", colors.Length > 0 ? colors[0] : Color.clear);
         material.SetColor("_Color1", colors.Length > 1 ? colors[1] : Color.clear);
         material.SetColor("_Color2", colors.Length > 2 ? colors[2] : Color.clear);
         material.SetColor("_Color3", colors.Length > 3 ? colors[3] : Color.clear);
-
-        bool hasLiquid = liquidCount > 0;
-        Color topColor = hasLiquid ? colors[liquidCount - 1] : Color.clear;
-
-        SetLiquidSurface(topColor, material.GetFloat("_FillAmount"), hasLiquid);
     }
 
-    private void SetDirection(bool dir) {
-        if (material == null) return;
+    public Tween TweenFillAmount(float targetFill, float duration, float? forceStart = null) {
+        if (material == null) return null;
 
-        // true = left -> right, false = right -> left
-        material.SetFloat("_Direction", dir ? 1f : -1f);
+        float currentFill = forceStart ?? material.GetFloat("_FillAmount");
+
+        if (forceStart.HasValue)
+            material.SetFloat("_FillAmount", currentFill);
+
+        return DOTween.To(
+            () => currentFill,
+            x => {
+                currentFill = x;
+                material.SetFloat("_FillAmount", x);
+            },
+            targetFill,
+            duration
+        )
+        .SetEase(Ease.Linear)
+        .SetLink(gameObject);
     }
 
     public void SelectedHover(bool hover) {
@@ -130,6 +179,124 @@ public partial class AnimationHandler : MonoBehaviour {
         .SetLink(gameObject)
         .OnComplete(() => {
             visual.localRotation = Quaternion.identity;
+        });
+    }
+
+    private void PlayPour(Bottle nextBottle) {
+        if (nextBottle == null || visual == null) return;
+
+        IsBusy = true;
+        BringToFront();
+        visual.DOKill();
+
+        int movedAmount = Mathf.Abs(currentBottle.changes);
+        float fillDuration = pourDuration * movedAmount;
+
+        BottleView fromView = currentBottle.GetComponent<BottleView>();
+        BottleView toView = nextBottle.GetComponent<BottleView>();
+
+        int toStartCount = nextBottle.liquidUnits.Count - movedAmount;
+        int toEndCount = nextBottle.liquidUnits.Count;
+
+        float fromEndFill =
+            fromView.GetVisualFillAmount(currentBottle.liquidUnits.Count);
+
+        float toStartFill = toStartCount <= 0
+            ? toView.GetPourInStartFill(toStartCount)
+            : toView.GetVisualFillAmount(toStartCount);
+
+        float toEndFill =
+            toView.GetVisualFillAmount(toEndCount);
+
+        Vector3 targetPos = nextBottle.transform.position;
+        targetPos.y += pourHeiOffset + currentBottle.changes * 0.1f;
+
+        float startAngle = pourStartAngle;
+        float endAngle = pourEndAngle;
+
+        if (originalPos.x > nextBottle.transform.position.x) {
+            targetPos.x += pourCornerOffset;
+        } else if (originalPos.x < nextBottle.transform.position.x) {
+            targetPos.x -= pourCornerOffset;
+            startAngle = -startAngle;
+            endAngle = -endAngle;
+        } else {
+            if (originalPos.x >= 0) {
+                targetPos.x -= pourCornerOffset;
+                startAngle = -startAngle;
+                endAngle = -endAngle;
+            } else {
+                targetPos.x += pourCornerOffset;
+            }
+        }
+
+        Sequence sequence = DOTween.Sequence();
+
+        sequence.Append(
+            visual.DOMove(targetPos, pourDuration)
+                .SetEase(Ease.OutQuad)
+        );
+
+        sequence.Join(
+            visual.DORotate(
+                new Vector3(0f, 0f, startAngle),
+                pourDuration
+            )
+            .SetEase(Ease.OutQuad)
+        );
+
+        sequence.AppendCallback(() =>
+        {
+            toView.RefreshColorsOnly(nextBottle.liquidUnits);
+
+            Spill(nextBottle, startAngle);
+
+            currentBottle.anim.TweenFillAmount(
+                fromEndFill,
+                fillDuration
+            );
+
+            nextBottle.anim.TweenFillAmount(
+                toEndFill,
+                fillDuration,
+                toStartFill
+            );
+        });
+
+        sequence.Append(
+            visual.DORotate(
+                new Vector3(0f, 0f, endAngle),
+                fillDuration
+            )
+            .SetEase(Ease.Linear)
+        );
+
+        sequence.AppendCallback(() =>
+        {
+            currentBottle.RefreshView();
+            nextBottle.RefreshView();
+
+            currentBottle.BottleSatisfy(nextBottle);
+        });
+
+        sequence.AppendInterval(0.15f);
+
+        sequence.Append(
+            visual.DOMove(originalPos, pourDuration)
+                .SetEase(Ease.OutQuad)
+        );
+
+        sequence.Join(
+            visual.DORotateQuaternion(originalRotation, pourDuration)
+                .SetEase(Ease.OutQuad)
+        );
+
+        sequence.SetLink(gameObject);
+
+        sequence.OnComplete(() =>
+        {
+            RestoreSorting();
+            IsBusy = false;
         });
     }
 
@@ -194,114 +361,6 @@ public partial class AnimationHandler : MonoBehaviour {
 
             spillParent.position = originalSpillParentPos;
             spillParent.gameObject.SetActive(false);
-        });
-    }
-
-    private void PlayPour(Bottle nextBottle) {
-        if (nextBottle == null || visual == null) return;
-
-        IsBusy = true;
-        BringToFront();
-        visual.DOKill();
-
-        int movedAmount = Mathf.Abs(currentBottle.changes);
-        float fillDuration = pourDuration * movedAmount;
-
-        BottleView fromView = currentBottle.GetComponent<BottleView>();
-        BottleView toView = nextBottle.GetComponent<BottleView>();
-
-        float fromEndFill = fromView.GetVisualFillAmount(currentBottle.liquidUnits.Count);
-
-        int toStartCount = nextBottle.liquidUnits.Count - movedAmount;
-        int toEndCount = nextBottle.liquidUnits.Count;
-
-        float toStartFill = toStartCount <= 0
-            ? toView.GetPourInStartFill(toStartCount)
-            : toView.GetVisualFillAmount(toStartCount);
-
-        float toEndFill = toView.GetVisualFillAmount(toEndCount);
-
-        Vector3 targetPos = nextBottle.transform.position;
-        targetPos.y += pourHeiOffset + currentBottle.changes * 0.1f;
-
-        float angle = currentBottle.changes * pourAngle + pourDefaultAngle;
-
-        if (originalPos.x > nextBottle.transform.position.x) {
-            targetPos.x += pourCornerOffset;
-            SetDirection(true);
-        } else if (originalPos.x < nextBottle.transform.position.x) {
-            targetPos.x -= pourCornerOffset;
-            SetDirection(false);
-            angle = -angle;
-        } else {
-            if (originalPos.x >= 0) {
-                targetPos.x -= pourCornerOffset;
-                SetDirection(false);
-                angle = -angle;
-            } else {
-                targetPos.x += pourCornerOffset;
-                SetDirection(true);
-            }
-        }
-
-        Sequence sequence = DOTween.Sequence();
-
-        sequence.Append(
-            visual.DOMove(targetPos, pourDuration)
-                .SetEase(Ease.OutQuad)
-        );
-
-        sequence.Join(
-            visual.DORotate(new Vector3(0, 0, angle), pourDuration)
-                .SetEase(Ease.OutQuad)
-        );
-
-        sequence.AppendCallback(() =>
-        {
-            toView.RefreshColorsOnly(nextBottle.liquidUnits);
-
-            Spill(nextBottle, angle);
-
-            currentBottle.anim.TweenFillAmount(
-                fromEndFill,
-                fillDuration
-            );
-
-            nextBottle.anim.TweenFillAmount(
-                toStartFill,
-                toEndFill,
-                fillDuration
-            );
-        });
-
-        sequence.AppendInterval(fillDuration);
-
-        sequence.AppendCallback(() =>
-        {
-            currentBottle.RefreshView();
-            nextBottle.RefreshView();
-
-            currentBottle.BottleSatisfy(nextBottle);
-        });
-
-        sequence.AppendInterval(0.2f);
-
-        sequence.Append(
-            visual.DOMove(originalPos, pourDuration)
-                .SetEase(Ease.OutQuad)
-        );
-
-        sequence.Join(
-            visual.DORotateQuaternion(originalRotation, pourDuration)
-                .SetEase(Ease.OutQuad)
-        );
-
-        sequence.SetLink(gameObject);
-
-        sequence.OnComplete(() =>
-        {
-            RestoreSorting();
-            IsBusy = false;
         });
     }
 
@@ -459,61 +518,6 @@ public partial class AnimationHandler : MonoBehaviour {
     private void RestoreSorting() {
         if (sortingGroup != null)
             sortingGroup.sortingOrder = originalSortingOrder;
-    }
-
-    public float CurrentFillAmount {
-        get {
-            if (material == null) return 0f;
-            return material.GetFloat("_FillAmount");
-        }
-    }
-
-    public Tween TweenFillAmount(float targetFill, float duration) {
-        float startFill =
-            material.GetFloat("_FillAmount");
-
-        return DOTween.To(
-            () => startFill,
-            x => {
-                startFill = x;
-
-                material.SetFloat(
-                    "_FillAmount",
-                    x
-                );
-
-                UpdateLiquidSurface();
-            },
-            targetFill,
-            duration
-        )
-        .SetEase(Ease.Linear)
-        .SetLink(gameObject);
-    }
-
-    public Tween TweenFillAmount(float startFill, float targetFill, float duration) {
-        material.SetFloat(
-            "_FillAmount",
-            startFill
-        );
-
-        return DOTween.To(
-            () => startFill,
-            x => {
-                startFill = x;
-
-                material.SetFloat(
-                    "_FillAmount",
-                    x
-                );
-
-                UpdateLiquidSurface();
-            },
-            targetFill,
-            duration
-        )
-        .SetEase(Ease.Linear)
-        .SetLink(gameObject);
     }
 
     public void Play(int action, Bottle nextBottle = null, Vector3 newPos = default) {

@@ -2,42 +2,38 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BottleView : MonoBehaviour {
+    [Header("References")]
     [SerializeField] private AnimationHandler anim;
     [SerializeField] private LiquidColorVisualData colorTranslator;
-    [SerializeField] private float bottleBottomFill = 0.55f;
 
+    [Header("Visual Fill Amounts")]
+    [SerializeField]
     private float[] fillAmounts =
     {
-        0f,   // 0 liquid
-        0.6f, // 1 liquid
-        0.65f, // 2 liquids
-        0.7f, // 3 liquids
-        0.75f  // 4 liquids
+        0f,    // 0 liquids
+        0.25f, // 1 liquid
+        0.50f, // 2 liquids
+        0.75f, // 3 liquids
+        1.00f  // 4 liquids
     };
 
-    public float GetPourInStartFill(int liquidCount) {
-        if (liquidCount <= 0)
-            return bottleBottomFill;
+    [Header("Pour Into Empty")]
+    [SerializeField] private float emptyPourStartFill = 0.05f;
 
-        return GetVisualFillAmount(liquidCount);
+    private void Awake() {
+        if (anim == null)
+            anim = GetComponent<AnimationHandler>();
     }
 
+    public void Refresh(List<LiquidUnit> liquidUnits) {
+        RevealMystery(liquidUnits);
 
-    public float GetVisualFillAmount(int liquidCount) {
-        liquidCount = Mathf.Clamp(liquidCount, 0, fillAmounts.Length - 1);
-        return fillAmounts[liquidCount];
-    }
+        Color[] colors = BuildColors(liquidUnits);
 
-    public Color[] BuildColors(List<LiquidUnit> liquidUnits) {
-        Color[] colors = new Color[4];
-
-        for (int i = 0; i < colors.Length; i++) {
-            colors[i] = i < liquidUnits.Count
-                ? colorTranslator.GetColor(liquidUnits[i].colorId)
-                : Color.clear;
-        }
-
-        return colors;
+        anim.SetPourLiquid(
+            colors,
+            GetVisualFillAmount(liquidUnits.Count)
+        );
     }
 
     public void RefreshColorsOnly(List<LiquidUnit> liquidUnits) {
@@ -45,21 +41,40 @@ public class BottleView : MonoBehaviour {
 
         Color[] colors = BuildColors(liquidUnits);
 
-        anim.SetPourLiquidColors(
-            colors,
-            liquidUnits.Count
-        );
+        anim.SetPourLiquidColors(colors);
     }
 
-    public void Refresh(List<LiquidUnit> liquidUnits) {
-        RevealMystery(liquidUnits);
-
-        Color[] colors = BuildColors(liquidUnits);
-        anim.SetPourLiquid(
-            colors,
-            GetVisualFillAmount(liquidUnits.Count),
-            liquidUnits.Count
+    public float GetVisualFillAmount(int liquidCount) {
+        liquidCount = Mathf.Clamp(
+            liquidCount,
+            0,
+            fillAmounts.Length - 1
         );
+
+        return fillAmounts[liquidCount];
+    }
+
+    public float GetPourInStartFill(int liquidCount) {
+        if (liquidCount <= 0)
+            return emptyPourStartFill;
+
+        return GetVisualFillAmount(liquidCount);
+    }
+
+    private Color[] BuildColors(List<LiquidUnit> liquidUnits) {
+        Color[] colors = new Color[4];
+
+        for (int i = 0; i < colors.Length; i++) {
+            if (i < liquidUnits.Count) {
+                colors[i] = colorTranslator.GetColor(
+                    liquidUnits[i].colorId
+                );
+            } else {
+                colors[i] = Color.clear;
+            }
+        }
+
+        return colors;
     }
 
     private void RevealMystery(List<LiquidUnit> liquidUnits) {
@@ -80,11 +95,8 @@ public class BottleView : MonoBehaviour {
             LiquidUnit above =
                 liquidUnits[i + 1];
 
-            if (
-                !above.isMystery &&
-                above.colorId ==
-                liquid.colorId
-            ) {
+            if (!above.isMystery &&
+                above.colorId == liquid.colorId) {
                 liquid.DeMysterize();
             }
         }
