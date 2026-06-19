@@ -6,9 +6,9 @@ public class test : MonoBehaviour
     [SerializeField] Bottle bottle2;
 
     void Start() {
-        bottle1.liquidUnits.Add(new LiquidUnit(LiquidColor.yellow));
-        bottle1.liquidUnits.Add(new LiquidUnit(LiquidColor.yellow));
-        bottle1.liquidUnits.Add(new LiquidUnit(LiquidColor.yellow));
+        bottle2.liquidUnits.Add(new LiquidUnit(LiquidColor.yellow));
+        bottle2.liquidUnits.Add(new LiquidUnit(LiquidColor.red));
+        bottle2.liquidUnits.Add(new LiquidUnit(LiquidColor.green));
 
         bottle1.RefreshView();
         bottle2.RefreshView();

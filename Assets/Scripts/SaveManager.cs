@@ -73,7 +73,7 @@ public class SaveManager : MonoBehaviour
         undo = 5;
 
         //Settings
-        music = true;
+        music = false;
         sfx = true;
     }
 

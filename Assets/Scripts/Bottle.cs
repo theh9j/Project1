@@ -4,57 +4,42 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public class Bottle : MonoBehaviour {
-
-    [SerializeField] private LiquidColorVisualData colorTranslate;
+    [Header("References")]
     public AnimationHandler anim;
-    private BottleView bottleView;
+    [SerializeField] private BottleView bottleView;
+
+    [Header("Liquid Data")]
     public List<LiquidUnit> liquidUnits = new List<LiquidUnit>();
+    public int maxCapacity = 4;
+
+    [Header("Events")]
     public UnityEvent<bool> onBottlePour;
     public UnityEvent<Bottle> aBottleCovered;
 
-
-
+    [Header("Lock Data")]
     public bool isLocked = false;
     public LiquidColor lockColor;
 
-
-    public int maxCapacity = 4;
+    [Header("State")]
     public bool isOccupied = false;
     public int changes;
-    private bool isCompleted = false;
 
+    [SerializeField] private bool isCompleted = false;
+    [SerializeField] private LiquidColorVisualData colorTranslate;
 
-    public void AttemptComplete() {
-        Completion = true;
-        onBottlePour?.Invoke(true);
-        anim.Play(4, null, transform.position + Vector3.up * 2.75f);
+    private void Awake() {
+
+        if (anim == null)
+            anim = GetComponent<AnimationHandler>();
     }
 
-    public void RemoveConditionalLock() {
-        lockColor = LiquidColor.red;
-        isLocked = false;
-        anim.Play(5, null, transform.position + Vector3.up * 10f);
+    private void Start() {
+        RefreshView();
     }
 
-    public void SetLocker(LiquidColor color, bool quick = false) {
-        isLocked = true;
-        lockColor = color;
-        Transform cover = transform.Find("Visual/Cover").transform;
-        cover.gameObject.SetActive(true);
-        if (quick) {
-            anim.AddCoverQ(colorTranslate.GetColor(color));
-        } else {
-            anim.AddCoverS(colorTranslate.GetColor(color));
-        }
-
-        aBottleCovered?.Invoke(this);   
-    }
-
-    public bool Distinction() {
-        int distinctColors = liquidUnits.Select(x => x.colorId)
-            .Distinct() 
-            .Count();
-        return distinctColors > 1;
+    public void RefreshView() {
+        if (bottleView != null)
+            bottleView.Refresh(liquidUnits);
     }
 
     public LiquidUnit GetTopLiquid() {
@@ -62,13 +47,57 @@ public class Bottle : MonoBehaviour {
         return liquidUnits[^1];
     }
 
+    public LiquidColor GetTopColor() {
+        LiquidUnit top = GetTopLiquid();
+        return top != null ? top.colorId : default;
+    }
+
+    public void AttemptComplete() {
+        Completion = true;
+
+        onBottlePour?.Invoke(true);
+
+        if (anim != null)
+            anim.Play(4, null, transform.position + Vector3.up * 2.75f);
+    }
+
+    public void RemoveConditionalLock() {
+        isLocked = false;
+
+        if (anim != null)
+            anim.Play(5, null, transform.position + Vector3.up * 10f);
+    }
+
+    public void SetLocker(LiquidColor color, bool quick = false) {
+        isLocked = true;
+        lockColor = color;
+
+        if (anim != null) {
+            if (quick)
+                anim.AddCoverQ(colorTranslate.GetColor(color));
+            else
+                anim.AddCoverS(colorTranslate.GetColor(color));
+        }
+
+        aBottleCovered?.Invoke(this);
+    }
+
+    public bool Distinction() {
+        return liquidUnits
+            .Select(x => x.colorId)
+            .Distinct()
+            .Count() > 1;
+    }
+
     public PourData Shuffle(List<Bottle> allBottles) {
         if (!Distinction()) return null;
 
-        PourData shuffled = new() { shuffle = this };
+        PourData shuffled = new PourData {
+            shuffle = this
+        };
 
         for (int i = 0; i < liquidUnits.Count; i++) {
-            shuffled.prior.Add(liquidUnits[i]);
+            shuffled.prior.Add(new LiquidUnit(liquidUnits[i]));
         }
 
         List<LiquidUnit> original = liquidUnits
@@ -83,9 +112,10 @@ public class Bottle : MonoBehaviour {
         }
         while (SameOrder(original, liquidUnits) && attempts < 50);
 
-        if (GetTopLiquid().isMystery) {
-            GetTopLiquid().DeMysterize();
-        }
+        LiquidUnit top = GetTopLiquid();
+
+        if (top != null && top.isMystery)
+            top.DeMysterize();
 
         RefreshView();
         onBottlePour?.Invoke(false);
@@ -94,17 +124,27 @@ public class Bottle : MonoBehaviour {
     }
 
     private void SmartSwap(List<LiquidUnit> list, List<Bottle> allBottles) {
-        LiquidColor originalTopColor = GetTopLiquid().colorId;
+        LiquidUnit originalTop = GetTopLiquid();
+        if (originalTop == null) {
+            Swap(list);
+            return;
+        }
 
-        List<LiquidColor> usefulColors = new();
+        LiquidColor originalTopColor = originalTop.colorId;
+
+        List<LiquidColor> usefulColors = new List<LiquidColor>();
 
         foreach (Bottle bottle in allBottles) {
+            if (bottle == null) continue;
             if (bottle == this) continue;
             if (bottle.IsEmpty) continue;
             if (bottle.isLocked) continue;
             if (bottle.Completion) continue;
 
-            LiquidColor otherTopColor = bottle.GetTopLiquid().colorId;
+            LiquidUnit otherTop = bottle.GetTopLiquid();
+            if (otherTop == null) continue;
+
+            LiquidColor otherTopColor = otherTop.colorId;
 
             if (otherTopColor == originalTopColor) continue;
 
@@ -120,7 +160,8 @@ public class Bottle : MonoBehaviour {
 
         if (usefulColors.Count == 0) return;
 
-        LiquidColor chosenColor = usefulColors[Random.Range(0, usefulColors.Count)];
+        LiquidColor chosenColor =
+            usefulColors[Random.Range(0, usefulColors.Count)];
 
         for (int i = 0; i < list.Count; i++) {
             if (list[i].colorId == chosenColor) {
@@ -133,7 +174,6 @@ public class Bottle : MonoBehaviour {
     private void Swap(List<LiquidUnit> list) {
         for (int i = list.Count - 1; i > 0; i--) {
             int random = Random.Range(0, i + 1);
-
             (list[i], list[random]) = (list[random], list[i]);
         }
     }
@@ -147,13 +187,21 @@ public class Bottle : MonoBehaviour {
         }
 
         return true;
-
     }
 
     public LiquidUnit RemoveTopLiquid() {
-        if (Completion) { Completion = false; anim.PlayUnCap(); }
+        if (IsEmpty) return null;
+
+        if (Completion) {
+            Completion = false;
+
+            if (anim != null)
+                anim.PlayUnCap();
+        }
+
         LiquidUnit topLiquid = GetTopLiquid();
         liquidUnits.RemoveAt(liquidUnits.Count - 1);
+
         return topLiquid;
     }
 
@@ -161,83 +209,79 @@ public class Bottle : MonoBehaviour {
         if (nextBottle == null) return false;
 
         if (isLocked || nextBottle.isLocked) return false;
-        if (isCompleted || nextBottle.isCompleted) return false;
+        if (Completion || nextBottle.Completion) return false;
         if (IsEmpty) return false;
         if (nextBottle.IsFull) return false;
-                
+
         LiquidUnit myTop = GetTopLiquid();
         LiquidUnit targetTop = nextBottle.GetTopLiquid();
 
+        if (myTop == null) return false;
         if (targetTop == null) return true;
 
         return myTop.colorId == targetTop.colorId;
     }
 
     public PourData Pour(Bottle nextBottle) {
-        PourData move = null;
-        if (!CanPourTo(nextBottle) || nextBottle.anim.IsBusy) return move;
-        changes = 1;
+        if (!CanPourTo(nextBottle)) return null;
+        if (nextBottle.anim != null && nextBottle.anim.IsBusy) return null;
+
+        changes = 0;
+
         LiquidColor pourColor = GetTopLiquid().colorId;
-        move = new() {
+
+        PourData move = new PourData {
             from = this,
             to = nextBottle
         };
+
         while (true) {
             if (IsEmpty) break;
-
             if (nextBottle.IsFull) break;
-
             if (GetTopLiquid().colorId != pourColor) break;
 
-            LiquidUnit topLiquid = GetTopLiquid();
-            
-            liquidUnits.RemoveAt(liquidUnits.Count - 1);
-            move.movedLiquids.Add(topLiquid);
+            LiquidUnit topLiquid = RemoveTopLiquid();
+
+            if (topLiquid == null) break;
+
+            move.movedLiquids.Add(new LiquidUnit(topLiquid));
             nextBottle.liquidUnits.Add(new LiquidUnit(topLiquid));
 
             changes++;
 
-            if (!IsEmpty) {
-                if (GetTopLiquid().isMystery) {
-                    GetTopLiquid().DeMysterize();
-                }
-            }
+            LiquidUnit newTop = GetTopLiquid();
+
+            if (newTop != null && newTop.isMystery)
+                newTop.DeMysterize();
         }
+
         nextBottle.changes = -changes;
-        BottleSatisfy(nextBottle);
+
         return move;
     }
 
-    
+    public void BottleSatisfy(Bottle nextBottle) {
+        if (nextBottle == null || nextBottle.IsEmpty) return;
 
-    private void BottleSatisfy(Bottle nextbottle) {
-        int i = 0;
-        LiquidColor colorIndex = nextbottle.GetTopLiquid().colorId;
-        foreach (LiquidUnit liquid in nextbottle.liquidUnits) {
-            if (liquid.colorId == colorIndex) {
-                i++;
-            }
+        LiquidColor colorIndex = nextBottle.GetTopLiquid().colorId;
+
+        int count = 0;
+
+        foreach (LiquidUnit liquid in nextBottle.liquidUnits) {
+            if (liquid.colorId == colorIndex)
+                count++;
         }
-        if (i == 4) {
-            nextbottle.AttemptComplete();
-        } else onBottlePour?.Invoke(false);
-    }
 
-    private void Awake() {
-        bottleView = GetComponent<BottleView>();
-    }
-
-    private void Start() {
-        RefreshView();
-    }
-
-    public void RefreshView() {
-        bottleView.Refresh(liquidUnits);
+        if (count == maxCapacity && nextBottle.liquidUnits.Count == maxCapacity) {
+            nextBottle.AttemptComplete();
+        } else {
+            onBottlePour?.Invoke(false);
+        }
     }
 
     public bool Completion {
-        get { return isCompleted; }
-        private set { isCompleted = value; }
+        get => isCompleted;
+        private set => isCompleted = value;
     }
 
     public bool IsEmpty => liquidUnits.Count == 0;

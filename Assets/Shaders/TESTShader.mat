@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-2128229260638251623
+--- !u!114 &-3098261872921553466
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: LiquidTest2
-  m_Shader: {fileID: -6465566751694194690, guid: f2c52fa7192524641845e1972df5bc81, type: 3}
+  m_Name: TESTShader
+  m_Shader: {fileID: -6465566751694194690, guid: c29bfcaddb02e0b42976ee1cf5def7ad, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -31,19 +31,12 @@ Material:
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
-  disabledShaderPasses: []
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _SampleTexture2D_a023c16df0994a6ebaffbff5cbdd0277_Texture_1_Texture2D:
-        m_Texture: {fileID: 2800000, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -58,19 +51,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BottomAmount: 0
-    - _CurveStrength: 0.4
-    - _Direction: 1
-    - _FillAmount: 0.6
-    - _SurfaceHeight: 0
-    - _SurfaceThickness: 0.03
-    - _TiltAmount: 0
-    m_Colors:
-    - White: {r: 1, g: 1, b: 1, a: 1}
-    - _Color0: {r: 0.96862745, g: 0.89411765, b: 0.05882353, a: 1}
-    - _Color1: {r: 0.96862745, g: 0.89411765, b: 0.05882353, a: 1}
-    - _Color2: {r: 0.96862745, g: 0.89411765, b: 0.05882353, a: 1}
-    - _Color3: {r: 0, g: 0, b: 0, a: 0}
-    - _SurfaceColor: {r: 0.9496855, g: 0.5226256, b: 0.5226256, a: 1}
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _XRMotionVectorsPass: 1
+    m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

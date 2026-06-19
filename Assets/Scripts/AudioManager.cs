@@ -21,6 +21,8 @@ public class AudioManager : MonoBehaviour
     }
 
     void Start() {
+        musicSource.mute = SaveManager.Instance.music;
+        sfxSource.mute = SaveManager.Instance.sfx;
         StartCoroutine(PlayBG(musicSource.clip));
     }
 

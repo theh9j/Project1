@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private BottleGen bottleGen;
     [SerializeField] private LevelCreator levelCreator;
     [SerializeField] private Tutorial tutor;
+    public bool play = true;
     public bool tutorial = true;
     public UnityEvent revive;
     public UnityEvent<int, int> gameOver;
@@ -31,7 +32,7 @@ public class GameManager : MonoBehaviour
         });
 
         
-        //OnGameStart(false, false, true);
+        if (play) OnGameStart(false, false, true);
     }
 
     private bool OnCompletion() {
