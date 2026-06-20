@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private BottleGen bottleGen;
     [SerializeField] private LevelCreator levelCreator;
     [SerializeField] private Tutorial tutor;
+    [SerializeField] private float timeScaler = 1f;
     public bool play = true;
     public bool tutorial = true;
     public UnityEvent revive;
@@ -33,6 +34,10 @@ public class GameManager : MonoBehaviour
 
         
         if (play) OnGameStart(false, false, true);
+    }
+
+    void Update() {
+        Time.timeScale = timeScaler;
     }
 
     private bool OnCompletion() {
@@ -176,7 +181,7 @@ public class GameManager : MonoBehaviour
         }
         move = from.Pour(to);
         if (move != null) {
-            //record.Push(move);
+            record.Push(move);
             from.anim.Play(2, to);
             from = null;
         } else {

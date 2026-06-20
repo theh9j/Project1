@@ -160,21 +160,25 @@ public class LevelCreator : MonoBehaviour
         List<Bottle> bottleList = bottleGen.DictionaryToSingularBottleConverter();
 
         for (int i = 0; i < data.bottleCount; i++) {
-
             if (data.bottles[i].isLocked) {
-                bottleList[i].SetLocker(ColorDebug(data.bottles[i].lockCondition), true);
-            } 
-            
+                bottleList[i].SetLocker(
+                    ColorDebug(data.bottles[i].lockCondition),
+                    true
+                );
+            }
+
+            bottleList[i].liquidUnits.Clear();
 
             for (int j = 0; j < data.bottles[i].liquids.Count; j++) {
-
                 LiquidUnit pendingLiquid = new(
                     ColorDebug(data.bottles[i].liquids[j].colorId),
                     data.bottles[i].liquids[j].isMystery
-                    );
+                );
+
                 bottleList[i].liquidUnits.Add(pendingLiquid);
             }
 
+            bottleList[i].RefreshView();
         }
         Debug.Log("Level Loaded");
         adminui.SetLevelnReward();

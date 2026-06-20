@@ -46,8 +46,11 @@ Material:
     m_Ints: []
     m_Floats:
     - _BottomAmount: 0
-    - _CurveStrength: 0.02
+    - _CurvePower: 2.3
+    - _CurveStrength: -0.03
     - _Direction: -1
+    - _EdgeEnd: 0.5
+    - _EdgeStart: 0.35
     - _FillAmount: 1
     - _SurfaceHeight: 0
     - _SurfaceThickness: 0.03

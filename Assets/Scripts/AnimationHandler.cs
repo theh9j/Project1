@@ -10,10 +10,13 @@ public partial class AnimationHandler : MonoBehaviour {
     [SerializeField] private Transform spill;
     [SerializeField] private Bottle currentBottle;
     [SerializeField] private LiquidColorVisualData colorTranslate;
+    
 
     [Header("Liquid Shader")]
     [SerializeField] private Transform liquidRoot;
+    [SerializeField] private Transform boundingBottle;
     [SerializeField] private SpriteRenderer liquidRenderer;
+    [SerializeField] private SpriteRenderer boundingBottleRenderer;
 
     [Header("Pour Settings")]
     [SerializeField] private float pourStartAngle = 65f;
@@ -27,25 +30,36 @@ public partial class AnimationHandler : MonoBehaviour {
     public float spillOffset = 3f;
 
     [Header("Liquid Width Scaling")]
-    [SerializeField] private float liquidWidthSpeed = 12f;
-    [SerializeField] private float bottleInnerWidth = 2f;
-    [SerializeField] private float bottleInnerHeight = 8f;
-    [SerializeField] private float widthPadding = 1.1f;
+    [SerializeField] private float liquidWidthPadding = 1f;
+    [SerializeField] private float liquidHeightPadding = 1f;
+    [SerializeField] private float liquidTopPadding = 0.08f;
+    private Vector3 baseLiquidWorldSize;
+    private Vector2 liquidOffsetPadding = new Vector2(0f, 0.04f);
+    private Vector3 liquidBaseScale;
+    private Vector3 liquidBaseOffset;
+    private float baseBottleWidth;
+    private float baseBottleHeight;
 
     private Material material;
 
     private Vector3 originalPos;
     private Quaternion originalRotation;
 
-    private Vector3 liquidBaseScale;
     private float baseProjectedWidth;
-    private float currentWidthMultiplier = 1f;
 
     private SortingGroup sortingGroup;
     private int originalSortingOrder;
 
 
     public bool IsBusy { get; private set; }
+
+    void Awake() {
+        if (liquidRenderer != null) {
+            material = new Material(liquidRenderer.sharedMaterial);
+            baseLiquidWorldSize = liquidRenderer.bounds.size;
+            liquidRenderer.material = material;
+        }
+    }
 
     private void Start() {
         originalPos = visual.position;
@@ -56,57 +70,56 @@ public partial class AnimationHandler : MonoBehaviour {
         if (sortingGroup != null)
             originalSortingOrder = sortingGroup.sortingOrder;
 
-        if (liquidRenderer != null) {
-            material = new Material(liquidRenderer.sharedMaterial);
-            liquidRenderer.material = material;
-        }
-
         if (liquidRoot != null) {
             liquidBaseScale = liquidRoot.localScale;
-            baseProjectedWidth = bottleInnerWidth;
+            liquidBaseOffset = liquidRoot.position - boundingBottle.position;
+        }
+
+        if (boundingBottleRenderer != null) {
+            Bounds b = boundingBottleRenderer.bounds;
+
+            baseBottleWidth = b.size.x;
+            baseBottleHeight = b.size.y;
         }
     }
 
-    private void Update() {
-        UpdateLiquidUprightScale();
+    void Update() {
+        UpdateLiquidBounds();
+        UpdateLiquidSurface(true);
     }
 
-    private void UpdateLiquidUprightScale() {
-        if (liquidRoot == null || visual == null)
+    private void UpdateLiquidBounds() {
+        if (boundingBottleRenderer == null ||
+            liquidRoot == null ||
+            liquidRenderer == null)
             return;
 
-        float angle = visual.eulerAngles.z;
+        Bounds b = boundingBottleRenderer.bounds;
 
-        if (angle > 180f)
-            angle -= 360f;
+        liquidRoot.position =
+            b.center +
+            Vector3.down * (liquidTopPadding * 0.5f) +
+            (Vector3)liquidOffsetPadding;
 
-        float rad = angle * Mathf.Deg2Rad;
-
-        float projectedWidth =
-            Mathf.Abs(Mathf.Cos(rad)) * bottleInnerWidth +
-            Mathf.Abs(Mathf.Sin(rad)) * bottleInnerHeight;
-
-        float targetMultiplier =
-            projectedWidth / baseProjectedWidth * widthPadding;
-
-        currentWidthMultiplier = Mathf.Lerp(
-            currentWidthMultiplier,
-            targetMultiplier,
-            Time.deltaTime * liquidWidthSpeed
-        );
-
-        // Keep liquid upright in world space.
         liquidRoot.rotation = Quaternion.identity;
 
+        float targetWidth = b.size.x * liquidWidthPadding;
+        float targetHeight =
+            (b.size.y - liquidTopPadding) * liquidHeightPadding;
+
         liquidRoot.localScale = new Vector3(
-            liquidBaseScale.x * currentWidthMultiplier,
-            liquidBaseScale.y,
+            liquidBaseScale.x * targetWidth / baseLiquidWorldSize.x,
+            liquidBaseScale.y * targetHeight / baseLiquidWorldSize.y,
             liquidBaseScale.z
         );
     }
 
-    public void SetPourLiquid(Color[] colors, float fillAmount) {
-        if (material == null) return;
+    public void SetPourLiquid(
+    Color[] colors,
+    float fillAmount,
+    int liquidCount) {
+        if (material == null)
+            return;
 
         material.SetColor("_Color0", colors.Length > 0 ? colors[0] : Color.clear);
         material.SetColor("_Color1", colors.Length > 1 ? colors[1] : Color.clear);
@@ -114,18 +127,42 @@ public partial class AnimationHandler : MonoBehaviour {
         material.SetColor("_Color3", colors.Length > 3 ? colors[3] : Color.clear);
 
         material.SetFloat("_FillAmount", Mathf.Clamp01(fillAmount));
+
+        bool hasLiquid = liquidCount > 0;
+
+        Color topColor = hasLiquid
+            ? colors[liquidCount - 1]
+            : Color.clear;
+
+        Color surfaceColor = Lighten(topColor, 0.3f);
+
+        SetLiquidSurface(surfaceColor, hasLiquid);
+
+        UpdateLiquidSurface(true);
     }
 
-    public void SetPourLiquidColors(Color[] colors) {
+    public void SetPourLiquidColors(Color[] colors, int liquidCount) {
         if (material == null) return;
 
         material.SetColor("_Color0", colors.Length > 0 ? colors[0] : Color.clear);
         material.SetColor("_Color1", colors.Length > 1 ? colors[1] : Color.clear);
         material.SetColor("_Color2", colors.Length > 2 ? colors[2] : Color.clear);
         material.SetColor("_Color3", colors.Length > 3 ? colors[3] : Color.clear);
+
+        bool hasLiquid = liquidCount > 0;
+        Color topColor = hasLiquid
+            ? colors[liquidCount - 1]
+            : Color.clear;
+
+        Color surfaceColor = Lighten(topColor, 0.3f);
+
+        SetLiquidSurface(surfaceColor, hasLiquid);
     }
 
-    public Tween TweenFillAmount(float targetFill, float duration, float? forceStart = null) {
+    public Tween TweenFillAmount(
+    float targetFill,
+    float duration,
+    float? forceStart = null) {
         if (material == null) return null;
 
         float currentFill = forceStart ?? material.GetFloat("_FillAmount");
@@ -137,17 +174,20 @@ public partial class AnimationHandler : MonoBehaviour {
             () => currentFill,
             x => {
                 currentFill = x;
+
                 material.SetFloat("_FillAmount", x);
+
+                UpdateLiquidSurface(true);
             },
             targetFill,
             duration
         )
-        .SetEase(Ease.Linear)
+        .SetEase(Ease.InQuad)
         .SetLink(gameObject);
     }
 
     public void SelectedHover(bool hover) {
-        if (visual == null) return;
+        if (visual == null) return; 
 
         visual.DOKill();
 
@@ -209,7 +249,7 @@ public partial class AnimationHandler : MonoBehaviour {
             toView.GetVisualFillAmount(toEndCount);
 
         Vector3 targetPos = nextBottle.transform.position;
-        targetPos.y += pourHeiOffset + currentBottle.changes * 0.1f;
+        targetPos.y += pourHeiOffset;
 
         float startAngle = pourStartAngle;
         float endAngle = pourEndAngle;

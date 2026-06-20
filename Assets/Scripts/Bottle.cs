@@ -33,9 +33,9 @@ public class Bottle : MonoBehaviour {
             anim = GetComponent<AnimationHandler>();
     }
 
-    private void Start() {
-        RefreshView();
-    }
+    //private void Start() {
+    //    RefreshView();
+    //}
 
     public void RefreshView() {
         if (bottleView != null)

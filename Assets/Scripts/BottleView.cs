@@ -27,12 +27,12 @@ public class BottleView : MonoBehaviour {
 
     public void Refresh(List<LiquidUnit> liquidUnits) {
         RevealMystery(liquidUnits);
-
         Color[] colors = BuildColors(liquidUnits);
 
         anim.SetPourLiquid(
             colors,
-            GetVisualFillAmount(liquidUnits.Count)
+            GetVisualFillAmount(liquidUnits.Count),
+            liquidUnits.Count
         );
     }
 
@@ -41,7 +41,10 @@ public class BottleView : MonoBehaviour {
 
         Color[] colors = BuildColors(liquidUnits);
 
-        anim.SetPourLiquidColors(colors);
+        anim.SetPourLiquidColors(
+            colors,
+            liquidUnits.Count
+        );
     }
 
     public float GetVisualFillAmount(int liquidCount) {
