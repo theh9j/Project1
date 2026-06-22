@@ -3,9 +3,11 @@ using UnityEngine;
 public enum LiquidColor
 {
     red,
-    green,
-    blue,
     yellow,
+    orange,
+    blue,
+    teal,
+    green,
     pink,
     purple,
     grey,

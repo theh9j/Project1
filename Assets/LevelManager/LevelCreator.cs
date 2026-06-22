@@ -2,8 +2,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Unity.Android.Gradle.Manifest;
-using UnityEditor;
 using UnityEngine;
 using Application = UnityEngine.Application;
 
@@ -17,18 +15,26 @@ public class LevelCreator : MonoBehaviour
     private LevelData levelData;
     private Dictionary<int, LiquidColor> colorTranslate;
 
-    private string levelPath = Application.dataPath + "/LevelManager/Levels/level_";
-    private string personalPath = Application.dataPath + "/LevelManager/save";
+    private string levelPath = Application.dataPath + "/Resources/Levels/level_";
+    private string personalPath = Application.dataPath + "/Resources/save.json";
 
     private void SaveLevel(int result) {
         string json = JsonUtility.ToJson(levelData, true);
-        File.WriteAllText(levelPath + result.ToString("D2"), json);
+        File.WriteAllText(levelPath + result.ToString("D2") + ".json", json);
         Debug.Log("Saved");
+
+        #if UNITY_EDITOR
+                UnityEditor.AssetDatabase.Refresh();
+        #endif
     }
 
     private void SaveLayout() {
         string json = JsonUtility.ToJson(levelData, true);
         File.WriteAllText(personalPath, json);
+
+        #if UNITY_EDITOR
+                UnityEditor.AssetDatabase.Refresh();
+        #endif
     }
 
     public void CheckForSafeSave() {
@@ -116,24 +122,22 @@ public class LevelCreator : MonoBehaviour
         } else {
             if (next) SaveManager.Instance.level += 1;
         }
-
-
-
-        string json;
+        TextAsset file;
 
         LevelData data;
-        if (File.Exists(personalPath) && launch) {
-            json = File.ReadAllText(personalPath);
-            data = JsonUtility.FromJson<LevelData>(json);
-            if (data.levelNumber == SaveManager.Instance.level && data.levelNumber != 0) {
-                Debug.Log("Test");
-                LoadData(data, false);
-                return;
+        if (launch) {
+            file = Resources.Load<TextAsset>("save");
+            if (file != null) {
+                data = JsonUtility.FromJson<LevelData>(file.text);
+                if (data.levelNumber == SaveManager.Instance.level && data.levelNumber != 0) {
+                    LoadData(data, false);
+                    return;
+                }
             }
         }
-        if (!File.Exists(levelPath + SaveManager.Instance.level.ToString("D2"))) return;
-        json = File.ReadAllText(levelPath + SaveManager.Instance.level.ToString("D2"));
-        data = JsonUtility.FromJson<LevelData>(json);
+        file = Resources.Load<TextAsset>("Levels/level_" + SaveManager.Instance.level.ToString("D2"));
+        if (file == null) return;
+        data = JsonUtility.FromJson<LevelData>(file.text);
         LoadData(data, randomize);
 
     }

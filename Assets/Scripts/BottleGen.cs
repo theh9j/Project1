@@ -1,6 +1,7 @@
 using DG.Tweening;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -9,12 +10,13 @@ public class BottleGen : MonoBehaviour
     [Header("GenObject")]
     public GameObject bottle;
     public GameManager gameManager;
+    [SerializeField] private UIAnimation uianim;
     public UnityEvent<Bottle> newBot;
     private Dictionary<int, List<Bottle>> bottleDict = new();
 
     [Header("Settings")]
     public int minBottleCount = 2;
-    public int maxBottleCount = 16;
+    public int maxBottleCount = 18;
     public int rowCount = 3;
     public int colCount = 6;
     public float xSpacing = 2.5f;
@@ -28,7 +30,7 @@ public class BottleGen : MonoBehaviour
 
     public void AddBottle(int prefCol = 0) {
         if (genCount == maxBottleCount+2 || rowIndex == rowCount) {
-            Debug.Log("Cannot add more bottles, max capacity reached!");
+            uianim.WarningMessage("Max bottles reached!");
             return;
         }
 
@@ -111,6 +113,14 @@ public class BottleGen : MonoBehaviour
             DictManager(newBottle);
         }
         bottleDict[rowAdd].Add(newBottle.GetComponent<Bottle>());
+        CheckForMapSize();
+    }
+
+    private void CheckForMapSize() {
+        if (Camera.main.orthographicSize != 20) return;
+        for (int i = 0; i < bottleDict.Count; i++) {
+            if (bottleDict[i].Count >= 5) gameManager.CameraOrtho(23);
+        }
     }
 
     private void DictManager(Bottle bottle) {
@@ -208,6 +218,7 @@ public class BottleGen : MonoBehaviour
     }
 
     private void Start() {
+        
         spawnX = Camera.main.ScreenToWorldPoint(
             new Vector3(Screen.width + screenOffset, 0f, Camera.main.nearClipPlane)
             ).x;

@@ -2,8 +2,6 @@ using UnityEngine;
 using DG.Tweening;
 using TMPro;
 using UnityEngine.UI;
-using UnityEngine.Events;
-using UnityEditor.Experimental.GraphView;
 using System;
 using Unity.VisualScripting;
 using Sequence = DG.Tweening.Sequence;

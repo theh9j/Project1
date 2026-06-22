@@ -1719,15 +1719,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   bottle: {fileID: 2817757691919090004, guid: 600e1a45ca75eef46a3512bd2d730b44, type: 3}
   gameManager: {fileID: 847021335}
+  uianim: {fileID: 774628084}
   newBot:
     m_PersistentCalls:
       m_Calls: []
   minBottleCount: 2
-  maxBottleCount: 16
+  maxBottleCount: 18
   rowCount: 3
   colCount: 6
-  xSpacing: 2.6
-  ySpacing: 8.2
+  xSpacing: 3.2
+  ySpacing: 9
   pointNemoY: 9
   screenOffset: 20
   genCount: 0
@@ -7967,6 +7968,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   anim: {fileID: 706749091}
   colorTranslator: {fileID: 11400000, guid: a841eed9d719893478567074e005b847, type: 2}
+  mysteriousColor: {r: 0, g: 0, b: 0, a: 1}
+  mysteryMarks: []
+  mysteryMarksRenders: []
   fillAmounts:
   - 0
   - 0.25
@@ -7986,10 +7990,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e838e3a83f92cd4fbf750f1feec8617, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AnimationHandler
+  bottleNeck: {fileID: 0}
   bottleCap: {fileID: 2109442066}
   cover: {fileID: 1593824403}
   visual: {fileID: 1866928496}
-  spill: {fileID: 2104673742}
   currentBottle: {fileID: 706749089}
   colorTranslate: {fileID: 11400000, guid: a841eed9d719893478567074e005b847, type: 2}
   liquidRoot: {fileID: 1320200439}
@@ -8010,6 +8014,9 @@ MonoBehaviour:
   liquidTopPadding: 0.08
   liquidSurface: {fileID: 679363452}
   liquidSurfaceRenderer: {fileID: 679363453}
+  spillParents: {fileID: 0}
+  liquidSpillPrefab: {fileID: 0}
+  spillWidth: 0.25
   surfaceYOffset: 0.08
   surfaceHeight: 0.28
   surfaceWidthPadding: 1
@@ -10611,17 +10618,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 852517653}
   m_CullTransparentMesh: 1
---- !u!114 &868119181 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5197750198765528114, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-  m_PrefabInstance: {fileID: 4251837864842823994}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e838e3a83f92cd4fbf750f1feec8617, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AnimationHandler
 --- !u!1 &892907767
 GameObject:
   m_ObjectHideFlags: 0
@@ -22787,10 +22783,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e838e3a83f92cd4fbf750f1feec8617, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AnimationHandler
+  bottleNeck: {fileID: 0}
   bottleCap: {fileID: 113766505}
   cover: {fileID: 187997530}
   visual: {fileID: 420364020}
-  spill: {fileID: 474559455}
   currentBottle: {fileID: 1859567590}
   colorTranslate: {fileID: 11400000, guid: a841eed9d719893478567074e005b847, type: 2}
   liquidRoot: {fileID: 1047317391}
@@ -22811,6 +22807,9 @@ MonoBehaviour:
   liquidTopPadding: 0.08
   liquidSurface: {fileID: 1593992454}
   liquidSurfaceRenderer: {fileID: 1593992455}
+  spillParents: {fileID: 0}
+  liquidSpillPrefab: {fileID: 0}
+  spillWidth: 0.25
   surfaceYOffset: 0.08
   surfaceHeight: 0.28
   surfaceWidthPadding: 1
@@ -22892,6 +22891,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   anim: {fileID: 1859567591}
   colorTranslator: {fileID: 11400000, guid: a841eed9d719893478567074e005b847, type: 2}
+  mysteriousColor: {r: 0, g: 0, b: 0, a: 1}
+  mysteryMarks: []
+  mysteryMarksRenders: []
   fillAmounts:
   - 0
   - 0.25
@@ -26473,7 +26475,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   levelSave: {fileID: 107534851}
-  coinSetForAdmin: 9000
+  coinSetForAdmin: 250
   startLevel: 0
   save: 0
   coins: 0
@@ -26681,83 +26683,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 600e1a45ca75eef46a3512bd2d730b44, type: 3}
---- !u!1001 &4251837864842823994
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 471898657223734379, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: anim
-      value: 
-      objectReference: {fileID: 868119181}
-    - target: {fileID: 471898657223734379, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: colorTranslator
-      value: 
-      objectReference: {fileID: 11400000, guid: a841eed9d719893478567074e005b847, type: 2}
-    - target: {fileID: 4990285677789967072, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4990285677789967072, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4990285677789967072, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4990285677789967072, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4990285677789967072, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4990285677789967072, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4990285677789967072, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4990285677789967072, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4990285677789967072, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4990285677789967072, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5197750198765528114, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: pourAngle
-      value: 7.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5197750198765528114, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: pourDefaultAngle
-      value: 75
-      objectReference: {fileID: 0}
-    - target: {fileID: 8903650134421740593, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_Name
-      value: BottlePrefab
-      objectReference: {fileID: 0}
-    - target: {fileID: 8903650134421740593, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: f5c04111cb4a6c04b9c9d3bccd8604fc, type: 3}
 --- !u!1001 &7006851935721817172
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -26839,5 +26764,4 @@ SceneRoots:
   - {fileID: 969954113}
   - {fileID: 774628081}
   - {fileID: 169361002}
-  - {fileID: 4251837864842823994}
   - {fileID: 1872730460}

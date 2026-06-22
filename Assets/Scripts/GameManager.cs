@@ -1,3 +1,4 @@
+using DG.Tweening;
 using NUnit.Framework;
 using System;
 using System.Collections;
@@ -24,6 +25,9 @@ public class GameManager : MonoBehaviour
     
     public int currentLevel = 0;
     
+    void Awake() {
+        Screen.orientation = ScreenOrientation.Portrait;
+    }
 
     void Start() {
 
@@ -32,7 +36,7 @@ public class GameManager : MonoBehaviour
             newBottle.onBottlePour.AddListener(CheckForImpossibility);
         });
 
-        
+        CameraOrtho(20);
         if (play) OnGameStart(false, false, true);
     }
 
@@ -43,9 +47,16 @@ public class GameManager : MonoBehaviour
     private bool OnCompletion() {
         conditionalBottles.Clear();
         gameOver?.Invoke(SaveManager.Instance.level, SaveManager.Instance.coinsReward);
+        
 
         Debug.Log("Game Completed!");
         return true;
+    }
+
+    public void CameraOrtho(float target) {
+        Camera.main
+            .DOOrthoSize(target, .3f)
+            .SetEase(Ease.InOutSine, 1f);
     }
 
     private void CheckForImpossibility(bool comp) {
@@ -110,6 +121,7 @@ public class GameManager : MonoBehaviour
 
     public void OnGameStart(bool rand, bool next, bool byLayout) {
         record = new();
+        CameraOrtho(20);
         conditionalBottles.Clear();
         levelCreator.LoadLevel(rand, next, byLayout);
         tutor.CheckForTutorial(tutorial);

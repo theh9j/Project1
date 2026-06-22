@@ -4,10 +4,10 @@ using DG.Tweening;
 
 public partial class AnimationHandler : MonoBehaviour {
     [Header("References")]
+    public Transform bottleNeck;
     [SerializeField] private Transform bottleCap;
     [SerializeField] private Transform cover;
     [SerializeField] private Transform visual;
-    [SerializeField] private Transform spill;
     [SerializeField] private Bottle currentBottle;
     [SerializeField] private LiquidColorVisualData colorTranslate;
     
@@ -41,6 +41,7 @@ public partial class AnimationHandler : MonoBehaviour {
     private float baseBottleHeight;
 
     private Material material;
+    private Material spillMat;
 
     private Vector3 originalPos;
     private Quaternion originalRotation;
@@ -62,6 +63,7 @@ public partial class AnimationHandler : MonoBehaviour {
     }
 
     private void Start() {
+
         originalPos = visual.position;
         originalRotation = visual.rotation;
 
@@ -86,6 +88,8 @@ public partial class AnimationHandler : MonoBehaviour {
     void Update() {
         UpdateLiquidBounds();
         UpdateLiquidSurface(true);
+        if (isSpilling)
+            UpdatePourSpill();
     }
 
     private void UpdateLiquidBounds() {
@@ -192,7 +196,7 @@ public partial class AnimationHandler : MonoBehaviour {
         visual.DOKill();
 
         if (hover) {
-            BringToFront();
+            BringToFront(500);
 
             visual.DOMove(originalPos + Vector3.up * 1.2f, 0.2f)
                 .SetEase(Ease.OutQuad)
@@ -201,7 +205,7 @@ public partial class AnimationHandler : MonoBehaviour {
             visual.DOMove(originalPos, 0.2f)
                 .SetEase(Ease.OutQuad)
                 .SetLink(gameObject)
-                .OnComplete(RestoreSorting);
+                .OnComplete(() => BringToFront());
         }
     }
 
@@ -226,7 +230,7 @@ public partial class AnimationHandler : MonoBehaviour {
         if (nextBottle == null || visual == null) return;
 
         IsBusy = true;
-        BringToFront();
+        BringToFront(1000);
         visual.DOKill();
 
         int movedAmount = Mathf.Abs(currentBottle.changes);
@@ -237,6 +241,9 @@ public partial class AnimationHandler : MonoBehaviour {
 
         int toStartCount = nextBottle.liquidUnits.Count - movedAmount;
         int toEndCount = nextBottle.liquidUnits.Count;
+
+        fromView.SetMystery(0f);
+        Debug.Log("Test");
 
         float fromEndFill =
             fromView.GetVisualFillAmount(currentBottle.liquidUnits.Count);
@@ -289,7 +296,7 @@ public partial class AnimationHandler : MonoBehaviour {
         {
             toView.RefreshColorsOnly(nextBottle.liquidUnits);
 
-            Spill(nextBottle, startAngle);
+            nextBottle.anim.StartPourSpill(currentBottle, nextBottle, startAngle < 0 ? true : false);
 
             currentBottle.anim.TweenFillAmount(
                 fromEndFill,
@@ -313,6 +320,7 @@ public partial class AnimationHandler : MonoBehaviour {
 
         sequence.AppendCallback(() =>
         {
+            nextBottle.anim.EndPourSpill();
             currentBottle.RefreshView();
             nextBottle.RefreshView();
 
@@ -335,76 +343,13 @@ public partial class AnimationHandler : MonoBehaviour {
 
         sequence.OnComplete(() =>
         {
-            RestoreSorting();
+            fromView.SetMystery(1f);
+            nextBottle.anim.BringToFront();
             IsBusy = false;
         });
     }
 
-    private void Spill(Bottle targetBottle, float angle) {
-        if (targetBottle == null || targetBottle.anim == null) return;
-        if (targetBottle.anim.spill == null) return;
-
-        Transform spillObj = targetBottle.anim.spill;
-        Transform spillParent = spillObj.parent;
-
-        if (spillParent == null) return;
-
-        SpriteRenderer spillRenderer = spillObj.GetComponent<SpriteRenderer>();
-
-        if (spillRenderer != null &&
-            colorTranslate != null &&
-            targetBottle.GetTopLiquid() != null) {
-            spillRenderer.color =
-                colorTranslate.GetColor(targetBottle.GetTopLiquid().colorId);
-        }
-
-        Vector3 originalSpillParentPos = spillParent.position;
-        float targetY = spillOffset + 3 * spillLenOffset;
-
-        spillParent.gameObject.SetActive(true);
-        spillParent.localScale = new Vector3(0.2f, 0f, 1f);
-
-        if (angle < 0) {
-            spillObj.localPosition = new Vector3(0.5f, -0.5f, 0f);
-            spillParent.DOMove(originalSpillParentPos + Vector3.left * 0.2f, 0f);
-        } else {
-            spillObj.localPosition = new Vector3(-0.5f, -0.5f, 0f);
-            spillParent.DOMove(originalSpillParentPos + Vector3.right * 0.2f, 0f);
-        }
-
-        Sequence seq = DOTween.Sequence();
-
-        seq.Append(
-            spillParent.DOScaleY(
-                targetY,
-                currentBottle.changes * pourDuration * 0.25f
-            )
-        );
-
-        seq.AppendInterval(currentBottle.changes * pourDuration * 0.5f);
-
-        seq.Append(
-            spillParent.DOScaleX(
-                0f,
-                currentBottle.changes * pourDuration * 0.25f
-            )
-        );
-
-        seq.SetLink(gameObject);
-
-        seq.OnComplete(() => {
-            spillParent.localScale = new Vector3(0.2f, 0f, 1f);
-
-            spillObj.localPosition = angle < 0
-                ? new Vector3(0.5f, -0.5f, 0f)
-                : new Vector3(-0.5f, -0.5f, 0f);
-
-            spillParent.position = originalSpillParentPos;
-            spillParent.gameObject.SetActive(false);
-        });
-    }
-
-    private void PlayCap(Vector3 finalPos) {
+    private void PlayCap() {
         if (bottleCap == null) return;
 
         bottleCap.DOKill();
@@ -412,24 +357,20 @@ public partial class AnimationHandler : MonoBehaviour {
         SpriteRenderer capRenderer = bottleCap.GetComponent<SpriteRenderer>();
         if (capRenderer == null) return;
 
-        Vector3 startPos = finalPos + Vector3.up * 1.5f;
-
-        bottleCap.position = startPos;
-        bottleCap.gameObject.SetActive(true);
-
-        Color color = capRenderer.color;
-        color.a = 0f;
-        capRenderer.color = color;
-
         Sequence seq = DOTween.Sequence();
 
-        seq.AppendInterval(pourDuration * -currentBottle.changes + 0.75f);
+        seq.AppendInterval(pourDuration * -currentBottle.changes + 0.2f);
 
-        seq.Append(capRenderer.DOFade(1f, 0.1f));
+        seq.Append(capRenderer.DOFade(1f, 0.2f).OnStart(() => {
+
+            bottleCap.gameObject.SetActive(true);
+        }
+        ));
 
         seq.Join(
-            bottleCap.DOMove(finalPos, 0.35f)
-                .SetEase(Ease.InQuad)
+            bottleCap.DOMove(bottleCap.position, 0.35f)
+                .From((Vector2)bottleCap.position + Vector2.up * 3f)
+                .SetEase(Ease.InQuint)
         );
 
         seq.SetLink(gameObject);
@@ -437,22 +378,24 @@ public partial class AnimationHandler : MonoBehaviour {
 
     public void PlayUnCap() {
         if (bottleCap == null) return;
+        bottleCap.DOKill();
 
         SpriteRenderer capRenderer = bottleCap.GetComponent<SpriteRenderer>();
         if (capRenderer == null) return;
 
-        Vector2 capCurrent = bottleCap.position;
+        Vector2 original = bottleCap.position;
 
         Sequence seq = DOTween.Sequence();
 
         seq.Join(
-            bottleCap.DOMove(capCurrent + Vector2.up * 5f, 0.35f)
+            bottleCap.DOMove(original + Vector2.up * 3f, 0.35f)
                 .SetEase(Ease.OutQuad)
         );
 
-        seq.Join(capRenderer.DOFade(0f, 0.1f));
+        seq.Join(capRenderer.DOFade(0f, 0.1f).OnComplete(() => { bottleCap.position = original; }));
 
         seq.SetLink(gameObject);
+
 
         seq.OnComplete(() => {
             bottleCap.gameObject.SetActive(false);
@@ -550,14 +493,10 @@ public partial class AnimationHandler : MonoBehaviour {
             });
     }
 
-    private void BringToFront() {
+    public void BringToFront(int target = 0) {
+        if (target == 0) target = originalSortingOrder;
         if (sortingGroup != null)
-            sortingGroup.sortingOrder = 1000;
-    }
-
-    private void RestoreSorting() {
-        if (sortingGroup != null)
-            sortingGroup.sortingOrder = originalSortingOrder;
+            sortingGroup.sortingOrder = target;
     }
 
     public void Play(int action, Bottle nextBottle = null, Vector3 newPos = default) {
@@ -578,7 +517,7 @@ public partial class AnimationHandler : MonoBehaviour {
                 break;
 
             case 4:
-                PlayCap(newPos);
+                PlayCap();
                 break;
 
             case 5:

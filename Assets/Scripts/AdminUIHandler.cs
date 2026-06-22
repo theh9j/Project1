@@ -101,13 +101,14 @@ public class AdminUIHandler : MonoBehaviour
         for (int u = liquidUnits.Count; (u >= liquidUnits.Count) && (u < colors.Length); u++) {
             colors[u].text = $"Color{u}";
         }
+        bottle.RefreshView();
     }
 
     public void NewDataForBottle() {
         if (!admin) return;
         if (Selection) {
             levelDesigner.SetColors(bottle, colors, mys);
-
+            bottle.RefreshView();
         }
     }
     
@@ -171,6 +172,7 @@ public class AdminUIHandler : MonoBehaviour
         } else {
             mys.text = "False";
         }
+        bottle.RefreshView();
     }
 
 

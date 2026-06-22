@@ -61,8 +61,10 @@ public partial class UIHandler : MonoBehaviour
     }
 
     public void AddBottle() {
-        if (bottleGen.genCount == bottleGen.maxBottleCount)
+        if (bottleGen.genCount == bottleGen.maxBottleCount) {
+            uianim.WarningMessage("Max bottles reached!");
             return;
+        }
 
         if (AnyBottleBusy())
             return;

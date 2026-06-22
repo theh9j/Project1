@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,6 +6,9 @@ public class BottleView : MonoBehaviour {
     [Header("References")]
     [SerializeField] private AnimationHandler anim;
     [SerializeField] private LiquidColorVisualData colorTranslator;
+    [SerializeField] private Color mysteriousColor = Color.black;
+    [SerializeField] private Transform[] mysteryMarks;
+    [SerializeField] private SpriteRenderer[] mysteryMarksRenders;
 
     [Header("Visual Fill Amounts")]
     [SerializeField]
@@ -34,6 +38,15 @@ public class BottleView : MonoBehaviour {
             GetVisualFillAmount(liquidUnits.Count),
             liquidUnits.Count
         );
+
+        RefreshMysteryMarks(liquidUnits);
+    }
+
+    public void SetMystery(float target) {
+        foreach (SpriteRenderer mark in mysteryMarksRenders) {
+            if (mark == null) continue;
+            mark.DOFade(target, 0f);
+        }
     }
 
     public void RefreshColorsOnly(List<LiquidUnit> liquidUnits) {
@@ -45,6 +58,8 @@ public class BottleView : MonoBehaviour {
             colors,
             liquidUnits.Count
         );
+
+        RefreshMysteryMarks(liquidUnits);
     }
 
     public float GetVisualFillAmount(int liquidCount) {
@@ -69,15 +84,22 @@ public class BottleView : MonoBehaviour {
 
         for (int i = 0; i < colors.Length; i++) {
             if (i < liquidUnits.Count) {
-                colors[i] = colorTranslator.GetColor(
-                    liquidUnits[i].colorId
-                );
+                colors[i] = liquidUnits[i].isMystery ? mysteriousColor : colorTranslator.GetColor(liquidUnits[i].colorId);
+
             } else {
                 colors[i] = Color.clear;
             }
         }
 
         return colors;
+    }
+
+    private void RefreshMysteryMarks(List<LiquidUnit> liquidUnits) {
+        for (int i = 0; i < mysteryMarks.Length; i++) {
+            bool show = i < liquidUnits.Count && liquidUnits[i].isMystery;
+
+            mysteryMarks[i].gameObject.SetActive(show);
+        }
     }
 
     private void RevealMystery(List<LiquidUnit> liquidUnits) {

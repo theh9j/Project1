@@ -15,19 +15,23 @@ MonoBehaviour:
   colorEntry:
   - color: {r: 1, g: 0.09019608, b: 0.09019608, a: 1}
     liquidColor: 0
-  - color: {r: 0.41960785, g: 0.9882353, b: 0.25490198, a: 1}
+  - color: {r: 1, g: 0.9261126, b: 0, a: 1}
     liquidColor: 1
-  - color: {r: 0.30980393, g: 0.32156864, b: 1, a: 1}
+  - color: {r: 1, g: 0.6010108, b: 0.0990566, a: 1}
     liquidColor: 2
-  - color: {r: 0.96862745, g: 0.89411765, b: 0.05882353, a: 1}
+  - color: {r: 0.058823515, g: 0.2750892, b: 0.96862745, a: 1}
     liquidColor: 3
-  - color: {r: 0.88235295, g: 0.5019608, b: 0.9490196, a: 1}
+  - color: {r: 0, g: 0.8784314, b: 0.71203756, a: 1}
     liquidColor: 4
-  - color: {r: 0.5686275, g: 0.047058824, b: 0.9411765, a: 1}
+  - color: {r: 0.5478898, g: 1, b: 0.48584908, a: 1}
     liquidColor: 5
-  - color: {r: 0.4117647, g: 0.4117647, b: 0.4117647, a: 1}
+  - color: {r: 1, g: 0.6933962, b: 0.90762305, a: 1}
     liquidColor: 6
-  - color: {r: 0.34117648, g: 0.18039216, b: 0.18039216, a: 1}
+  - color: {r: 0.303293, g: 0.105909556, b: 0.6415094, a: 1}
     liquidColor: 7
-  - color: {r: 0, g: 0, b: 0, a: 1}
+  - color: {r: 0.2735849, g: 0.2735849, b: 0.2735849, a: 1}
     liquidColor: 8
+  - color: {r: 0.3679245, g: 0.2730909, b: 0.21346565, a: 1}
+    liquidColor: 9
+  - color: {r: 0, g: 0, b: 0, a: 1}
+    liquidColor: 10

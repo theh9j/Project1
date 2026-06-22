@@ -53,12 +53,13 @@ public class Bottle : MonoBehaviour {
     }
 
     public void AttemptComplete() {
+        if (Completion) return;
         Completion = true;
 
         onBottlePour?.Invoke(true);
 
         if (anim != null)
-            anim.Play(4, null, transform.position + Vector3.up * 2.75f);
+            anim.Play(4);
     }
 
     public void RemoveConditionalLock() {

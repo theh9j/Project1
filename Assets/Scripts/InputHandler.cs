@@ -69,9 +69,38 @@ public class InputHandler : MonoBehaviour
         previousInput = InputMode.Invalid;
     }
 
+    private bool TryGetPointerPosition(out Vector2 screenPos) {
+        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed) {
+            screenPos = Touchscreen.current.primaryTouch.position.ReadValue();
+            return true;
+        }
+
+        if (Mouse.current != null) {
+            screenPos = Mouse.current.position.ReadValue();
+            return true;
+        }
+
+        screenPos = default;
+        return false;
+    }
+
+    private bool IsPointerOverUI() {
+        if (EventSystem.current == null) return false;
+
+        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed) {
+            int touchId = Touchscreen.current.primaryTouch.touchId.ReadValue();
+            return EventSystem.current.IsPointerOverGameObject(touchId);
+        }
+
+        return EventSystem.current.IsPointerOverGameObject();
+    }
+
     private void onMouseDown() {
-        if (EventSystem.current.IsPointerOverGameObject()) return;
-        Vector2 worldPos = mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        if (IsPointerOverUI()) return;
+
+        if (!TryGetPointerPosition(out Vector2 screenPos)) return;
+
+        Vector2 worldPos = mainCamera.ScreenToWorldPoint(screenPos);
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
 
         if (hit.collider == null) {
