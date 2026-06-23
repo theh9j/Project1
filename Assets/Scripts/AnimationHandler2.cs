@@ -5,13 +5,13 @@ using UnityEngine.Rendering;
 
 public partial class AnimationHandler : MonoBehaviour {
     [Header("Liquid Surface")]
-    [SerializeField] private Transform liquidSurface;
+    public Transform liquidSurface;
     [SerializeField] private SpriteRenderer liquidSurfaceRenderer;
 
     [Header("Liquid Spill")]
+    [SerializeField] private Spill spill;
     [SerializeField] private Transform spillParents;
     [SerializeField] private GameObject liquidSpillPrefab;
-    [SerializeField] private float spillWidth = 0.25f;
 
     private Transform liquidSpill;
     private SpriteRenderer liquidSpillRenderer;
@@ -27,6 +27,11 @@ public partial class AnimationHandler : MonoBehaviour {
     [SerializeField] private float surfaceWidthPadding = 1f;
     [SerializeField] private float surfaceFollowSpeed = 30f;
     [SerializeField] private float liquidVisualHeight = .95f;
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip pourSFX;
+    [SerializeField] private AudioClip dingSFX;
+    [SerializeField] private AudioClip downSFX;
 
     public void SetLiquidSurface(Color color, bool hasLiquid) {
         if (liquidSurface == null || liquidSurfaceRenderer == null)
@@ -94,74 +99,30 @@ public partial class AnimationHandler : MonoBehaviour {
         liquidSpillRenderer.material = spillMat;
     }
 
-    public void StartPourSpill(Bottle fromBottle, Bottle toBottle, bool rightSide) {
-        if (liquidSpill != null)
-            Destroy(liquidSpill.gameObject);
-
-        liquidSpill = Instantiate(
+    public Spill StartPourSpill(Bottle fromBottle, Bottle toBottle, bool rightSide) {
+        Spill newSpill = Instantiate(
             liquidSpillPrefab,
             spillParents
-        ).transform;
+        ).GetComponent<Spill>();
 
-        liquidSpillRenderer =
-            liquidSpill.GetComponent<SpriteRenderer>();
+        AudioManager.Instance.PlaySFX(pourSFX);
 
-        spillStartPoint = fromBottle.anim.bottleNeck;
-        spillEndSurface = toBottle.anim.liquidSurface;
+        newSpill.Init(
+            fromBottle,
+            toBottle,
+            colorTranslate.GetColor(toBottle.GetTopColor()),
+            rightSide
+        );
 
-        HighlightSpill(colorTranslate.GetColor(toBottle.GetTopColor()), rightSide);
-
-        liquidSpillRenderer.material = spillMat;
-
-        spillParents.position = spillStartPoint.position;
-        spillParents.rotation = Quaternion.identity;
-        spillParents.localScale = Vector3.one;
-
-        liquidSpill.localPosition = Vector3.zero;
-        liquidSpill.localRotation = Quaternion.identity;
-        liquidSpill.localScale = new Vector3(spillWidth, 0f, 1f);
-
-        isSpilling = true;
+        return newSpill;
     }
 
-    private void UpdatePourSpill() {
-        if (liquidSpill == null)
+    public void EndPourSpill(Spill targetSpill) {
+        if (targetSpill == null)
             return;
 
-        Vector3 start = spillStartPoint.position;
-        float endY = spillEndSurface.position.y;
+        AudioManager.Instance.StopSFX();
 
-        float length = Mathf.Abs(start.y - endY);
-
-        spillParents.position = start;
-        spillParents.rotation = Quaternion.identity;
-
-        liquidSpill.localPosition =
-            new Vector3(0f, -length * 0.5f, 0f);
-
-        liquidSpill.localScale =
-            new Vector3(spillWidth, length, 1f);
-    }
-
-    public void EndPourSpill() {
-        if (liquidSpill == null)
-            return;
-
-        isSpilling = false;
-
-        Transform spillToDestroy = liquidSpill;
-
-        liquidSpill = null;
-        liquidSpillRenderer = null;
-        spillStartPoint = null;
-        spillEndSurface = null;
-
-        spillToDestroy
-            .DOScaleX(0f, 0.25f)
-            .SetEase(Ease.InQuad)
-            .OnComplete(() => {
-                if (spillToDestroy != null)
-                    Destroy(spillToDestroy.gameObject);
-            });
+        targetSpill.EndPourSpill();
     }
 }

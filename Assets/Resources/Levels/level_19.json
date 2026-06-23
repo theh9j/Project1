@@ -11,28 +11,7 @@
     {
       "liquids": [
         { "colorId": 0, "isMystery": true },
-        { "colorId": 1, "isMystery": true },
         { "colorId": 2, "isMystery": false },
-        { "colorId": 3, "isMystery": false }
-      ],
-      "isLocked": false,
-      "lockCondition": 0
-    },
-
-    {
-      "liquids": [
-        { "colorId": 1, "isMystery": true },
-        { "colorId": 2, "isMystery": true },
-        { "colorId": 3, "isMystery": false }
-      ],
-      "isLocked": false,
-      "lockCondition": 0
-    },
-
-    {
-      "liquids": [
-        { "colorId": 2, "isMystery": true },
-        { "colorId": 3, "isMystery": true },
         { "colorId": 4, "isMystery": false }
       ],
       "isLocked": false,
@@ -41,8 +20,18 @@
 
     {
       "liquids": [
-        { "colorId": 4, "isMystery": true },
-        { "colorId": 0, "isMystery": true },
+        { "colorId": 1, "isMystery": true },
+        { "colorId": 3, "isMystery": false },
+        { "colorId": 0, "isMystery": false }
+      ],
+      "isLocked": false,
+      "lockCondition": 0
+    },
+
+    {
+      "liquids": [
+        { "colorId": 2, "isMystery": true },
+        { "colorId": 4, "isMystery": false },
         { "colorId": 1, "isMystery": false }
       ],
       "isLocked": false,
@@ -51,6 +40,7 @@
 
     {
       "liquids": [
+        { "colorId": 3, "isMystery": true },
         { "colorId": 0, "isMystery": false },
         { "colorId": 2, "isMystery": false }
       ],
@@ -60,6 +50,7 @@
 
     {
       "liquids": [
+        { "colorId": 4, "isMystery": true },
         { "colorId": 1, "isMystery": false },
         { "colorId": 3, "isMystery": false }
       ],
@@ -69,7 +60,8 @@
 
     {
       "liquids": [
-        { "colorId": 4, "isMystery": false }
+        { "colorId": 0, "isMystery": true },
+        { "colorId": 2, "isMystery": true }
       ],
       "isLocked": false,
       "lockCondition": 0
@@ -77,9 +69,16 @@
 
     {
       "liquids": [
-        { "colorId": 4, "isMystery": false },
-        { "colorId": 0, "isMystery": false }
+        { "colorId": 1, "isMystery": true },
+        { "colorId": 3, "isMystery": true },
+        { "colorId": 4, "isMystery": false }
       ],
+      "isLocked": false,
+      "lockCondition": 0
+    },
+
+    {
+      "liquids": [],
       "isLocked": false,
       "lockCondition": 0
     }

@@ -28,6 +28,9 @@ public class Settings : MonoBehaviour
         OGcoords[1] = musicButton.transform.parent.position;
         OGcoords[2] = replayButton.transform.parent.position;
 
+        ButtonUnavailable(musicButton.transform, !SaveManager.Instance.music);
+        ButtonUnavailable(audioButton.transform, !SaveManager.Instance.sfx);
+
         setting.onClick.AddListener(() => {
             if (settingBusy) return;
             settingBusy = true;
@@ -100,7 +103,7 @@ public class Settings : MonoBehaviour
     }
 
     private void Replay() {
-        gameManager.OnGameStart(true, false, false);
+        gameManager.OnGameStart(true, false);
         Close();
     }
 

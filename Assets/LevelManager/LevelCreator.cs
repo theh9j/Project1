@@ -1,12 +1,10 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using Application = UnityEngine.Application;
 
-public class LevelCreator : MonoBehaviour
-{
+public class LevelCreator : MonoBehaviour {
+    [Header("References")]
     [SerializeField] private AdminUIHandler adminui;
     [SerializeField] private UIHandler ui;
     [SerializeField] private BottleGen bottleGen;
@@ -15,186 +13,298 @@ public class LevelCreator : MonoBehaviour
     private LevelData levelData;
     private Dictionary<int, LiquidColor> colorTranslate;
 
-    private string levelPath = Application.dataPath + "/Resources/Levels/level_";
-    private string personalPath = Application.dataPath + "/Resources/save.json";
-
-    private void SaveLevel(int result) {
-        string json = JsonUtility.ToJson(levelData, true);
-        File.WriteAllText(levelPath + result.ToString("D2") + ".json", json);
-        Debug.Log("Saved");
-
-        #if UNITY_EDITOR
-                UnityEditor.AssetDatabase.Refresh();
-        #endif
+    private string LevelResourcePath(int level) {
+        return "Levels/level_" + level.ToString("D2");
     }
 
-    private void SaveLayout() {
-        string json = JsonUtility.ToJson(levelData, true);
-        File.WriteAllText(personalPath, json);
-
-        #if UNITY_EDITOR
-                UnityEditor.AssetDatabase.Refresh();
-        #endif
-    }
-
-    public void CheckForSafeSave() {
-        List<Bottle> bottles = bottleGen.DictionaryToSingularBottleConverter();
-        foreach (Bottle bottle in bottles) {
-            if (!bottle.IsEmpty) { 
-                if (!bottle.Completion) {
-                    Debug.Log("Saved");
-                    DataProcess(true);
-                    return;
-                }
-            }
+    private string PlayerSavePath {
+        get {
+            return Path.Combine(
+                Application.persistentDataPath,
+                "save.json"
+            );
         }
-        SaveManager.Instance.level += 1;
     }
 
     public void DataProcess(bool layout = false) {
-        int result;
-        int reward;
+        levelData = BuildCurrentLevelData(layout);
+
+        if (levelData == null)
+            return;
+
+        if (layout)
+            SaveLayout();
+        else
+            SaveLevel();
+    }
+
+    private LevelData BuildCurrentLevelData(bool layout) {
+        int levelNumber;
+        int coins;
         int shuffle;
         int undo;
         int addBottle;
 
-        if (!layout) {
-            if (!int.TryParse(adminui.levelInput.text, out result)) return;
-            if (!int.TryParse(adminui.coinInput.text, out reward)) reward = 0;
-            
-            if (!int.TryParse(adminui.shuffleInput.text, out shuffle)) shuffle = 0;
-            if (!int.TryParse(adminui.undoInput.text, out undo)) undo = 0;
-            if (!int.TryParse(adminui.addBottleInput.text, out addBottle)) addBottle = 0;
-        } else {
-            result = SaveManager.Instance.level;
-            reward = SaveManager.Instance.coinsReward;
-
+        if (layout) {
+            levelNumber = SaveManager.Instance.level;
+            coins = SaveManager.Instance.coinsReward;
             shuffle = SaveManager.Instance.shufflesReward;
             undo = SaveManager.Instance.undosReward;
             addBottle = SaveManager.Instance.addBottlesReward;
+        } else {
+            if (!int.TryParse(adminui.levelInput.text, out levelNumber))
+                return null;
+
+            if (!int.TryParse(adminui.coinInput.text, out coins))
+                coins = 0;
+
+            if (!int.TryParse(adminui.shuffleInput.text, out shuffle))
+                shuffle = 0;
+
+            if (!int.TryParse(adminui.undoInput.text, out undo))
+                undo = 0;
+
+            if (!int.TryParse(adminui.addBottleInput.text, out addBottle))
+                addBottle = 0;
         }
-        
 
-        levelData = new();
-        List<Bottle> currentBottleData = bottleGen.DictionaryToSingularBottleConverter();
+        LevelData data = new LevelData();
 
+        data.levelNumber = levelNumber;
 
-        levelData.levelNumber = result;
-        levelData.rewards.coins = reward;
+        data.rewards.coins = coins;
+        data.rewards.shuffle = shuffle;
+        data.rewards.undo = undo;
+        data.rewards.addBottle = addBottle;
 
-        levelData.rewards.shuffle = shuffle;
-        levelData.rewards.undo = undo;
-        levelData.rewards.addBottle = addBottle;
+        List<Bottle> bottles =
+            bottleGen.DictionaryToSingularBottleConverter();
 
+        data.bottleCount = bottles.Count;
 
-        levelData.bottleCount = currentBottleData.Count;
-        for (int i = 0; i < currentBottleData.Count; i++) {
-
-            BottleData bottleData = new() {
-                isLocked = currentBottleData[i].isLocked,
-                lockCondition = translator.TranslatedColor(currentBottleData[i].lockColor)
+        foreach (Bottle bottle in bottles) {
+            BottleData bottleData = new BottleData {
+                isLocked = bottle.isLocked,
+                lockCondition = translator.TranslatedColor(bottle.lockColor)
             };
 
-            for (int j = 0; j < currentBottleData[i].liquidUnits.Count; j++) {
-
-                LiquidData liquidData = new() {
-                    colorId = translator.TranslatedColor(currentBottleData[i].liquidUnits[j].colorId),
-                    isMystery = currentBottleData[i].liquidUnits[j].isMystery
+            foreach (LiquidUnit unit in bottle.liquidUnits) {
+                LiquidData liquidData = new LiquidData {
+                    colorId = translator.TranslatedColor(unit.colorId),
+                    isMystery = unit.isMystery
                 };
-                bottleData.liquids.Add(liquidData);
 
+                bottleData.liquids.Add(liquidData);
             }
-            levelData.bottles.Add(bottleData);
+
+            data.bottles.Add(bottleData);
         }
-        if (!layout) SaveLevel(result);
-        else SaveLayout();
+
+        return data;
     }
 
+    private void SaveLevel() {
+    #if UNITY_EDITOR
+        string path =
+            Path.Combine(
+                Application.dataPath,
+                "Resources/Levels/level_" +
+                levelData.levelNumber.ToString("D2") +
+                ".json"
+            );
 
+        string json = JsonUtility.ToJson(levelData, true);
+        File.WriteAllText(path, json);
 
-    //LEVEL LOADING
+        UnityEditor.AssetDatabase.Refresh();
 
+        Debug.Log("Editor level saved: " + path);
+    #else
+            Debug.LogWarning("SaveLevel is editor-only. Runtime should use SaveLayout.");
+    #endif
+    }
 
+    private void SaveLayout() {
+        string json = JsonUtility.ToJson(levelData, true);
+        File.WriteAllText(PlayerSavePath, json);
 
-    public void LoadLevel(bool randomize = false, bool next = false, bool launch = false) {
+        Debug.Log("Player layout saved: " + PlayerSavePath);
+    }
+
+    public void CheckForSafeSave() {
+        LevelData currentData = BuildCurrentLevelData(true);
+
+        if (currentData == null)
+            return;
+
+        if (IsLevelCompleted(currentData)) {
+            DeleteSavedLayout();
+            return;
+        }
+
+        levelData = currentData;
+        SaveLayout();
+    }
+
+    public void DeleteSavedLayout() {
+        if (File.Exists(PlayerSavePath))
+            File.Delete(PlayerSavePath);
+    }
+
+    public void LoadLevel(bool randomize = false, bool launch = false) {
         if (adminui.admin) {
-            SaveManager.Instance.level = int.TryParse(adminui.levelInput.text, out int result) ? result : 0;
-        } else {
-            if (next) SaveManager.Instance.level += 1;
-        }
-        TextAsset file;
+            SaveManager.Instance.level =
+                int.TryParse(adminui.levelInput.text, out int adminLevel)
+                    ? adminLevel
+                    : 0;
 
-        LevelData data;
-        if (launch) {
-            file = Resources.Load<TextAsset>("save");
-            if (file != null) {
-                data = JsonUtility.FromJson<LevelData>(file.text);
-                if (data.levelNumber == SaveManager.Instance.level && data.levelNumber != 0) {
-                    LoadData(data, false);
-                    return;
-                }
-            }
+            LoadDefaultLevel(SaveManager.Instance.level, randomize);
+            return;
         }
-        file = Resources.Load<TextAsset>("Levels/level_" + SaveManager.Instance.level.ToString("D2"));
-        if (file == null) return;
-        data = JsonUtility.FromJson<LevelData>(file.text);
+
+        if (launch && TryLoadSavedLayout())
+            return;
+
+        LoadDefaultLevel(SaveManager.Instance.level, randomize);
+    }
+
+    private bool TryLoadSavedLayout() {
+        if (!File.Exists(PlayerSavePath))
+            return false;
+
+        string json = File.ReadAllText(PlayerSavePath);
+        LevelData savedData = JsonUtility.FromJson<LevelData>(json);
+
+        if (savedData == null)
+            return false;
+
+        if (savedData.levelNumber != SaveManager.Instance.level)
+            return false;
+
+        if (IsLevelCompleted(savedData)) {
+            DeleteSavedLayout();
+            SaveManager.Instance.level += 1;
+            return false;
+        }
+
+        LoadData(savedData, false);
+        return true;
+    }
+
+    private void LoadDefaultLevel(int level, bool randomize) {
+        TextAsset file =
+            Resources.Load<TextAsset>(
+                LevelResourcePath(level)
+            );
+
+        if (file == null) {
+            Debug.LogWarning(
+                "Level file not found: " +
+                LevelResourcePath(level)
+            );
+            return;
+        }
+
+        LevelData data =
+            JsonUtility.FromJson<LevelData>(file.text);
+
         LoadData(data, randomize);
-
     }
 
     private void LoadData(LevelData data, bool randomize) {
-        if (randomize) {
-            colorTranslate = translator.Randomizer();
-        } else {
-            colorTranslate = new();
-            for (int i = 0; i < Enum.GetValues(typeof(LiquidColor)).Length; i++) {
-                colorTranslate[i] = ((LiquidColor[])Enum.GetValues(typeof(LiquidColor)))[i];
-            }
-        }
+        PrepareColorTranslation(randomize);
 
         SaveManager.Instance.level = data.levelNumber;
-        SaveManager.Instance.coinsReward = data.rewards.coins;
 
+        SaveManager.Instance.coinsReward = data.rewards.coins;
         SaveManager.Instance.shufflesReward = data.rewards.shuffle;
         SaveManager.Instance.undosReward = data.rewards.undo;
         SaveManager.Instance.addBottlesReward = data.rewards.addBottle;
 
         bottleGen.GenAmount(data.bottleCount);
 
-        List<Bottle> bottleList = bottleGen.DictionaryToSingularBottleConverter();
+        List<Bottle> bottleList =
+            bottleGen.DictionaryToSingularBottleConverter();
 
         for (int i = 0; i < data.bottleCount; i++) {
-            if (data.bottles[i].isLocked) {
-                bottleList[i].SetLocker(
-                    ColorDebug(data.bottles[i].lockCondition),
+            Bottle bottle = bottleList[i];
+            BottleData bottleData = data.bottles[i];
+
+            bottle.liquidUnits.Clear();
+
+            if (bottleData.isLocked) {
+                bottle.SetLocker(
+                    ColorDebug(bottleData.lockCondition),
                     true
                 );
             }
 
-            bottleList[i].liquidUnits.Clear();
+            for (int j = 0; j < bottleData.liquids.Count; j++) {
+                LiquidData liquidData =
+                    bottleData.liquids[j];
 
-            for (int j = 0; j < data.bottles[i].liquids.Count; j++) {
-                LiquidUnit pendingLiquid = new(
-                    ColorDebug(data.bottles[i].liquids[j].colorId),
-                    data.bottles[i].liquids[j].isMystery
+                LiquidUnit unit = new LiquidUnit(
+                    ColorDebug(liquidData.colorId),
+                    liquidData.isMystery
                 );
 
-                bottleList[i].liquidUnits.Add(pendingLiquid);
+                bottle.liquidUnits.Add(unit);
             }
 
-            bottleList[i].RefreshView();
+            bottle.RefreshView();
+            bottle.CheckCompleteOnLoad();
         }
-        Debug.Log("Level Loaded");
+
+        Debug.Log("Level Loaded: " + data.levelNumber);
+
         adminui.SetLevelnReward();
         ui.BaseUpd();
     }
 
-    private LiquidColor ColorDebug(int color) {
-        if (colorTranslate.TryGetValue(color, out LiquidColor result)) {
-            return result;
-        } else {
-            throw new Exception("Critical Error for Color Decode");
+    private void PrepareColorTranslation(bool randomize) {
+        if (randomize) {
+            colorTranslate = translator.Randomizer();
+            return;
+        }
+
+        colorTranslate = new Dictionary<int, LiquidColor>();
+
+        LiquidColor[] colors =
+            (LiquidColor[])Enum.GetValues(typeof(LiquidColor));
+
+        for (int i = 0; i < colors.Length; i++) {
+            colorTranslate[i] = colors[i];
         }
     }
 
+    private LiquidColor ColorDebug(int color) {
+        if (colorTranslate.TryGetValue(
+            color,
+            out LiquidColor result)) {
+            return result;
+        }
+
+        throw new Exception(
+            "Critical Error for Color Decode: " + color
+        );
+    }
+
+    private bool IsLevelCompleted(LevelData data) {
+        foreach (BottleData bottle in data.bottles) {
+            if (bottle.liquids.Count == 0)
+                continue;
+
+            if (bottle.liquids.Count < 4)
+                return false;
+
+            int color = bottle.liquids[0].colorId;
+
+            foreach (LiquidData liquid in bottle.liquids) {
+                if (liquid.colorId != color)
+                    return false;
+            }
+        }
+
+        return true;
+    }
 }

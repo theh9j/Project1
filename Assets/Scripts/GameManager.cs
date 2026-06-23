@@ -37,17 +37,34 @@ public class GameManager : MonoBehaviour
         });
 
         CameraOrtho(20);
-        if (play) OnGameStart(false, false, true);
+        if (play) OnGameStart(false, true);
     }
 
     void Update() {
         Time.timeScale = timeScaler;
     }
 
+    public void ContinueToNextLevel() {
+        OnGameStart(false, false);
+    }
+
     private bool OnCompletion() {
+        int completedLevel = SaveManager.Instance.level;
+        int coinReward = SaveManager.Instance.coinsReward;
+
+        SaveManager.Instance.coins += SaveManager.Instance.coinsReward;
+        SaveManager.Instance.shuffle += SaveManager.Instance.shufflesReward;
+        SaveManager.Instance.undo += SaveManager.Instance.undosReward;
+        SaveManager.Instance.addBottle += SaveManager.Instance.addBottlesReward;
+
+        SaveManager.Instance.level++;
+
+        levelCreator.DeleteSavedLayout();
+        SaveManager.Instance.SaveData(false);
+
         conditionalBottles.Clear();
-        gameOver?.Invoke(SaveManager.Instance.level, SaveManager.Instance.coinsReward);
-        
+
+        gameOver?.Invoke(completedLevel, coinReward);
 
         Debug.Log("Game Completed!");
         return true;
@@ -116,19 +133,24 @@ public class GameManager : MonoBehaviour
     }
 
     public void ADGameStart(bool rand) {
-        OnGameStart(rand, false, false);
+        OnGameStart(rand, false);
     }
 
-    public void OnGameStart(bool rand, bool next, bool byLayout) {
-        record = new();
+    public void OnGameStart(bool rand, bool byLayout) {
+        record = new Stack<PourData>();
         CameraOrtho(20);
         conditionalBottles.Clear();
-        levelCreator.LoadLevel(rand, next, byLayout);
+
+        levelCreator.LoadLevel(rand, byLayout);
         tutor.CheckForTutorial(tutorial);
     }
 
     public bool BottleAvailable(Bottle currentBottle) {
+        if (currentBottle == null) return false;
+        if (currentBottle.isOccupied) return false;
+        if (currentBottle.anim != null && currentBottle.anim.IsBusy) return false;
         if (currentBottle.isLocked || currentBottle.Completion) return false;
+
         return true;
     }
 
@@ -165,41 +187,58 @@ public class GameManager : MonoBehaviour
         PourData shuffled = bottle.Shuffle(bottleGen.DictionaryToSingularBottleConverter());
         record.Push(shuffled);  
         return true;
-    }   
+    }
 
     public void TryPour(Bottle to) {
+        if (to == null) return;
+
         if (SaveManager.Instance.level == 0 && tutor.firstEver) {
             if (TutorialTryPour(to)) nextStep?.Invoke();
             return;
         }
+
         if (to.isOccupied) return;
-        to.isOccupied = true;
 
         if (from == null) {
-            if (to.IsEmpty || to.Completion) {
+            if (to.anim.IsUnavailable) return;
+            if (to.IsEmpty || to.Completion || to.isLocked) {
                 to.anim.Play(1);
-                to.isOccupied = false;
                 return;
             }
+
             from = to;
             from.anim.SelectedHover(true);
-            to.isOccupied = false;
             return;
-        } else if (from == to) {
+        }
+
+        if (from == to) {
             from.anim.SelectedHover(false);
             from = null;
-            to.isOccupied = false;
             return;
         }
+
         move = from.Pour(to);
+
         if (move != null) {
             record.Push(move);
-            from.anim.Play(2, to);
+
+            Bottle pourFrom = from;
+            Bottle pourTo = to;
+
+            pourFrom.anim.SelectedHover(false);
+            pourFrom.isOccupied = true;
+
             from = null;
-        } else {
-            to.anim.Play(1);
+
+            pourFrom.anim.Play(2, pourTo, default, () =>
+            {
+                pourFrom.isOccupied = false;
+            });
+
+            return;
         }
-        to.isOccupied = false;
+
+        to.anim.Play(1);
     }
 
 

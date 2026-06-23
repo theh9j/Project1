@@ -22,7 +22,7 @@ public class Bottle : MonoBehaviour {
 
     [Header("State")]
     public bool isOccupied = false;
-    public int changes;
+    public int changes = 0;
 
     [SerializeField] private bool isCompleted = false;
     [SerializeField] private LiquidColorVisualData colorTranslate;
@@ -206,6 +206,22 @@ public class Bottle : MonoBehaviour {
         return topLiquid;
     }
 
+    public void CheckCompleteOnLoad() {
+        if (IsEmpty || liquidUnits.Count < maxCapacity)
+            return;
+
+        LiquidColor firstColor = liquidUnits[0].colorId;
+
+        for (int i = 1; i < liquidUnits.Count; i++) {
+            if (liquidUnits[i].colorId != firstColor)
+                return;
+        }
+
+        Debug.Log("I've been played");
+        Completion = true;
+        anim.SetCap();
+    }
+
     public bool CanPourTo(Bottle nextBottle) {
         if (nextBottle == null) return false;
 
@@ -225,7 +241,7 @@ public class Bottle : MonoBehaviour {
 
     public PourData Pour(Bottle nextBottle) {
         if (!CanPourTo(nextBottle)) return null;
-        if (nextBottle.anim != null && nextBottle.anim.IsBusy) return null;
+        if (anim.IsBusy || nextBottle.anim.IsBusy) return null;
 
         changes = 0;
 

@@ -117,7 +117,6 @@ public class BottleGen : MonoBehaviour
     }
 
     private void CheckForMapSize() {
-        if (Camera.main.orthographicSize != 20) return;
         for (int i = 0; i < bottleDict.Count; i++) {
             if (bottleDict[i].Count >= 5) gameManager.CameraOrtho(23);
         }

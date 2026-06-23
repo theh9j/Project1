@@ -12,6 +12,7 @@ public class UIAnimation : MonoBehaviour
 
     //Common Variables
     public GameObject gamePause;
+    [SerializeField] private GameManager gameManager;
     private Vector2 centre = new(Screen.width / 2, Screen.height / 2);
     private Func<Transform> actions;
 
@@ -55,12 +56,13 @@ public class UIAnimation : MonoBehaviour
         Image img = gamePause.GetComponent<Image>();
 
         img.DOKill();
+        img.DOFade(0, 0);
         gamePause.SetActive(true);
 
         return DOTween.Sequence()
             .AppendInterval(wait).OnStart(() => { input.GamePause(); })
             .Append(
-                img.DOFade(.97f, .35f)
+                img.DOFade(.97f, .35f).From(0)
             );
     }
 
@@ -154,15 +156,16 @@ public class UIAnimation : MonoBehaviour
     }
 
     public void NextLevel() {
-        gameWinPanel.transform.DOMove(
-            new(centre.x * 5, centre.y),
-            .6f
-            ).OnComplete(() => {
-                gameWinPanel.SetActive(false);
-            });
+        continueButton.interactable = false;
 
-        
-        GameContinue(.5f);
+        gameWinPanel.transform.DOMove(
+            new Vector2(centre.x * 5, centre.y),
+            .6f
+        ).OnComplete(() => {
+            gameWinPanel.SetActive(false);
+            gamePause.SetActive(false);
+            input.UndoModes();
+        });
     }
 
 
@@ -173,16 +176,13 @@ public class UIAnimation : MonoBehaviour
 
         DOTween.Sequence()
             .Append(
-                cost.transform.GetComponent<Image>().DOFade(0f, .5f)
+                cost.transform.GetComponent<Image>().DOFade(0f, .1f)
                     .OnComplete(
                     () => {
                         cost.SetActive(false);
-                    })
-            )
-            .AppendInterval(.4f).OnComplete(() => {
-                notif.SetActive(true);
-                notif.transform.GetComponent<Image>().DOFade(1, .5f);
-            });
+                        notif.SetActive(true);
+                        notif.transform.GetComponent<Image>().DOFade(1, .1f);
+                    }));
     }
 
     private void UpdateRewards() {

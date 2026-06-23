@@ -268,8 +268,8 @@ public class Tutorial : MonoBehaviour
             .OnStart(() => { current?.Kill(); })
             .OnComplete(() => { current = ArrowBounce(); });
 
-        yield return StartCoroutine(WaitForInput(lang.ac));
         yield return WaitForEvent();
+        yield return StartCoroutine(WaitForInput(lang.ac));
         yield return StartCoroutine(WaitForInput(lang.ad));
 
         current.Kill();
@@ -374,6 +374,7 @@ public class Tutorial : MonoBehaviour
     }
 
     private IEnumerator Level10() {
+        Tutorialize(true);
         guide.DOMove(
             new Vector2(centre.x, centre.y * .6f),
             .4f
@@ -387,6 +388,7 @@ public class Tutorial : MonoBehaviour
     }
 
     private IEnumerator Level20() {
+        Tutorialize(true);
         guide.DOMove(
             new Vector2(centre.x, centre.y * .6f),
             .4f

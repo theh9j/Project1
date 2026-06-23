@@ -117,6 +117,7 @@ public class InputHandler : MonoBehaviour
 
         if (adui.admin) {
             if (prev == bottle) {
+
                 prev.anim.SelectedHover(false);
                 prev = null;
                 adui.BottleSelectedChangeColor();

@@ -10,7 +10,7 @@ public partial class AnimationHandler : MonoBehaviour {
     [SerializeField] private Transform visual;
     [SerializeField] private Bottle currentBottle;
     [SerializeField] private LiquidColorVisualData colorTranslate;
-    
+    [SerializeField] private Transform bottleCapPos;
 
     [Header("Liquid Shader")]
     [SerializeField] private Transform liquidRoot;
@@ -39,6 +39,7 @@ public partial class AnimationHandler : MonoBehaviour {
     private Vector3 liquidBaseOffset;
     private float baseBottleWidth;
     private float baseBottleHeight;
+    private Tween shakeTween;
 
     private Material material;
     private Material spillMat;
@@ -53,6 +54,7 @@ public partial class AnimationHandler : MonoBehaviour {
 
 
     public bool IsBusy { get; private set; }
+    public bool IsUnavailable { get; set; }
 
     void Awake() {
         if (liquidRenderer != null) {
@@ -63,7 +65,6 @@ public partial class AnimationHandler : MonoBehaviour {
     }
 
     private void Start() {
-
         originalPos = visual.position;
         originalRotation = visual.rotation;
 
@@ -83,13 +84,15 @@ public partial class AnimationHandler : MonoBehaviour {
             baseBottleWidth = b.size.x;
             baseBottleHeight = b.size.y;
         }
+
+        dingSFX.LoadAudioData();
+        pourSFX.LoadAudioData();
+        downSFX.LoadAudioData();
     }
 
     void Update() {
         UpdateLiquidBounds();
         UpdateLiquidSurface(true);
-        if (isSpilling)
-            UpdatePourSpill();
     }
 
     private void UpdateLiquidBounds() {
@@ -191,30 +194,37 @@ public partial class AnimationHandler : MonoBehaviour {
     }
 
     public void SelectedHover(bool hover) {
-        if (visual == null) return; 
+        if (visual == null) return;
+        if (IsBusy || IsUnavailable) return;
 
         visual.DOKill();
-
+        
         if (hover) {
             BringToFront(500);
-
-            visual.DOMove(originalPos + Vector3.up * 1.2f, 0.2f)
+            AudioManager.Instance.PlaySFX(dingSFX);
+            visual.DOLocalMove(Vector3.up * 1.2f, 0.2f)
                 .SetEase(Ease.OutQuad)
+                .OnStart(() => {  })
                 .SetLink(gameObject);
         } else {
-            visual.DOMove(originalPos, 0.2f)
+            visual.DOLocalMove(Vector3.zero, 0.2f)
                 .SetEase(Ease.OutQuad)
                 .SetLink(gameObject)
-                .OnComplete(() => BringToFront());
+                .OnComplete(() => { BringToFront(); AudioManager.Instance.PlaySFX(downSFX); });
         }
     }
 
+
     private void PlayShake() {
         if (visual == null) return;
+        if (IsBusy || IsUnavailable) return;
 
-        visual.DOKill();
+        if (shakeTween != null && shakeTween.IsActive() && shakeTween.IsPlaying())
+            return;
 
-        visual.DOShakeRotation(
+        visual.localRotation = Quaternion.identity;
+
+        shakeTween = visual.DOShakeRotation(
             0.8f,
             new Vector3(0f, 0f, 5f),
             80,
@@ -223,13 +233,16 @@ public partial class AnimationHandler : MonoBehaviour {
         .SetLink(gameObject)
         .OnComplete(() => {
             visual.localRotation = Quaternion.identity;
+            shakeTween = null;
         });
     }
 
-    private void PlayPour(Bottle nextBottle) {
+    private void PlayPour(Bottle nextBottle, System.Action onComplete = null) {
+        if (IsBusy) return;
         if (nextBottle == null || visual == null) return;
 
         IsBusy = true;
+        nextBottle.anim.IsUnavailable = true;
         BringToFront(1000);
         visual.DOKill();
 
@@ -243,7 +256,6 @@ public partial class AnimationHandler : MonoBehaviour {
         int toEndCount = nextBottle.liquidUnits.Count;
 
         fromView.SetMystery(0f);
-        Debug.Log("Test");
 
         float fromEndFill =
             fromView.GetVisualFillAmount(currentBottle.liquidUnits.Count);
@@ -278,6 +290,7 @@ public partial class AnimationHandler : MonoBehaviour {
         }
 
         Sequence sequence = DOTween.Sequence();
+        Spill current = null;
 
         sequence.Append(
             visual.DOMove(targetPos, pourDuration)
@@ -296,7 +309,7 @@ public partial class AnimationHandler : MonoBehaviour {
         {
             toView.RefreshColorsOnly(nextBottle.liquidUnits);
 
-            nextBottle.anim.StartPourSpill(currentBottle, nextBottle, startAngle < 0 ? true : false);
+            current = nextBottle.anim.StartPourSpill(currentBottle, nextBottle, startAngle < 0 ? true : false);
 
             currentBottle.anim.TweenFillAmount(
                 fromEndFill,
@@ -320,7 +333,7 @@ public partial class AnimationHandler : MonoBehaviour {
 
         sequence.AppendCallback(() =>
         {
-            nextBottle.anim.EndPourSpill();
+            nextBottle.anim.EndPourSpill(current);
             currentBottle.RefreshView();
             nextBottle.RefreshView();
 
@@ -339,6 +352,10 @@ public partial class AnimationHandler : MonoBehaviour {
                 .SetEase(Ease.OutQuad)
         );
 
+        sequence.Append(
+            visual.DOLocalMove(Vector3.zero, .2f)
+            );
+
         sequence.SetLink(gameObject);
 
         sequence.OnComplete(() =>
@@ -346,7 +363,18 @@ public partial class AnimationHandler : MonoBehaviour {
             fromView.SetMystery(1f);
             nextBottle.anim.BringToFront();
             IsBusy = false;
+            nextBottle.anim.IsUnavailable = false;
+            onComplete?.Invoke();
         });
+    }
+
+    public void SetCap() {
+        if (bottleCap == null) return;
+        SpriteRenderer capRenderer = bottleCap.GetComponent<SpriteRenderer>();
+        if (capRenderer == null) return;
+        bottleCap.DOKill();
+
+        bottleCap.gameObject.SetActive(true);
     }
 
     private void PlayCap() {
@@ -368,8 +396,8 @@ public partial class AnimationHandler : MonoBehaviour {
         ));
 
         seq.Join(
-            bottleCap.DOMove(bottleCap.position, 0.35f)
-                .From((Vector2)bottleCap.position + Vector2.up * 3f)
+            bottleCap.DOLocalMove(Vector3.zero, 0.35f)
+                .From(Vector2.up * 3f)
                 .SetEase(Ease.InQuint)
         );
 
@@ -383,16 +411,14 @@ public partial class AnimationHandler : MonoBehaviour {
         SpriteRenderer capRenderer = bottleCap.GetComponent<SpriteRenderer>();
         if (capRenderer == null) return;
 
-        Vector2 original = bottleCap.position;
-
         Sequence seq = DOTween.Sequence();
 
         seq.Join(
-            bottleCap.DOMove(original + Vector2.up * 3f, 0.35f)
+            bottleCap.DOLocalMove(Vector2.up * 3f, 0.35f)
                 .SetEase(Ease.OutQuad)
         );
 
-        seq.Join(capRenderer.DOFade(0f, 0.1f).OnComplete(() => { bottleCap.position = original; }));
+        seq.Join(capRenderer.DOFade(0f, 0.1f));
 
         seq.SetLink(gameObject);
 
@@ -409,6 +435,8 @@ public partial class AnimationHandler : MonoBehaviour {
         SpriteRenderer indicator = cover.GetChild(0).GetComponent<SpriteRenderer>();
 
         cover.gameObject.SetActive(true);
+
+        cover.DOMove(visual.position, 0);
 
         if (cloth != null)
             cloth.DOFade(1f, 0f).SetLink(gameObject);
@@ -483,6 +511,7 @@ public partial class AnimationHandler : MonoBehaviour {
     }
 
     private void MoveBottleRoot(Vector3 newPos) {
+        if (IsBusy) return;
         transform.DOKill();
 
         transform.DOMove(newPos, 0.35f)
@@ -499,9 +528,10 @@ public partial class AnimationHandler : MonoBehaviour {
             sortingGroup.sortingOrder = target;
     }
 
-    public void Play(int action, Bottle nextBottle = null, Vector3 newPos = default) {
+    public void Play(int action, Bottle nextBottle = null, Vector3 newPos = default, System.Action onComplete = null) {
         if (action == 1) {
             PlayShake();
+            onComplete?.Invoke();
             return;
         }
 
@@ -509,19 +539,22 @@ public partial class AnimationHandler : MonoBehaviour {
 
         switch (action) {
             case 2:
-                PlayPour(nextBottle);
+                PlayPour(nextBottle, onComplete);
                 break;
 
             case 3:
                 MoveBottleRoot(newPos);
+                onComplete?.Invoke();
                 break;
 
             case 4:
                 PlayCap();
+                onComplete?.Invoke();
                 break;
 
             case 5:
                 RemoveCover();
+                onComplete?.Invoke();
                 break;
         }
     }

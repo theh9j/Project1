@@ -21,15 +21,15 @@ public class AudioManager : MonoBehaviour
     }
 
     void Start() {
-        musicSource.mute = SaveManager.Instance.music;
-        sfxSource.mute = SaveManager.Instance.sfx;
+        musicSource.mute = !SaveManager.Instance.music;
+        sfxSource.mute = !SaveManager.Instance.sfx;
         StartCoroutine(PlayBG(musicSource.clip));
     }
 
     private IEnumerator PlayBG(AudioClip clip) {
         while (true) {
             musicSource.clip = clip;
-            musicSource.volume = .3f;
+            musicSource.volume = .1f;
             musicSource.Play();
 
             yield return new WaitForSeconds(clip.length - .5f);
@@ -38,13 +38,22 @@ public class AudioManager : MonoBehaviour
 
             musicSource.Stop();
             musicSource.time = 0;
-            musicSource.volume = .3f;
+            musicSource.volume = .1f;
 
         }
     }
 
     public void PlaySFX(AudioClip clip) {
-        sfxSource.PlayOneShot(clip);
+        sfxSource.volume = .3f;
+        sfxSource.clip = clip;
+        sfxSource.Play();
+    }
+
+    public void StopSFX() {
+        sfxSource?.DOFade(0f, .2f).OnComplete(() => {
+            sfxSource.Stop();
+        });
+        
     }
 
     public bool ToggleMuteBG() {

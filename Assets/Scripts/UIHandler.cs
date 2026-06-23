@@ -88,21 +88,17 @@ public partial class UIHandler : MonoBehaviour
     }
 
     public void LevelAdvance() {
-        SaveManager.Instance.coins += SaveManager.Instance.coinsReward;
-        SaveManager.Instance.shuffle += SaveManager.Instance.shufflesReward;
-        SaveManager.Instance.undo += SaveManager.Instance.undosReward;
-        SaveManager.Instance.addBottle += SaveManager.Instance.addBottlesReward;
-
         BaseUpd();
-        for (int i = 0; i < 3; i++) {
+
+        for (int i = 0; i < 3; i++)
             UpdateCount(i);
-        }
-        gameManager.OnGameStart(true, true, false);
+
+        gameManager.OnGameStart(true, false);
         uianim.NextLevel();
     }
 
     public void Replay() {
-        gameManager.OnGameStart(true, false, true);
+        gameManager.OnGameStart(true, false);
         uianim.Revived();
     }
 

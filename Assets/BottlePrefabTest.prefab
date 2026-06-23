@@ -255,11 +255,11 @@ Transform:
   m_GameObject: {fileID: 1659517120461243886}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.010000001, y: 3.717, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.25, y: 0.24, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8840848115398850576}
+  m_Father: {fileID: 8917037193409041379}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7269177267512171953
 SpriteRenderer:
@@ -347,7 +347,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8840848115398850576}
   - {fileID: 1010180828611973539}
@@ -484,6 +484,7 @@ MonoBehaviour:
   visual: {fileID: 1822319213298052354}
   currentBottle: {fileID: 384034331578921285}
   colorTranslate: {fileID: 11400000, guid: a841eed9d719893478567074e005b847, type: 2}
+  bottleCapPos: {fileID: 8917037193409041379}
   liquidRoot: {fileID: 7891013586318589224}
   boundingBottle: {fileID: 2740084847252475369}
   liquidRenderer: {fileID: 7544275469498779251}
@@ -502,14 +503,17 @@ MonoBehaviour:
   liquidTopPadding: 1.1
   liquidSurface: {fileID: 8544386117437508056}
   liquidSurfaceRenderer: {fileID: 1489205127474271052}
+  spill: {fileID: 8372223028176413741, guid: 9e11ae3dbe14ccc43b799e6e6336e0f4, type: 3}
   spillParents: {fileID: 2601066876845988071}
   liquidSpillPrefab: {fileID: 4368430057029974538, guid: 9e11ae3dbe14ccc43b799e6e6336e0f4, type: 3}
-  spillWidth: 0.25
   surfaceYOffset: 0.1
   surfaceHeight: 0.35
   surfaceWidthPadding: 1
   surfaceFollowSpeed: 30
   liquidVisualHeight: 0.95
+  pourSFX: {fileID: 8300000, guid: 7ce563df40477a14fb000cbf5eb2959f, type: 3}
+  dingSFX: {fileID: 8300000, guid: 3cbb457748c77254aa84ed8acf88d363, type: 3}
+  downSFX: {fileID: 8300000, guid: 6964840a1fce36d42a36aecd7bdd4496, type: 3}
 --- !u!114 &7468210078338934295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -898,7 +902,7 @@ Transform:
   - {fileID: 2914746515721454913}
   - {fileID: 2601066876845988071}
   - {fileID: 6528981647858345950}
-  - {fileID: 115351965195559536}
+  - {fileID: 8917037193409041379}
   m_Father: {fileID: 1822319213298052354}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!210 &1503124607883238014
@@ -1218,6 +1222,38 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &7284843472549446072
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8917037193409041379}
+  m_Layer: 7
+  m_Name: BottleCapMovePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8917037193409041379
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7284843472549446072}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 3.717, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 115351965195559536}
+  m_Father: {fileID: 8840848115398850576}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7774094121028710358
 GameObject:
   m_ObjectHideFlags: 0

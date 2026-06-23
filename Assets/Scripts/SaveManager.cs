@@ -1,34 +1,32 @@
 using UnityEngine;
 
-public class SaveManager : MonoBehaviour
-{
+public class SaveManager : MonoBehaviour {
     public static SaveManager Instance;
+
     [SerializeField] private LevelCreator levelSave;
 
     public int coinSetForAdmin = 9000;
     public int startLevel = 0;
-    public bool save = false;
+    public bool resetSaveOnStart = false;
 
-    [HideInInspector] public int coins;
-    [HideInInspector] public int level;
+    public int coins;
+    public int level;
 
-    //Rewards
-    [HideInInspector] public int coinsReward;
-    [HideInInspector] public int shufflesReward;
-    [HideInInspector] public int addBottlesReward;
-    [HideInInspector] public int undosReward;
+    public int coinsReward;
+    public int shufflesReward;
+    public int addBottlesReward;
+    public int undosReward;
 
-    //Boosters
-    [HideInInspector] public int shuffle;
-    [HideInInspector] public int addBottle;
-    [HideInInspector] public int undo;
+    public int shuffle;
+    public int addBottle;
+    public int undo;
 
-    [HideInInspector] public bool music;
-    [HideInInspector] public bool sfx;
+    public bool music;
+    public bool sfx;
 
-    void Awake() {
-        if (Instance != null) {
-            Destroy(Instance);
+    private void Awake() {
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
             return;
         }
 
@@ -39,69 +37,75 @@ public class SaveManager : MonoBehaviour
     }
 
     public void LoadData() {
-        if (!save) PlayerPrefs.DeleteKey("FirstLaunch");
+        if (resetSaveOnStart) {
+            PlayerPrefs.DeleteAll();
+        }
 
+        if (!PlayerPrefs.HasKey("HasSave")) {
+            FirstTime();
+            return;
+        }
 
-        if (!PlayerPrefs.HasKey("FirstLaunch")) { FirstTime(); return; }
+        coins = PlayerPrefs.GetInt("Coins", coinSetForAdmin);
+        level = PlayerPrefs.GetInt("Level", startLevel);
 
-        coins = PlayerPrefs.GetInt("Coins"); //Base amount for first time playing
-        level = PlayerPrefs.GetInt("Level");
-        coinsReward = PlayerPrefs.GetInt("CoinsReward");
+        coinsReward = PlayerPrefs.GetInt("CoinsReward", 60);
+        shufflesReward = PlayerPrefs.GetInt("ShufflesReward", 0);
+        undosReward = PlayerPrefs.GetInt("UndosReward", 0);
+        addBottlesReward = PlayerPrefs.GetInt("AddBottlesReward", 20);
 
+        shuffle = PlayerPrefs.GetInt("Shuffle", 5);
+        addBottle = PlayerPrefs.GetInt("AddBottle", 5);
+        undo = PlayerPrefs.GetInt("Undo", 5);
 
-        shuffle = PlayerPrefs.GetInt("Shuffle");
-        addBottle = PlayerPrefs.GetInt("Add");
-        undo = PlayerPrefs.GetInt("Undo");
-
-        //SETTINGS
-        music = PlayerPrefs.GetInt("Music") != 0;
-        sfx = PlayerPrefs.GetInt("SFX") != 0;
+        music = PlayerPrefs.GetInt("Music", 1) != 0;
+        sfx = PlayerPrefs.GetInt("SFX", 1) != 0;
     }
 
     private void FirstTime() {
         coins = coinSetForAdmin;
         level = startLevel;
 
-        //Rewards
         coinsReward = 60;
         shufflesReward = 2;
+        undosReward = 2;
         addBottlesReward = 2;
 
-        //Boosters
         shuffle = 5;
         addBottle = 5;
         undo = 5;
 
-        //Settings
-        music = false;
+        music = true;
         sfx = true;
+
+        SaveData(false);
     }
 
-    public void SaveData() {
+    public void SaveData(bool saveLayout = true) {
+        if (saveLayout && levelSave != null)
+            levelSave.CheckForSafeSave();
 
-        levelSave.CheckForSafeSave();
+        PlayerPrefs.SetInt("HasSave", 1);
+
         PlayerPrefs.SetInt("Coins", coins);
         PlayerPrefs.SetInt("Level", level);
-        PlayerPrefs.SetInt("CoinsReward", coinsReward);
 
         PlayerPrefs.SetInt("Shuffle", shuffle);
-        PlayerPrefs.SetInt("Add", addBottle);
+        PlayerPrefs.SetInt("AddBottle", addBottle);
         PlayerPrefs.SetInt("Undo", undo);
 
         PlayerPrefs.SetInt("Music", music ? 1 : 0);
         PlayerPrefs.SetInt("SFX", sfx ? 1 : 0);
 
-        PlayerPrefs.SetInt("FirstLaunch", 1);
-
         PlayerPrefs.Save();
-        
     }
 
-    void OnApplicationQuit() {
+    private void OnApplicationQuit() {
         SaveData();
     }
 
-    void OnApplicationPause(bool a) {
-        if (a) SaveData();
+    private void OnApplicationPause(bool paused) {
+        if (paused)
+            SaveData();
     }
 }

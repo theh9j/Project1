@@ -40,7 +40,6 @@ public partial class UIHandler : MonoBehaviour
         this.onBuy = onBuy;
         this.onWatchAd = onWatchAd;
         this.onCancel = onCancel;
-        Debug.Log("A");
 
         buyButton.transform.GetChild(0).GetComponent<TMP_Text>().text = $"<sprite=0>{price}";
         buyButton.interactable = SaveManager.Instance.coins > price;
@@ -116,6 +115,10 @@ public partial class UIHandler : MonoBehaviour
 
     public void Undo() {
         bool turn;
+        foreach (Bottle bottle in bottleGen.DictionaryToSingularBottleConverter()) {
+            if (bottle.anim.IsBusy) return;
+        }
+
         if (SaveManager.Instance.undo > 0) {
             turn = gameManager.Undo();
             if (turn) SaveManager.Instance.undo--;
