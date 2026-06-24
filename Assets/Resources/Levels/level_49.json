@@ -1,125 +1,239 @@
 {
-  "levelNumber": 49,
-  "bottleCount": 13,
-  "rewards": {
-    "coins": 320,
-    "shuffle": 1,
-    "addBottle": 1,
-    "undo": 1
-  },
-  "bottles": [
-    {
-      "liquids": [
-        { "colorId": 0, "isMystery": true },
-        { "colorId": 3, "isMystery": false },
-        { "colorId": 7, "isMystery": false }
-      ],
-      "isLocked": false,
-      "lockCondition": 0
+    "levelNumber": 49,
+    "bottleCount": 14,
+    "rewards": {
+        "coins": 240,
+        "shuffle": 2,
+        "addBottle": 2,
+        "undo": 2
     },
-    {
-      "liquids": [
-        { "colorId": 1, "isMystery": true },
-        { "colorId": 4, "isMystery": false },
-        { "colorId": 8, "isMystery": false }
-      ],
-      "isLocked": false,
-      "lockCondition": 0
-    },
-    {
-      "liquids": [
-        { "colorId": 2, "isMystery": true },
-        { "colorId": 5, "isMystery": false },
-        { "colorId": 6, "isMystery": false }
-      ],
-      "isLocked": false,
-      "lockCondition": 0
-    },
-    {
-      "liquids": [
-        { "colorId": 3, "isMystery": true },
-        { "colorId": 6, "isMystery": false },
-        { "colorId": 0, "isMystery": false }
-      ],
-      "isLocked": false,
-      "lockCondition": 0
-    },
-    {
-      "liquids": [
-        { "colorId": 4, "isMystery": true },
-        { "colorId": 7, "isMystery": false },
-        { "colorId": 1, "isMystery": false }
-      ],
-      "isLocked": false,
-      "lockCondition": 0
-    },
-    {
-      "liquids": [
-        { "colorId": 5, "isMystery": true },
-        { "colorId": 8, "isMystery": false },
-        { "colorId": 2, "isMystery": false }
-      ],
-      "isLocked": false,
-      "lockCondition": 0
-    },
-    {
-      "liquids": [
-        { "colorId": 6, "isMystery": true },
-        { "colorId": 0, "isMystery": false },
-        { "colorId": 4, "isMystery": false }
-      ],
-      "isLocked": false,
-      "lockCondition": 0
-    },
-    {
-      "liquids": [
-        { "colorId": 7, "isMystery": true },
-        { "colorId": 1, "isMystery": false },
-        { "colorId": 5, "isMystery": false }
-      ],
-      "isLocked": false,
-      "lockCondition": 0
-    },
-    {
-      "liquids": [
-        { "colorId": 8, "isMystery": true },
-        { "colorId": 2, "isMystery": false },
-        { "colorId": 3, "isMystery": false }
-      ],
-      "isLocked": false,
-      "lockCondition": 0
-    },
-    {
-      "liquids": [
-        { "colorId": 0, "isMystery": false },
-        { "colorId": 5, "isMystery": false }
-      ],
-      "isLocked": true,
-      "lockCondition": 2
-    },
-    {
-      "liquids": [
-        { "colorId": 1, "isMystery": false },
-        { "colorId": 6, "isMystery": false },
-        { "colorId": 8, "isMystery": false }
-      ],
-      "isLocked": true,
-      "lockCondition": 4
-    },
-    {
-      "liquids": [
-        { "colorId": 2, "isMystery": false },
-        { "colorId": 3, "isMystery": false },
-        { "colorId": 4, "isMystery": false },
-        { "colorId": 7, "isMystery": false }
-      ],
-      "isLocked": true,
-      "lockCondition": 5
-    },
-    {
-      "liquids": [],
-      "isLocked": false,
-      "lockCondition": 0
-    }
-  ]
+    "bottles": [
+        {
+            "liquids": [
+                {
+                    "colorId": 0,
+                    "isMystery": true
+                },
+                {
+                    "colorId": 3,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 6,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 1,
+                    "isMystery": true
+                },
+                {
+                    "colorId": 4,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 7,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 2,
+                    "isMystery": true
+                },
+                {
+                    "colorId": 5,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 8,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 3,
+                    "isMystery": true
+                },
+                {
+                    "colorId": 6,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 4,
+                    "isMystery": true
+                },
+                {
+                    "colorId": 7,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 1,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 5,
+                    "isMystery": true
+                },
+                {
+                    "colorId": 8,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 2,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 6,
+                    "isMystery": true
+                },
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 4,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 7,
+                    "isMystery": true
+                },
+                {
+                    "colorId": 1,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 5,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 8,
+                    "isMystery": true
+                },
+                {
+                    "colorId": 2,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 3,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 0,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 5,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": true,
+            "lockCondition": 2
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 1,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 6,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": true,
+            "lockCondition": 4
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 2,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 3,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 4,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [
+                {
+                    "colorId": 7,
+                    "isMystery": false
+                },
+                {
+                    "colorId": 8,
+                    "isMystery": false
+                }
+            ],
+            "isLocked": false,
+            "lockCondition": 0
+        },
+        {
+            "liquids": [],
+            "isLocked": false,
+            "lockCondition": 0
+        }
+    ]
 }

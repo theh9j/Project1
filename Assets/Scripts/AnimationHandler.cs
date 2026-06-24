@@ -436,8 +436,6 @@ public partial class AnimationHandler : MonoBehaviour {
 
         cover.gameObject.SetActive(true);
 
-        cover.DOMove(visual.position, 0);
-
         if (cloth != null)
             cloth.DOFade(1f, 0f).SetLink(gameObject);
 
@@ -457,12 +455,10 @@ public partial class AnimationHandler : MonoBehaviour {
 
         Sequence seq = DOTween.Sequence();
 
-        Vector2 startPt = visual.position + Vector3.up * 1.5f;
-
         seq.Append(
-            cover.DOMove(visual.position, 0.45f)
+            cover.DOLocalMove(Vector3.zero, 0.45f)
                 .SetEase(Ease.OutSine)
-                .From(startPt)
+                .From(Vector3.up * 1.5f)
         );
 
         if (cloth != null)
@@ -486,14 +482,12 @@ public partial class AnimationHandler : MonoBehaviour {
         SpriteRenderer cloth = cover.GetComponent<SpriteRenderer>();
         SpriteRenderer indicator = cover.GetChild(0).GetComponent<SpriteRenderer>();
 
-        Vector3 endPos = visual.position + Vector3.up * 1.5f;
-
         Sequence seq = DOTween.Sequence();
 
         seq.AppendInterval(2f);
 
         seq.Append(
-            cover.DOMove(endPos, 0.45f)
+            cover.DOLocalMove(Vector3.up * 1.5f, 0.45f)
                 .SetEase(Ease.OutQuad)
         );
 

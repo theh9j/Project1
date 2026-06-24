@@ -1,6 +1,6 @@
 {
   "levelNumber": 40,
-  "bottleCount": 12,
+  "bottleCount": 13,
   "rewards": {
     "coins": 360,
     "shuffle": 2,
@@ -99,12 +99,18 @@
     {
       "liquids": [
         { "colorId": 2, "isMystery": false },
-        { "colorId": 6, "isMystery": false },
+        { "colorId": 6, "isMystery": false }
+      ],
+      "isLocked": false,
+      "lockCondition": 0
+    },
+    {
+      "liquids": [
         { "colorId": 3, "isMystery": false },
         { "colorId": 7, "isMystery": false }
       ],
-      "isLocked": true,
-      "lockCondition": 4
+      "isLocked": false,
+      "lockCondition": 0
     },
     {
       "liquids": [],

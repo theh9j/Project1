@@ -3,6 +3,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
+#if UNITY_EDITOR
 public class AdminUIHandler : MonoBehaviour
 {
 
@@ -175,9 +176,14 @@ public class AdminUIHandler : MonoBehaviour
         bottle.RefreshView();
     }
 
+    public void CheckForPos() {
+        Debug.Log(LevelProcessor.SolveAns(bottleGen.DictionaryToSingularBottleConverter(), 20_000_000));
+    }
+
 
     public bool Selection {
         get { return selected; }
         private set { selected = value; }
     }
 }
+#endif

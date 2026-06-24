@@ -52,6 +52,20 @@ public class Bottle : MonoBehaviour {
         return top != null ? top.colorId : default;
     }
 
+    public int GetAdjacentColorCount() {
+        if (IsEmpty || Completion) return 5;             //Fallback
+        LiquidColor c = GetTopColor();
+        int u = 0;
+        for (int i = liquidUnits.Count-1; i >= 0; i--) {
+            if (liquidUnits[i].colorId == c) {
+                u++;
+                continue;
+            }
+            break;
+        }
+        return u;
+    }
+
     public void AttemptComplete() {
         if (Completion) return;
         Completion = true;

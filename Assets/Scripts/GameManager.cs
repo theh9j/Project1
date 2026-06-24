@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour
         if (comp) comp = CheckForComplete();
         if (comp) return;
 
-        if (!IsStillPlayable()) {
+        if (!LevelProcessor.CheckForPossibleMoves(bottleGen.DictionaryToSingularBottleConverter())) {
             gameOver?.Invoke(SaveManager.Instance.level, 0);
         }
     }
