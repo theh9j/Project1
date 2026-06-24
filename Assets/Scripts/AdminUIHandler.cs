@@ -3,7 +3,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
-#if UNITY_EDITOR
+
 public class AdminUIHandler : MonoBehaviour
 {
 
@@ -50,7 +50,6 @@ public class AdminUIHandler : MonoBehaviour
             adminHandler.text = "Handler Inactive";
         }
     }
-
     public void GenBottle() {
         
         bottleGenInput.text = bottleGenInput.text.Replace(" ", "");
@@ -186,4 +185,3 @@ public class AdminUIHandler : MonoBehaviour
         private set { selected = value; }
     }
 }
-#endif
