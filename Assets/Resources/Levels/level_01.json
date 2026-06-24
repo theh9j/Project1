@@ -3,9 +3,9 @@
     "bottleCount": 3,
     "rewards": {
         "coins": 60,
-        "shuffle": 1,
-        "addBottle": 2,
-        "undo": 1
+        "shuffle": 0,
+        "addBottle": 0,
+        "undo": 0
     },
     "bottles": [
         {

@@ -165,6 +165,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.4
   androidMinAspectRatio: 1
   applicationIdentifier:
+    Android: com.Minh.MagicSort.vip
     Standalone: com.DefaultCompany.2D-URP
   buildNumber:
     Standalone: 0
@@ -684,7 +685,7 @@ PlayerSettings:
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
-    Android: DOTWEEN;DOTWEEN_UITOOLKIT
+    Android: DOTWEEN;DOTWEEN_UITOOLKIT;SENTIS_ANALYTICS_ENABLED
     EmbeddedLinux: DOTWEEN;DOTWEEN_UITOOLKIT
     GameCoreScarlett: DOTWEEN;DOTWEEN_UITOOLKIT
     GameCoreXboxOne: DOTWEEN;DOTWEEN_UITOOLKIT

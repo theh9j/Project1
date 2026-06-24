@@ -361,7 +361,7 @@ public partial class AnimationHandler : MonoBehaviour {
         sequence.OnComplete(() =>
         {
             fromView.SetMystery(1f);
-            nextBottle.anim.BringToFront();
+            BringToFront();
             IsBusy = false;
             nextBottle.anim.IsUnavailable = false;
             onComplete?.Invoke();

@@ -1,35 +1,34 @@
-using UnityEngine;
-using DG.Tweening;
-using TMPro;
-using UnityEngine.UI;
 using System;
-using Unity.VisualScripting;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using DG.Tweening;
 using Sequence = DG.Tweening.Sequence;
 
-
-public class UIAnimation : MonoBehaviour
-{
-
-    //Common Variables
+public class UIAnimation : MonoBehaviour {
+    [Header("Common")]
     public GameObject gamePause;
     [SerializeField] private GameManager gameManager;
-    private Vector2 centre = new(Screen.width / 2, Screen.height / 2);
-    private Func<Transform> actions;
+    [SerializeField] private InputHandler input;
 
-    //GameOver Variables
+    private Vector2 centre;
+    private Sequence bgSeq;
+
+    private bool settingsOpen;
+    private bool deadOpen;
+
+    [Header("Game Over")]
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] public Transform options;
     [SerializeField] private Transform gameOverText;
-    [SerializeField] private InputHandler input;
 
     public float goTextEndPoint = 1.9f;
     public float optionEndPoint = .4f;
 
-    //GameWin Variables
+    [Header("Game Win")]
     [SerializeField] private GameObject gameWinPanel;
     [SerializeField] private TMP_Text levelIndex;
     [SerializeField] private Button continueButton;
-
     [SerializeField] private TMP_Text coinWinsText;
 
     [SerializeField] private TMP_Text[] shuffleReTexts = new TMP_Text[2];
@@ -41,288 +40,335 @@ public class UIAnimation : MonoBehaviour
     [SerializeField] private TMP_Text[] addReTexts = new TMP_Text[2];
     [SerializeField] private GameObject addSelf;
 
-    //Warning Message
+    private Func<Transform> rewardActions;
+
+    [Header("Warning")]
     [SerializeField] private Transform warningSelf;
     [SerializeField] private TMP_Text[] warnings = new TMP_Text[2];
     private Sequence warn;
 
-    void Start() {
-        actions += ShuffleReward;
-        actions += UndoReward;
-        actions += AddBottleReward;
+    private void Awake() {
+        centre = new Vector2(Screen.width / 2f, Screen.height / 2f);
     }
 
-    public Sequence OpenGamePauseBG(float wait) {
+    private void Start() {
+        rewardActions += ShuffleReward;
+        rewardActions += UndoReward;
+        rewardActions += AddBottleReward;
+    }
+
+    public Sequence RequestBackground(bool fromSettings, float wait = 0f) {
+        if (fromSettings)
+            settingsOpen = true;
+        else
+            deadOpen = true;
+
         Image img = gamePause.GetComponent<Image>();
 
+        bgSeq?.Kill(false);
         img.DOKill();
-        img.DOFade(0, 0);
+
         gamePause.SetActive(true);
 
-        return DOTween.Sequence()
-            .AppendInterval(wait).OnStart(() => { input.GamePause(); })
+        return bgSeq = DOTween.Sequence()
+            .AppendInterval(wait)
+            .AppendCallback(() => {
+                input.GamePause();
+            })
             .Append(
-                img.DOFade(.97f, .35f).From(0)
+                img.DOFade(.97f, .35f)
             );
     }
 
-    public Sequence GameContinue(float wait) {
+    public Sequence ReleaseBackground(bool fromSettings, float wait = 0f) {
+        if (fromSettings)
+            settingsOpen = false;
+        else
+            deadOpen = false;
+
         Image img = gamePause.GetComponent<Image>();
 
+        bgSeq?.Kill(false);
         img.DOKill();
 
-        return DOTween.Sequence()
-            .AppendInterval(wait)
-            .Append(
-                img.DOFade(0f, .5f)
-            )
-            .OnComplete(() => {
-                gameOverPanel.SetActive(false);
+        Sequence seq = DOTween.Sequence()
+            .AppendInterval(wait);
+
+        if (!settingsOpen && !deadOpen) {
+            seq.Append(
+                img.DOFade(0f, .35f)
+            );
+
+            seq.OnComplete(() => {
                 gamePause.SetActive(false);
                 input.UndoModes();
             });
+        }
+
+        return bgSeq = seq;
     }
 
     public void GameEnd(int level, int amount = 0) {
-
-        OpenGamePauseBG(2.5f).OnComplete(() => {
-            if (amount != 0) GameWin(level, amount); else GameOver();
-        });
+        RequestBackground(false, 2.5f)
+            .OnComplete(() => {
+                if (amount != 0)
+                    GameWin(level, amount);
+                else
+                    GameOver();
+            });
     }
 
     private void GameOver() {
-        
         gameOverPanel.SetActive(true);
 
         gameOverText.DOMove(
-            new(centre.x, centre.y * goTextEndPoint),
+            new Vector2(centre.x, centre.y * goTextEndPoint),
             .6f
-        ).From(new Vector2(centre.x, Screen.height + 100)).SetEase(Ease.OutBack, 1.5f);
+        )
+        .From(new Vector2(centre.x, Screen.height + 100))
+        .SetEase(Ease.OutBack, 1.5f);
 
-        gameOverText.GetComponent<CanvasGroup>().DOFade(1f, .8f);
+        gameOverText.GetComponent<CanvasGroup>()
+            .DOFade(1f, .8f);
 
-        if (SaveManager.Instance.level < 5) {
+        if (SaveManager.Instance.level < 5)
             options.transform.GetChild(0).gameObject.SetActive(false);
-        } else {
+        else
             options.transform.GetChild(0).gameObject.SetActive(true);
-        }
 
         options.DOMove(
-            new(centre.x, centre.y * optionEndPoint),
+            new Vector2(centre.x, centre.y * optionEndPoint),
             .8f
-        ).From(new Vector2(Screen.width * 2, centre.y * optionEndPoint)).SetEase(Ease.OutSine);
+        )
+        .From(new Vector2(Screen.width * 2, centre.y * optionEndPoint))
+        .SetEase(Ease.OutSine);
 
-        options.GetComponent<CanvasGroup>().DOFade(1, .8f);
+        options.GetComponent<CanvasGroup>()
+            .DOFade(1f, .8f);
     }
 
     private void GameWin(int level, int amount) {
         continueButton.interactable = false;
         gameWinPanel.SetActive(true);
-        string levelt = $"Level {level}";
 
-        levelIndex.text = levelt;
-        levelIndex.transform.GetChild(0).GetComponent<TMP_Text>().text = levelt;
-        levelIndex.transform.GetChild(1).GetComponent<TMP_Text>().text = levelt;
+        string levelText = $"Level {level}";
 
-        coinWinsText.text = "+" + amount.ToString();
-        coinWinsText.transform.GetChild(0).GetComponent<TMP_Text>().text = "+" + amount.ToString();
+        levelIndex.text = levelText;
+        levelIndex.transform.GetChild(0).GetComponent<TMP_Text>().text = levelText;
+        levelIndex.transform.GetChild(1).GetComponent<TMP_Text>().text = levelText;
 
+        string coinText = "+" + amount;
+        coinWinsText.text = coinText;
+        coinWinsText.transform.GetChild(0).GetComponent<TMP_Text>().text = coinText;
 
         gameWinPanel.transform.DOMove(
             centre,
             .3f
-            ).From(new Vector2(Screen.width * 2, centre.y)).SetEase(Ease.OutSine)
-            .OnComplete(() => {
-                UpdateRewards();
-            });
+        )
+        .From(new Vector2(Screen.width * 2, centre.y))
+        .SetEase(Ease.OutSine)
+        .OnComplete(UpdateRewards);
     }
 
     public void Revived() {
-
         gameOverText.DOMove(
-            new(centre.x, Screen.height + 100),
+            new Vector2(centre.x, Screen.height + 100),
             .3f
         );
-        gameOverText.GetComponent<CanvasGroup>().DOFade(0, .8f);
+
+        gameOverText.GetComponent<CanvasGroup>()
+            .DOFade(0f, .8f);
 
         options.DOMove(
-            new(Screen.width * 2, centre.y * optionEndPoint),
+            new Vector2(Screen.width * 2, centre.y * optionEndPoint),
             .4f
-        ).SetEase(Ease.InSine);
+        )
+        .SetEase(Ease.InSine);
 
-        options.GetComponent<CanvasGroup>().DOFade(0, .8f);
+        options.GetComponent<CanvasGroup>()
+            .DOFade(0f, .8f);
 
-        GameContinue(.5f);
+        gameOverPanel.SetActive(false);
+
+        ReleaseBackground(false, .5f);
     }
 
     public void NextLevel() {
         continueButton.interactable = false;
 
         gameWinPanel.transform.DOMove(
-            new Vector2(centre.x * 5, centre.y),
+            new Vector2(centre.x * 5f, centre.y),
             .6f
-        ).OnComplete(() => {
+        )
+        .OnComplete(() => {
             gameWinPanel.SetActive(false);
-            gamePause.SetActive(false);
-            input.UndoModes();
+            ReleaseBackground(false, 0f);
         });
-    }
-
-
-    public void DisplayCost(GameObject cost, GameObject notif, bool undo) { 
-        if (undo) {
-            (notif, cost) = (cost, notif);
-        }
-
-        DOTween.Sequence()
-            .Append(
-                cost.transform.GetComponent<Image>().DOFade(0f, .1f)
-                    .OnComplete(
-                    () => {
-                        cost.SetActive(false);
-                        notif.SetActive(true);
-                        notif.transform.GetComponent<Image>().DOFade(1, .1f);
-                    }));
     }
 
     private void UpdateRewards() {
         Sequence seq = DOTween.Sequence();
-        foreach (Delegate d in actions.GetInvocationList()) {
+
+        foreach (Delegate d in rewardActions.GetInvocationList()) {
             Func<Transform> action = (Func<Transform>)d;
-            if (action() != null) {
-                seq.Append(
-                    action().DOMove(
-                        action().position,
-                        .4f
-                        ).From(new Vector2(action().position.x, action().position.y * .8f))
-                        .OnStart(() => {
-                            action().gameObject.SetActive(true);
-                        })
-                        .SetEase(Ease.OutBack, 1.5f)
-                    );
+            Transform reward = action();
 
-                seq.Join(
-                        action().GetComponent<CanvasGroup>().DOFade(1f, .4f).From(0)
-                    );
+            if (reward == null)
+                continue;
 
-            }
-            seq.OnComplete(() => {
-                continueButton.interactable = true;
-            });
+            seq.Append(
+                reward.DOMove(
+                    reward.position,
+                    .4f
+                )
+                .From(new Vector2(reward.position.x, reward.position.y * .8f))
+                .OnStart(() => {
+                    reward.gameObject.SetActive(true);
+                })
+                .SetEase(Ease.OutBack, 1.5f)
+            );
+
+            seq.Join(
+                reward.GetComponent<CanvasGroup>()
+                    .DOFade(1f, .4f)
+                    .From(0f)
+            );
         }
+
+        seq.OnComplete(() => {
+            continueButton.interactable = true;
+        });
     }
 
     private Transform ShuffleReward() {
-        if (SaveManager.Instance.shufflesReward > 0) {
-            foreach (var reward in shuffleReTexts) {
-                reward.text = "+" + SaveManager.Instance.shufflesReward.ToString();
-            }
-            return shuffleSelf.transform;
-        } else {
+        if (SaveManager.Instance.shufflesReward <= 0) {
             shuffleSelf.SetActive(false);
             return null;
         }
+
+        foreach (TMP_Text reward in shuffleReTexts)
+            reward.text = "+" + SaveManager.Instance.shufflesReward;
+
+        return shuffleSelf.transform;
     }
 
     private Transform UndoReward() {
-        if (SaveManager.Instance.undosReward > 0) {
-            foreach (var reward in undoReTexts) {
-                reward.text = "+" + SaveManager.Instance.undosReward.ToString();
-            }
-            return undoSelf.transform;
-        } else {
+        if (SaveManager.Instance.undosReward <= 0) {
             undoSelf.SetActive(false);
             return null;
         }
+
+        foreach (TMP_Text reward in undoReTexts)
+            reward.text = "+" + SaveManager.Instance.undosReward;
+
+        return undoSelf.transform;
     }
 
     private Transform AddBottleReward() {
-        if (SaveManager.Instance.addBottlesReward > 0) {
-            foreach (var reward in addReTexts) {
-                reward.text = "+" + SaveManager.Instance.addBottlesReward.ToString();
-            }
-            return addSelf.transform;
-        } else {
+        if (SaveManager.Instance.addBottlesReward <= 0) {
             addSelf.SetActive(false);
             return null;
         }
+
+        foreach (TMP_Text reward in addReTexts)
+            reward.text = "+" + SaveManager.Instance.addBottlesReward;
+
+        return addSelf.transform;
     }
 
-    
-
     public void PopupConfirmation(Transform popup) {
-        Vector2 popupPos = new(centre.x, centre.y * .3f);
+        RequestBackground(true, 0f);
+
+        Vector2 popupPos = new Vector2(centre.x, centre.y * .3f);
+
         popup.DOMove(
             popupPos,
             .35f
-            ).From(
-            new Vector2(centre.x, centre.y * -.3f)
-            )
-            .SetEase(Ease.OutBack, 1.5f)
-            .OnStart(() => {
-                gamePause.SetActive(true);
-                popup.gameObject.SetActive(true);
-            });
-
-        gamePause.GetComponent<Image>().DOFade(
-                .97f,
-                .35f
-                );
+        )
+        .From(new Vector2(centre.x, centre.y * -.3f))
+        .SetEase(Ease.OutBack, 1.5f)
+        .OnStart(() => {
+            popup.gameObject.SetActive(true);
+        });
     }
 
     public void PopupClose(Transform popup) {
-        Vector2 popupPos = new(centre.x, centre.y * -.3f);
-        gamePause.GetComponent<Image>().DOFade(
-                0f,
-                .35f
-                );
+        Vector2 popupPos = new Vector2(centre.x, centre.y * -.3f);
 
         popup.DOMove(
             popupPos,
             .35f
-            ).SetEase(Ease.OutQuad, 2f)
-            .OnComplete(() => {
-                popup.gameObject.SetActive(false);
-                gamePause.SetActive(false);
-            });
+        )
+        .SetEase(Ease.OutQuad)
+        .OnComplete(() => {
+            popup.gameObject.SetActive(false);
+            ReleaseBackground(true, 0f);
+        });
     }
 
     public void WarningMessage(string message) {
-        warn?.Kill();
+        warn?.Kill(false);
 
-        foreach (TMP_Text warning in warnings) {
+        foreach (TMP_Text warning in warnings)
             warning.text = message;
-        }
+
+        CanvasGroup group = warningSelf.GetComponent<CanvasGroup>();
 
         warn = DOTween.Sequence();
 
         warn.Append(
             warningSelf.DOMove(
-                new(centre.x, centre.y * goTextEndPoint),
+                new Vector2(centre.x, centre.y * goTextEndPoint),
                 .3f
-                ).From(new Vector2(centre.x, Screen.height + 100))
-                .SetEase(Ease.OutBack, 1.5f)
-                .OnStart(() => {
-                    warningSelf.gameObject.SetActive(true);
-                }));
+            )
+            .From(new Vector2(centre.x, Screen.height + 100))
+            .SetEase(Ease.OutBack, 1.5f)
+            .OnStart(() => {
+                warningSelf.gameObject.SetActive(true);
+            })
+        );
 
         warn.Join(
-                warningSelf.GetComponent<CanvasGroup>().DOFade(1f, .5f).From(0));
+            group.DOFade(1f, .5f)
+                .From(0f)
+        );
 
         warn.AppendInterval(2f);
 
         warn.Append(
             warningSelf.DOMove(
-                new(centre.x, Screen.height + 100),
+                new Vector2(centre.x, Screen.height + 100),
                 .3f
-                ).SetEase(Ease.InBack, 2.5f)
-                );
+            )
+            .SetEase(Ease.InBack, 2.5f)
+        );
 
         warn.Join(
-            warningSelf.GetComponent<CanvasGroup>().DOFade(0f, .5f).From(1).OnComplete(() => {
-                warningSelf.gameObject.SetActive(false);
-                warn = null;
+            group.DOFade(0f, .5f)
+        );
+
+        warn.OnComplete(() => {
+            warningSelf.gameObject.SetActive(false);
+            warn = null;
+        });
+    }
+
+    public void DisplayCost(GameObject cost, GameObject notif, bool undo) {
+        if (undo)
+            (notif, cost) = (cost, notif);
+
+        DOTween.Sequence()
+            .Append(
+                cost.transform.GetComponent<Image>()
+                    .DOFade(0f, .1f)
+            )
+            .AppendCallback(() => {
+                cost.SetActive(false);
+                notif.SetActive(true);
             })
+            .Append(
+                notif.transform.GetComponent<Image>()
+                    .DOFade(1f, .1f)
             );
     }
 }
